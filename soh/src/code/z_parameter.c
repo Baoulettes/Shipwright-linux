@@ -2940,15 +2940,22 @@ void Interface_DrawItemButtons(GlobalContext* globalCtx) {
     // Empty C Button Arrows
     for (temp = 1; temp < 4; temp++) {
         if (gSaveContext.equips.buttonItems[temp] > 0xF0) {
+            
             if (temp == 1) {
-                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_C_BTN_COLOR(0), R_C_BTN_COLOR(1), R_C_BTN_COLOR(2),
-                                interfaceCtx->cLeftAlpha);
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_C_BTN_COLOR(0), R_C_BTN_COLOR(1), R_C_BTN_COLOR(2), interfaceCtx->cLeftAlpha);
+                if (CVar_GetS32("gHudColors", 1) == 2) {
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCCBtnPrimR", 255), CVar_GetS32("gCCCBtnPrimG", 160), CVar_GetS32("gCCCBtnPrimB", 0), interfaceCtx->cLeftAlpha);
+                }
             } else if (temp == 2) {
-                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_C_BTN_COLOR(0), R_C_BTN_COLOR(1), R_C_BTN_COLOR(2),
-                                interfaceCtx->cDownAlpha);
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_C_BTN_COLOR(0), R_C_BTN_COLOR(1), R_C_BTN_COLOR(2), interfaceCtx->cDownAlpha);
+                if (CVar_GetS32("gHudColors", 1) == 2) {
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCCBtnPrimR", 255), CVar_GetS32("gCCCBtnPrimG", 160), CVar_GetS32("gCCCBtnPrimB", 0), interfaceCtx->cDownAlpha);
+                }
             } else {
-                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_C_BTN_COLOR(0), R_C_BTN_COLOR(1), R_C_BTN_COLOR(2),
-                                interfaceCtx->cRightAlpha);
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_C_BTN_COLOR(0), R_C_BTN_COLOR(1), R_C_BTN_COLOR(2), interfaceCtx->cRightAlpha);
+                if (CVar_GetS32("gHudColors", 1) == 2) {
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCCBtnPrimR", 255), CVar_GetS32("gCCCBtnPrimG", 160), CVar_GetS32("gCCCBtnPrimB", 0), interfaceCtx->cRightAlpha);
+                }
             }
 
             OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, ((u8*)gButtonBackgroundTex), 32, 32,

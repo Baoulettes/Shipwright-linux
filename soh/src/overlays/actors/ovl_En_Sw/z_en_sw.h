@@ -17,11 +17,11 @@ typedef struct EnSw {
     /* 0x01F4 */ Color_RGBA8 unk_1F4;
     /* 0x01F8 */ Vec3s jointTable[30];
     /* 0x02AC */ Vec3s morphTable[30];
-    /* 0x0360 */ u8 unk_360;
+    /* 0x0360 */ u8 velocityY;                  //unk_360;
     /* 0x0364 */ Vec3f unk_364;
     /* 0x0370 */ Vec3f unk_370;
     /* 0x037C */ Vec3f unk_37C;
-    /* 0x0388 */ s16 unk_388;
+    /* 0x0388 */ s16 RandOffset1030;            //unk_388;
     /* 0x038A */ s16 unk_38A;
     /* 0x038C */ s16 unk_38C;
     /* 0x038E */ s16 unk_38E;
@@ -37,8 +37,8 @@ typedef struct EnSw {
     /* 0x0430 */ CollisionPoly* unk_430;
     /* 0x0434 */ Vec3f unk_434;
     /* 0x0440 */ s16 unk_440;
-    /* 0x0442 */ s16 unk_442;
-    /* 0x0444 */ s16 unk_444;
+    /* 0x0442 */ s16 RandOffset2010;            //unk_442;
+    /* 0x0444 */ s16 newShapeRotZ;              //unk_444;
     /* 0x0446 */ s16 unk_446;
     /* 0x0448 */ Vec3f unk_448;
     /* 0x0454 */ Vec3f unk_454;
@@ -46,7 +46,7 @@ typedef struct EnSw {
     /* 0x046C */ Vec3f unk_46C;
     /* 0x0478 */ Vec3f unk_478;
     /* 0x0484 */ Vec3f unk_484;
-    /* 0x0490 */ char unk_490[0x48];
+    /* 0x0490 */ char unk_490[0x48];            //Unused?
 } EnSw; // size = 0x04D8
 
 #endif

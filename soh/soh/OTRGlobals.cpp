@@ -92,6 +92,10 @@ extern "C" uint64_t GetPerfCounter() {
 }
 #endif
 
+extern "C" void Graph_StartFrame() {
+    OTRGlobals::Instance->context->GetWindow()->StartFrame();
+}
+
 // C->C++ Bridge
 extern "C" void Graph_ProcessFrame(void (*run_one_game_iter)(void)) {
     OTRGlobals::Instance->context->GetWindow()->MainLoop(run_one_game_iter);

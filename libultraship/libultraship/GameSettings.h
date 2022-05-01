@@ -6,6 +6,7 @@ struct SoHConfigType {
         bool soh = false;
         bool menu_bar = false;
         bool soh_sink = true;
+        bool mapselect = false;
     } debug;
 
     // Controller

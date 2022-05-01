@@ -1,3 +1,8 @@
+/*
+ * File: z_en_sw.c
+ * Overlay: ovl_En_Sw
+ * Description: Golden Skulltula
+ */
 #include "z_en_sw.h"
 #include "objects/object_st/object_st.h"
 
@@ -89,7 +94,8 @@ s32 func_80B0BE20(EnSw* this, CollisionPoly* poly) {
     EnSw_CrossProduct(&this->unk_370, &sp44, &this->unk_37C);
     temp_f0 = Math3D_Vec3fMagnitude(&this->unk_37C);
     if (temp_f0 < 0.001f) {
-        return 0;
+        temp_f0 = 0.001f;
+        //return 1;
     }
     this->unk_37C.x = this->unk_37C.x * (1.0f / temp_f0);
     this->unk_37C.y = this->unk_37C.y * (1.0f / temp_f0);
@@ -113,6 +119,7 @@ s32 func_80B0BE20(EnSw* this, CollisionPoly* poly) {
     this->unk_3D8.ww = 1.0f;
     Matrix_MtxFToYXZRotS(&this->unk_3D8, &this->actor.world.rot, 0);
     //! @bug: Does not return.
+    return 1;
 }
 
 CollisionPoly* func_80B0C020(GlobalContext* globalCtx, Vec3f* arg1, Vec3f* arg2, Vec3f* arg3, s32* arg4) {
@@ -158,7 +165,7 @@ s32 func_80B0C0CC(EnSw* this, GlobalContext* globalCtx, s32 arg2) {
     sp78.z -= this->unk_364.z * 18.0f;
     temp_s1 = func_80B0C020(globalCtx, &sp84, &sp78, &sp90, &sp70);
 
-    if ((temp_s1 != NULL) && (this->unk_360 == 0)) {
+    if ((temp_s1 != NULL) && (this->velocityY == 0)) {
         sp78.x = sp84.x + (this->unk_37C.x * 24);
         sp78.y = sp84.y + (this->unk_37C.y * 24);
         sp78.z = sp84.z + (this->unk_37C.z * 24);
@@ -183,7 +190,6 @@ s32 func_80B0C0CC(EnSw* this, GlobalContext* globalCtx, s32 arg2) {
             if (phi_s1 == 0) {
                 sp78.x = sp84.x - (this->unk_37C.x * 24.0f);
                 sp78.y = sp84.y - (this->unk_37C.y * 24.0f);
-                if (0) {}
                 sp78.z = sp84.z - (this->unk_37C.z * 24.0f);
             } else if (phi_s1 == 1) {
                 sp78.x = sp84.x + (this->unk_370.x * 24.0f);
@@ -273,7 +279,7 @@ void EnSw_Init(Actor* thisx, GlobalContext* globalCtx) {
     switch ((thisx->params & 0xE000) >> 0xD) {
         case 3:
         case 4:
-            this->unk_360 = 1;
+            this->velocityY = 1;
             this->actor.velocity.y = 8.0f;
             this->actor.speedXZ = 4.0f;
             this->actor.gravity = -1.0f;
@@ -313,7 +319,7 @@ void EnSw_Destroy(Actor* thisx, GlobalContext* globalCtx) {
     Collider_DestroyJntSph(globalCtx, &this->collider);
 }
 
-s32 func_80B0C9F0(EnSw* this, GlobalContext* globalCtx) {
+s32 func_80B0C9F0(EnSw* this, GlobalContext* globalCtx) { //Death function, to set colors etc.
     s32 phi_v1 = false;
 
     if (this->actor.xyzDistToPlayerSq < SQ(400.0f) && ((this->actor.params & 0xE000) >> 0xD) == 0 &&
@@ -340,7 +346,7 @@ s32 func_80B0C9F0(EnSw* this, GlobalContext* globalCtx) {
                 } else {
                     this->unk_420 = -0.1f;
                 }
-                this->unk_394 = 0xA;
+                this->unk_394 = 0xA; //Alive state?
                 this->unk_38A = 1;
                 this->unk_420 *= 4.0f;
                 this->actionFunc = func_80B0D878;
@@ -351,9 +357,8 @@ s32 func_80B0C9F0(EnSw* this, GlobalContext* globalCtx) {
                 this->actor.shape.shadowScale = 16.0f;
                 this->actor.gravity = -1.0f;
                 this->actor.flags &= ~ACTOR_FLAG_0;
-                this->actionFunc = func_80B0DB00;
+                this->actionFunc = func_80B0DB00; //function to spawn actor (GS Token here)
             }
-
             Audio_PlayActorSound2(&this->actor, NA_SE_EN_STALWALL_DEAD);
             return true;
         }
@@ -384,27 +389,28 @@ void func_80B0CBE8(EnSw* this, GlobalContext* globalCtx) {
     }
 }
 
-s32 func_80B0CCF4(EnSw* this, f32* arg1) {
-    CollisionPoly* temp_v1;
+s32 func_80B0CCF4(EnSw* this, f32* arg1, GlobalContext* globalCtx) {
+    CollisionPoly* floorPoly;
     f32 temp_f0;
-    Vec3f sp6C;
+    Vec3f floorPolyNormal;
     MtxF sp2C;
 
     if (this->actor.floorPoly == NULL) {
-        return false;
+        return true;
+    } else {
+        floorPoly = this->actor.floorPoly;
+        floorPolyNormal.x = COLPOLY_GET_NORMAL(floorPoly->normal.x);
+        floorPolyNormal.y = COLPOLY_GET_NORMAL(floorPoly->normal.y);
+        floorPolyNormal.z = COLPOLY_GET_NORMAL(floorPoly->normal.z);
+        Matrix_RotateAxis(*arg1, &floorPolyNormal, MTXMODE_NEW);
+        Matrix_MultVec3f(&this->unk_370, &floorPolyNormal);
     }
-
-    temp_v1 = this->actor.floorPoly;
-    sp6C.x = COLPOLY_GET_NORMAL(temp_v1->normal.x);
-    sp6C.y = COLPOLY_GET_NORMAL(temp_v1->normal.y);
-    sp6C.z = COLPOLY_GET_NORMAL(temp_v1->normal.z);
-    Matrix_RotateAxis(*arg1, &sp6C, MTXMODE_NEW);
-    Matrix_MultVec3f(&this->unk_370, &sp6C);
-    this->unk_370 = sp6C;
+    this->unk_370 = floorPolyNormal;
     EnSw_CrossProduct(&this->unk_370, &this->unk_364, &this->unk_37C);
     temp_f0 = Math3D_Vec3fMagnitude(&this->unk_37C);
     if (temp_f0 < 0.001f) {
-        return false;
+        temp_f0 = 0.002f;
+        //return true;
     }
     temp_f0 = 1.0f / temp_f0;
     this->unk_37C.x *= temp_f0;
@@ -435,8 +441,7 @@ void func_80B0CEA8(EnSw* this, GlobalContext* globalCtx) {
         Camera* activeCam = GET_ACTIVE_CAM(globalCtx);
 
         if (!(Math_Vec3f_DistXYZ(&this->actor.world.pos, &activeCam->eye) >= 380.0f)) {
-            Audio_PlayActorSound2(&this->actor, ((this->actor.params & 0xE000) >> 0xD) > 0 ? NA_SE_EN_STALGOLD_ROLL
-                                                                                           : NA_SE_EN_STALWALL_ROLL);
+            Audio_PlayActorSound2(&this->actor, ((this->actor.params & 0xE000) >> 0xD) > 0 ? NA_SE_EN_STALGOLD_ROLL : NA_SE_EN_STALWALL_ROLL);
         }
     }
 }
@@ -515,7 +520,7 @@ void func_80B0D3AC(EnSw* this, GlobalContext* globalCtx) {
     this->actor.velocity.y = CLAMP_MIN(this->actor.velocity.y, this->actor.minVelocityY);
 
     if (this->actor.velocity.y < 0.0f) {
-        this->unk_360 = 0;
+        this->velocityY = 0;
     }
 
     if (func_80B0C0CC(this, globalCtx, 1) == 1) {
@@ -548,7 +553,7 @@ void func_80B0D590(EnSw* this, GlobalContext* globalCtx) {
 
         Math_ApproachF(&this->actor.scale.x, !IS_DAY ? 0.02f : 0.0f, 0.2f, 0.01f);
         Actor_SetScale(&this->actor, this->actor.scale.x);
-    }
+    } 
 
     if (this->unk_38E != 0) {
         this->unk_38E--;
@@ -588,13 +593,13 @@ void func_80B0D590(EnSw* this, GlobalContext* globalCtx) {
             sp2C = 32768.0f / this->skelAnime.endFrame;
             sp2C *= this->skelAnime.curFrame;
             sp2C = Math_SinS(sp2C) * this->unk_420;
-            func_80B0CCF4(this, &sp2C);
+            func_80B0CCF4(this, &sp2C, globalCtx);
             this->actor.shape.rot = this->actor.world.rot;
         }
     }
 }
 
-void func_80B0D878(EnSw* this, GlobalContext* globalCtx) {
+void func_80B0D878(EnSw* this, GlobalContext* globalCtx) {// on death stuff like spawning an actor.
     Actor* temp_v0;
     Vec3f pos;
     Vec3f velAndAccel = { 0.0f, 0.5f, 0.0f };
@@ -606,7 +611,7 @@ void func_80B0D878(EnSw* this, GlobalContext* globalCtx) {
         func_80B0CEA8(this, globalCtx);
     }
 
-    func_80B0CCF4(this, &this->unk_420);
+    func_80B0CCF4(this, &this->unk_420, globalCtx);
     this->actor.shape.rot = this->actor.world.rot;
 
     if ((this->unk_394 == 0) && (this->unk_392 == 0)) {
@@ -654,7 +659,6 @@ void func_80B0DB00(EnSw* this, GlobalContext* globalCtx) {
         } else {
             this->actor.velocity.y = ((this->unk_38A--) * 8.0f) * 0.5f;
         }
-
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_DODO_M_GND);
         Actor_SpawnFloorDustRing(globalCtx, &this->actor, &this->actor.world.pos, 16.0f, 0xC, 2.0f, 0x78, 0xA, 0);
     }
@@ -720,7 +724,7 @@ s32 func_80B0DFFC(EnSw* this, GlobalContext* globalCtx) {
         this->collider.base.acFlags &= ~AC_HIT;
         sp4C = false;
     } else if (((globalCtx->state.frames % 4) == 0) &&
-               !BgCheck_EntityLineTest1(&globalCtx->colCtx, &this->actor.world.pos, &this->unk_454, &sp50, &sp60, true,
+               !BgCheck_EntityLineTest1(&globalCtx->colCtx, &this->actor.world.pos, &this->unk_454, &sp50, &sp60, true, 
                                         false, false, true, &sp5C)) {
         sp4C = false;
     } else if (((globalCtx->state.frames % 4) == 1) &&
@@ -730,7 +734,6 @@ s32 func_80B0DFFC(EnSw* this, GlobalContext* globalCtx) {
     } else if (((globalCtx->state.frames % 4) == 2) &&
                !BgCheck_EntityLineTest1(&globalCtx->colCtx, &this->actor.world.pos, &this->unk_46C, &sp50, &sp60, true,
                                         false, false, true, &sp5C)) {
-        if (0) {}
         sp4C = false;
     } else if (((globalCtx->state.frames % 4) == 3) &&
                BgCheck_EntityLineTest1(&globalCtx->colCtx, &this->actor.world.pos, &this->unk_478, &sp50, &sp60, true,
@@ -785,7 +788,7 @@ s32 func_80B0E430(EnSw* this, f32 arg1, s16 arg2, s32 arg3, GlobalContext* globa
     Camera* activeCam;
     f32 lastFrame = Animation_GetLastFrame(&object_st_Anim_000304);
 
-    if (DECR(this->unk_388) != 0) {
+    if (DECR(this->RandOffset1030) != 0) {
         Math_SmoothStepToF(&this->skelAnime.playSpeed, 0.0f, 0.6f, 1000.0f, 0.01f);
         return 0;
     }
@@ -806,9 +809,9 @@ s32 func_80B0E430(EnSw* this, f32 arg1, s16 arg2, s32 arg3, GlobalContext* globa
     } else {
         this->unk_440 = 0;
     }
-    Math_SmoothStepToS(&this->actor.shape.rot.z, this->unk_444, 4, arg2, arg2);
+    Math_SmoothStepToS(&this->actor.shape.rot.z, this->newShapeRotZ, 4, arg2, arg2);
     this->actor.world.rot = this->actor.shape.rot;
-    if (this->actor.shape.rot.z == this->unk_444) {
+    if (this->actor.shape.rot.z == this->newShapeRotZ) {
         return 1;
     }
     return 0;
@@ -820,14 +823,14 @@ void func_80B0E5E0(EnSw* this, GlobalContext* globalCtx) {
 
     if (func_80B0E430(this, 6.0f, 0x3E8, 1, globalCtx)) {
         rand = Rand_ZeroOne();
-        this->unk_444 =
+        this->newShapeRotZ =
             ((s16)(20000.0f * rand) + 0x2EE0) * (Rand_ZeroOne() >= 0.5f ? 1.0f : -1.0f) + this->actor.world.rot.z;
-        this->unk_388 = Rand_S16Offset(10, 30);
+        this->RandOffset1030 = Rand_S16Offset(10, 30);
     }
 
-    if ((DECR(this->unk_442) == 0) && (func_80B0DEA8(this, globalCtx, 1))) {
+    if ((DECR(this->RandOffset2010) == 0) && (func_80B0DEA8(this, globalCtx, 1))) { 
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_STALWALL_LAUGH);
-        this->unk_442 = 20;
+        this->RandOffset2010 = 20;
         this->actionFunc = func_80B0E728;
     }
 }
@@ -836,24 +839,23 @@ void func_80B0E728(EnSw* this, GlobalContext* globalCtx) {
     Player* player = GET_PLAYER(globalCtx);
     s32 pad;
 
-    if (DECR(this->unk_442) != 0) {
+    if (DECR(this->RandOffset2010) != 0) {
         if (func_80B0DEA8(this, globalCtx, 1)) {
             this->unk_448 = player->actor.world.pos;
             this->unk_448.y += 30.0f;
-            this->unk_444 = func_80B0DE34(this, &this->unk_448);
+            this->newShapeRotZ = func_80B0DE34(this, &this->unk_448);
             func_80B0E430(this, 6.0f, (u16)0xFA0, 0, globalCtx);
         } else {
             this->actionFunc = func_80B0E5E0;
         }
     } else {
         if (!func_80B0DFFC(this, globalCtx)) {
-            this->unk_442 = Rand_S16Offset(20, 10);
-            this->unk_444 = func_80B0DE34(this, &this->actor.home.pos);
+            this->RandOffset2010 = Rand_S16Offset(20, 10);
+            this->newShapeRotZ = func_80B0DE34(this, &this->actor.home.pos);
             this->unk_448 = this->actor.home.pos;
             this->actionFunc = func_80B0E9BC;
         } else {
             func_80B0E314(this, this->unk_448, 8.0f);
-
             if (DECR(this->unk_440) == 0) {
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_STALWALL_DASH);
                 this->unk_440 = 4;
@@ -871,7 +873,7 @@ void func_80B0E90C(EnSw* this, GlobalContext* globalCtx) {
 
     func_80B0E314(this, this->unk_448, 0.0f);
     if (this->actor.speedXZ == 0.0f) {
-        this->unk_444 = func_80B0DE34(this, &this->actor.home.pos);
+        this->newShapeRotZ = func_80B0DE34(this, &this->actor.home.pos);
         this->unk_448 = this->actor.home.pos;
         this->actionFunc = func_80B0E9BC;
     }
@@ -892,7 +894,7 @@ void EnSw_Update(Actor* thisx, GlobalContext* globalCtx) {
     EnSw* this = (EnSw*)thisx;
 
     SkelAnime_Update(&this->skelAnime);
-    func_80B0C9F0(this, globalCtx);
+    func_80B0C9F0(this, globalCtx); //Death function, to set colors etc.
     this->actionFunc(this, globalCtx);
     func_80B0CBE8(this, globalCtx);
 }
@@ -998,7 +1000,6 @@ void func_80B0EEA4(GlobalContext* globalCtx) {
 void EnSw_Draw(Actor* thisx, GlobalContext* globalCtx) {
     EnSw* this = (EnSw*)thisx;
     Color_RGBA8 sp30 = { 184, 0, 228, 255 };
-
     if (((this->actor.params & 0xE000) >> 0xD) != 0) {
         Matrix_RotateX(DEGF_TO_RADF(-80), MTXMODE_APPLY);
         if (this->actor.colChkInfo.health != 0) {

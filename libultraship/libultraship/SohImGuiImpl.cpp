@@ -166,14 +166,20 @@ namespace SohImGui {
         }
     }
 
-    /*bool UseInternalRes() {
-        switch (impl.backend) {
-        case Backend::SDL:
-            return true;
-        default:
-            return false;
+    void LoadCVars() {
+        FILE* fp; //Cvars file.
+        char* line = NULL;
+        size_t len = 0;
+        ssize_t read;
+        fp = fopen("cvars.cfg", "r");
+        if(fp != NULL) {
+            while ((read = getline(&line, &len, fp)) != -1) {
+                SohImGui::console->Dispatch(line);
+                printf("Loaded : %s",line);
+            }
         }
-    }*/
+    }
+
 	void SaveCVars() {
 		std::string output;
 		std::ofstream cvarfile;
@@ -186,8 +192,6 @@ namespace SohImGui {
 		    else if (cvar.second->type == CVAR_TYPE_FLOAT)
 		        output += StringHelper::Sprintf("set %s %f\n", cvar.first.c_str(), cvar.second->value.valueFloat);
 		}
-
-		//File::WriteAllText("cvars.cfg", output);
 		cvarfile << output.c_str();
 		cvarfile.close();
 	}
@@ -329,7 +333,6 @@ namespace SohImGui {
         }
         console->Init();
         ImGuiWMInit();
-        LoadCosmeticColors();
         ImGuiBackendInit();
         ModInternal::registerHookListener({ GFX_INIT, [](const HookEvent ev) {
 
@@ -354,6 +357,7 @@ namespace SohImGui {
             pads = static_cast<OSContPad*>(ev->baseArgs["cont_pad"]);
         } });
         Game::InitSettings();
+        LoadCosmeticColors();
     }
 
     void Update(EventImpl event) {
@@ -460,7 +464,6 @@ namespace SohImGui {
     }
 
     void DrawMainMenuAndCalculateGameSize() {
-
         console->Update();
         ImGuiBackendNewFrame();
         ImGuiWMNewFrame();
@@ -681,6 +684,7 @@ namespace SohImGui {
             if (ImGui::BeginMenu("Developer Tools")) {
                 HOOK(ImGui::MenuItem("Stats", nullptr, &Game::Settings.debug.soh));
                 HOOK(ImGui::MenuItem("Console", nullptr, &console->opened));
+                //HOOK(ImGui::MenuItem("Zelda map select (Don't use yet)", nullptr, &Game::Settings.debug.mapselect));
 
                 ImGui::Text("Debug");
                 ImGui::Separator();
@@ -703,6 +707,165 @@ namespace SohImGui {
             ImGui::SliderInt("Mul", reinterpret_cast<int*>(&gfx_current_dimensions.internal_mul), 1, 8);
             ImGui::Text("MSAA:");
             ImGui::SliderInt("MSAA", reinterpret_cast<int*>(&gfx_msaa_level), 1, 8);
+            ImGui::End();
+            ImGui::PopStyleColor();
+        }
+
+        static SceneSelectList sScenes[] = {
+            { " 1:Hyrule Field", 0x00CD },
+            { " 2:Kakariko Village", 0x00DB },
+            { " 3:Graveyard", 0x00E4 },
+            { " 4:Zora's River", 0x00EA },
+            { " 5:Kokiri Forest", 0x00EE },
+            { " 6:Sacred Forest Meadow", 0x00FC },
+            { " 7:Lake Hylia", 0x0102 },
+            { " 8:Zora's Domain", 0x0108 },
+            { " 9:Zora's Fountain", 0x010E },
+            { "10:Gerudo Valley", 0x0117 },
+            { "11:Lost Woods", 0x011E },
+            { "12:Desert Colossus", 0x0123 },
+            { "13:Gerudo's Fortress", 0x0129 },
+            { "14:Haunted Wasteland", 0x0130 },
+            { "15:Hyrule Castle", 0x0138 },
+            { "16:Death Mountain Trail", 0x013D },
+            { "17:Death Mountain Crater", 0x0147 },
+            { "18:Goron City", 0x014D },
+            { "19:Lon Lon Ranch", 0x0157 },
+            { "20:Temple Of Time", 0x0053 },
+            { "21:Chamber of Sages", 0x006B },
+            { "22:Shooting Gallery", 0x003B },
+            { "23:Castle Courtyard Game", 0x007A },
+            { "24:Grave 1", 0x031C },
+            { "25:Grave 2", 0x004B },
+            { "26:Royal Family's Tomb", 0x002D },
+            { "27:Great Fairy's Fountain (Din)", 0x0315 },
+            { "28:Great Fairy's Fountain (Farore)", 0x036D },
+            { "29:Great Fairy's Fountain (Nayru)", 0x0371 },
+            { "30:Ganon's Tower - Collapsing", 0x043F },
+            { "31:Castle Courtyard", 0x0400 },
+            { "32:Fishing Pond", 0x045F },
+            { "33:Bombchu Bowling Alley", 0x0507 },
+            { "34:Lon Lon Ranch House", 0x004F },
+            { "35:Lon Lon Ranch Silo", 0x05D0 },
+            { "36:Guard House", 0x007E },
+            { "37:Potion Shop", 0x0072 },
+            { "38:Treasure Chest Game", 0x0063 },
+            { "39:House Of Skulltula", 0x0550 },
+            { "40:Entrance to Market", 0x0033 },
+            { "41:Market", 0x00B1 },
+            { "42:Back Alley", 0x00AD },
+            { "43:Temple of Time Exterior", 0x0171 },
+            { "44:Link's House", 0x00BB },
+            { "45:Kakariko House 1", 0x02FD },
+            { "46:Back Alley House 1", 0x043B },
+            { "47:House of the Know-it-All Brothers", 0x00C9 },
+            { "48:House of Twins", 0x009C },
+            { "49:Mido's House", 0x0433 },
+            { "50:Saria's House", 0x0437 },
+            { "51:Stable", 0x02F9 },
+            { "52:Grave Keeper's Hut", 0x030D },
+            { "53:Dog Lady's House", 0x0398 },
+            { "54:Impa's House", 0x039C },
+            { "55:Lakeside Laboratory", 0x0043 },
+            { "56:Running Man's Tent", 0x03A0 },
+            { "57:Bazaar", 0x00B7 },
+            { "58:Kokiri Shop", 0x00C1 },
+            { "59:Goron Shop", 0x037C },
+            { "60:Zora Shop", 0x0380 },
+            { "61:Closed Shop", 0x0384 },
+            { "62:Potion Shop", 0x0388 },
+            { "63:Bombchu Shop ", 0x0390 },
+            { "64:Happy Mask Shop", 0x0530 },
+            { "65:Gerudo Training Ground", 0x0008 },
+            { "66:Inside the Deku Tree", 0x0000 },
+            { "67:Gohma's Lair", 0x040F },
+            { "68:Dodongo's Cavern", 0x0004 },
+            { "69:King Dodongo's Lair", 0x040B },
+            { "70:Inside Jabu-Jabu's Belly", 0x0028 },
+            { "71:Barinade's Lair", 0x0301 },
+            { "72:Forest Temple", 0x0169 },
+            { "73:Phantom Ganon's Lair", 0x000C },
+            { "74:Bottom of the Well", 0x0098 },
+            { "75:Shadow Temple", 0x0037 },
+            { "76:Bongo Bongo's Lair", 0x0413 },
+            { "77:Fire Temple", 0x0165 },
+            { "78:Volvagia's Lair", 0x0305 },
+            { "79:Water Temple", 0x0010 },
+            { "80:Morpha's Lair", 0x0417 },
+            { "81:Spirit Temple", 0x0082 },
+            { "82:Iron Knuckle's Lair", 0x008D },
+            { "83:Twinrova's Lair", 0x05EC },
+            { "84:Stairs to Ganondorf's Lair", 0x041B },
+            { "85:Ganondorf's Lair", 0x041F },
+            { "86:Ice Cavern", 0x0088 },
+            { "87:DampÃ© Grave Relay Game", 0x044F },
+            { "88:Inside Ganon's Castle", 0x0467 },
+            { "89:Ganon's Lair", 0x0517 },
+            { "90:Escaping Ganon's Castle 1", 0x0179 },
+            { "91:Escaping Ganon's Castle 2", 0x01B5 },
+            { "92:Escaping Ganon's Castle 3", 0x03DC },
+            { "93:Escaping Ganon's Castle 4", 0x03E4 },
+            { "94:Escaping Ganon's Castle 5", 0x056C },
+            { "95:Thieves' Hideout 1-2", 0x0486 },
+            { "96:Thieves' Hideout 3-4 9-10", 0x048E },
+            { "97:Thieves' Hideout 5-6", 0x0496 },
+            { "98:Thieves' Hideout 7-8", 0x049E },
+            { "99:Thieves' Hideout 11-12", 0x04AE },
+            { "100:Thieves' Hideout 13", 0x0570 },
+            { "101:Grotto 0", 0x003F },
+            { "102:Grotto 1", 0x0598 },
+            { "103:Grotto 2", 0x059C },
+            { "104:Grotto 3", 0x05A0 },
+            { "105:Grotto 4", 0x05A4 },
+            { "106:Grotto 5", 0x05A8 },
+            { "107:Grotto 6", 0x05AC },
+            { "108:Grotto 7", 0x05B0 },
+            { "109:Grotto 8", 0x05B4 },
+            { "110:Grotto 9", 0x05B8 },
+            { "111:Grotto 10", 0x05BC },
+            { "112:Grotto 11", 0x05C0 },
+            { "113:Grotto 12", 0x05C4 },
+            { "114:Grotto 13", 0x05FC },
+            { "115:Goddess Cutscene Environment", 0x00A0 },
+            { "116:Test Room", 0x0520 },
+            { "117:SRD Map", 0x0018 },
+            { "118:Test Map", 0x0094 },
+            { "119:Treasure Chest Warp", 0x0024 },
+            { "120:Stalfos Miniboss Room", 0x001C },
+            { "121:Stalfos Boss Room", 0x0020 },
+            { "122:Dark Link Room", 0x0047 },
+            { "123:Shooting Gallery Duplicate", 0x02EA },
+            { "124:depth test", 0x00B6 },
+            { "125:Hyrule Garden Game (Broken)", 0x0076 },
+            { "title", 0x0000 }
+        };
+
+        if (Game::Settings.debug.mapselect) {
+            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
+            ImGui::Begin("Zelda map select", nullptr, ImGuiWindowFlags_None);
+            ImVec2 ScrollListSize = ImGui::GetContentRegionAvail();
+            ImGui::BeginListBox("Maps list",ImVec2(ScrollListSize.x,(ScrollListSize.y)-100));
+
+            for (int i = 0; i <= 125 ; i++) {
+                ImVec2 ButtonSize = ImGui::GetContentRegionAvail();
+                if (ImGui::Button(sScenes[i].name.c_str(),ImVec2(ButtonSize.x,18))) {
+                    
+                    //gSaveContext.linkAge = CVar_GetS32("gDbgMapSelAge", 0);
+                    int cutesceneindex[11] = {
+                        0xFFF0,0xFFF1,0xFFF2,
+                        0xFFF3,0xFFF4,0xFFF5,
+                        0xFFF6,0xFFF7,0xFFF8,
+                        0xFFF9,0xFFFA
+                    };
+                    //gSaveContext.cutsceneIndex = cutesceneindex[CVar_GetS32("gDbgMapSelStage", 0)];
+
+                };
+            }
+            ImGui::EndListBox();
+            EnhancementSliderInt("Stage: %d", "##MapStage", "gDbgMapSelStage", 0, 11, "");
+            ImGui::Text("Age:");
+            EnhancementRadioButton("Child", "gDbgMapSelAge", 0);
+            EnhancementRadioButton("Adult", "gDbgMapSelAge", 1);
             ImGui::End();
             ImGui::PopStyleColor();
         }

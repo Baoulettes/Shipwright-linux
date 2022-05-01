@@ -761,8 +761,7 @@ void TitleCard_InitBossName(GlobalContext* globalCtx, TitleCardContext* titleCtx
                             u8 height) {
 
     if (ResourceMgr_OTRSigCheck(texture))
-        texture = ResourceMgr_LoadTexByName(texture);
-
+        texture = ResourceMgr_LoadTexByName(texture);       
     titleCtx->texture = texture;
     titleCtx->x = x;
     titleCtx->y = y;
@@ -1004,11 +1003,13 @@ void TitleCard_Update(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
 void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
     s32 width;
     s32 height;
-    s32 unused;
     s32 titleX;
     s32 doubleWidth;
     s32 titleY;
     s32 titleSecondY;
+    s32 textureLanguageOffset;
+    s32 shiftTopY;
+    s32 shiftBottomY;
 
     if (titleCtx->alpha != 0) {
         width = titleCtx->width;
@@ -1025,23 +1026,37 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
         WORLD_OVERLAY_DISP = func_80093808(WORLD_OVERLAY_DISP);
         gDPSetPrimColor(WORLD_OVERLAY_DISP++, 0, 0, (u8)titleCtx->intensity, (u8)titleCtx->intensity, (u8)titleCtx->intensity, (u8)titleCtx->alpha);
 
-        gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture, G_IM_FMT_IA, G_IM_SIZ_8b, width, height, 0,
-        G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        textureLanguageOffset = 0x0;
+        shiftTopY = 0x0;
+        shiftBottomY = 0x1000;
+        if (gSaveContext.language == LANGUAGE_GER && titleCtx->height == 40 && titleCtx->width == 128) {
+            textureLanguageOffset = (width * height * gSaveContext.language);
+            shiftTopY = 0x400;
+            shiftBottomY = 0x1400;
+        } else if (gSaveContext.language == LANGUAGE_FRA && titleCtx->height == 40 && titleCtx->width == 128) {
+            textureLanguageOffset = (width * height * gSaveContext.language);
+            shiftTopY = 0x800;
+            shiftBottomY = 0x1800;
+        }
 
-        gSPTextureRectangle(WORLD_OVERLAY_DISP++, titleX, titleY, ((doubleWidth * 2) + titleX) - 4, titleY + (height * 4) - 1, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+        gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + (uintptr_t)textureLanguageOffset + (uintptr_t)shiftTopY, G_IM_FMT_IA, G_IM_SIZ_8b,
+                            width, height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
+                            G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
+        gSPTextureRectangle(WORLD_OVERLAY_DISP++, titleX, titleY, ((doubleWidth * 2) + titleX) - 4, titleY + (height * 4),
+                            G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
         height = titleCtx->height - height;
 
         // If texture is bigger than 0x1000, display the rest
+        // for Boss Title card the the bottom part of it.
         if (height > 0) {
-            gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + 0x1000,
-                                G_IM_FMT_IA,
+            gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + (uintptr_t)textureLanguageOffset + (uintptr_t)shiftBottomY, G_IM_FMT_IA,
                                 G_IM_SIZ_8b, width, height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                 G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
             gSPTextureRectangle(WORLD_OVERLAY_DISP++, titleX, titleSecondY, ((doubleWidth * 2) + titleX) - 4,
-                                titleSecondY + (height * 4) - 1, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+                                titleSecondY + (height * 4), G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
         }
         CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_actor.c", 2880);
     }

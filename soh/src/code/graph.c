@@ -474,6 +474,8 @@ static void RunFrame()
             uint64_t ticksA, ticksB;
             ticksA = GetPerfCounter();
 
+            Graph_StartFrame();
+
             OTRSetFrameDivisor(R_UPDATE_RATE);
             //OTRSetFrameDivisor(0);
 

@@ -46,6 +46,12 @@ namespace SohImGui {
             void* event;
         } sdl;
     } EventImpl;
+
+    typedef struct {
+        std::string name;
+        int entranceIndex;
+    } SceneSelectList;
+
     extern Console* console;
     void SaveCVars();
     void Init(WindowImpl window_impl);
