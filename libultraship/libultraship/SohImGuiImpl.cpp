@@ -17,7 +17,7 @@
 #include "Lib/stb/stb_image.h"
 #include "Lib/Fast3D/gfx_rendering_api.h"
 #include "Utils/StringHelper.h"
-#include "../../soh/soh/Enhancements/debugconsole.h"
+//#include "../../soh/soh/Enhancements/debugconsole.h"
 
 #ifdef ENABLE_OPENGL
 #include "Lib/ImGui/backends/imgui_impl_opengl3.h"
@@ -563,7 +563,8 @@ namespace SohImGui {
                 EnhancementCheckbox("Minimal UI", "gMinimalUI");
                 EnhancementCheckbox("MM Bunny Hood", "gMMBunnyHood");
                 EnhancementCheckbox("Visual Stone of Agony", "gVisualAgony");
-                EnhancementCheckbox("Fix L&R Pause menu", "gUniformLR");
+
+                EnhancementCheckbox("Always show dungeon entrances", "gAlwaysShowDungeonMinimapIcon");
                 
                 ImGui::Text("Graphics");
                 ImGui::Separator();
@@ -573,6 +574,11 @@ namespace SohImGui {
                 EnhancementCheckbox("Enable 3D Dropped items", "gNewDrops");
                 EnhancementCheckbox("Dynamic Wallet Icon", "gDynamicWalletIcon");
 
+                if (ImGui::BeginMenu("Fixes")) {
+                    EnhancementCheckbox("Fix L&R Pause menu", "gUniformLR");
+                    EnhancementCheckbox("Fix Dungeon entrances", "gFixDungeonMinimapIcon");
+                    ImGui::EndMenu();
+                }
                 ImGui::EndMenu();
             }
 
@@ -662,11 +668,24 @@ namespace SohImGui {
                         }
                         ImGui::EndMenu();
                     }
+                    HOOK(ImGui::MenuItem("Interface edit", nullptr, &Game::Settings.cosmetics.uiedit));
                     ImGui::EndMenu();
                 }
             ImGui::EndMenu();
             }
             
+        if (Game::Settings.cosmetics.uiedit) {
+            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
+            ImGui::Begin("Interface modifier", nullptr, ImGuiWindowFlags_None);
+            EnhancementCheckbox("Use margins", "gHUDMargins");
+            EnhancementSliderInt("Top : %dx", "##UIMARGINT", "gHUDMargin_T", -20, 20, "");
+            EnhancementSliderInt("Left: %dx", "##UIMARGINL", "gHUDMargin_L", -25, 25, "");
+            EnhancementSliderInt("Right: %dx", "##UIMARGINR", "gHUDMargin_R", -25, 25, "");
+            EnhancementSliderInt("Bottom: %dx", "##UIMARGINB", "gHUDMargin_B", -20, 20, "");
+            ImGui::End();
+            ImGui::PopStyleColor();
+        }
+
             if (CVar_GetS32("gLanguages", 0) == 0) {
                 SelectedLanguage = 0;
             } else if (CVar_GetS32("gLanguages", 0) == 1) {
@@ -974,7 +993,6 @@ namespace SohImGui {
     }
 
     void Render() {
-        console->Draw();
 
         ImGui::Render();
         ImGuiRenderDrawData(ImGui::GetDrawData());

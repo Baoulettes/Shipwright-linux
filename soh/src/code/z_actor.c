@@ -758,10 +758,12 @@ void func_8002CDE4(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
 }
 
 void TitleCard_InitBossName(GlobalContext* globalCtx, TitleCardContext* titleCtx, void* texture, s16 x, s16 y, u8 width,
-                            u8 height) {
+                            u8 height, s16 hasTranslation) {
 
     if (ResourceMgr_OTRSigCheck(texture))
-        texture = ResourceMgr_LoadTexByName(texture);       
+        texture = ResourceMgr_LoadTexByName(texture);
+    titleCtx->isBossCard = true;
+    titleCtx->hasTranslation = hasTranslation;   
     titleCtx->texture = texture;
     titleCtx->x = x;
     titleCtx->y = y;
@@ -769,12 +771,12 @@ void TitleCard_InitBossName(GlobalContext* globalCtx, TitleCardContext* titleCtx
     titleCtx->height = height;
     titleCtx->durationTimer = 80;
     titleCtx->delayTimer = 0;
+
 }
 
 void TitleCard_InitPlaceName(GlobalContext* globalCtx, TitleCardContext* titleCtx, char* texture, s32 x, s32 y,
                              s32 width, s32 height, s32 delay) {
     SceneTableEntry* loadedScene = globalCtx->loadedScene;
-
   //  size_t size = loadedScene->titleFile.vromEnd - loadedScene->titleFile.vromStart;
     switch (globalCtx->sceneNum) {
         case SCENE_YDAN:
@@ -979,7 +981,8 @@ void TitleCard_InitPlaceName(GlobalContext* globalCtx, TitleCardContext* titleCt
 
     titleCtx->texture = ResourceMgr_LoadTexByName(texture);
 
-    //titleCtx->texture = texture;
+    titleCtx->isBossCard = 0;
+    titleCtx->hasTranslation = 0;
     titleCtx->x = x;
     titleCtx->y = y;
     titleCtx->width = width;
@@ -1010,7 +1013,6 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
     s32 textureLanguageOffset;
     s32 shiftTopY;
     s32 shiftBottomY;
-
     if (titleCtx->alpha != 0) {
         width = titleCtx->width;
         height = titleCtx->height;
@@ -1029,14 +1031,18 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
         textureLanguageOffset = 0x0;
         shiftTopY = 0x0;
         shiftBottomY = 0x1000;
-        if (gSaveContext.language == LANGUAGE_GER && titleCtx->height == 40 && titleCtx->width == 128) {
-            textureLanguageOffset = (width * height * gSaveContext.language);
-            shiftTopY = 0x400;
-            shiftBottomY = 0x1400;
-        } else if (gSaveContext.language == LANGUAGE_FRA && titleCtx->height == 40 && titleCtx->width == 128) {
-            textureLanguageOffset = (width * height * gSaveContext.language);
-            shiftTopY = 0x800;
-            shiftBottomY = 0x1800;
+
+        //if this card is bosses cards, has translation and that is not using English language.
+        if (titleCtx->isBossCard == 1 && titleCtx->hasTranslation == 1 && gSaveContext.language != LANGUAGE_ENG) {
+            if (gSaveContext.language == LANGUAGE_GER) {
+                textureLanguageOffset = (width * height * gSaveContext.language);
+                shiftTopY = 0x400;
+                shiftBottomY = 0x1400;
+            } else if (gSaveContext.language == LANGUAGE_FRA) {
+                textureLanguageOffset = (width * height * gSaveContext.language);
+                shiftTopY = 0x800;
+                shiftBottomY = 0x1800;
+            }
         }
 
         gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + (uintptr_t)textureLanguageOffset + (uintptr_t)shiftTopY, G_IM_FMT_IA, G_IM_SIZ_8b,
@@ -2555,8 +2561,16 @@ void func_80030FA8(GraphicsContext* gfxCtx) {
     gDPLoadTextureBlock(POLY_XLU_DISP++, gLensOfTruthMaskTex, G_IM_FMT_I, G_IM_SIZ_8b, 64, 64, 0,
                         G_TX_MIRROR | G_TX_CLAMP, G_TX_MIRROR | G_TX_CLAMP, 6, 6, G_TX_NOLOD, G_TX_NOLOD);
 
+    s32 x = OTRGetRectDimensionFromLeftEdge(0) << 2;
+    s32 w = OTRGetRectDimensionFromRightEdge(SCREEN_WIDTH) << 2;
+
+    float ratio = OTRGetAspectRatio();
+
     gDPSetTileSize(POLY_XLU_DISP++, G_TX_RENDERTILE, 384, 224, 892, 732);
-    gSPTextureRectangle(POLY_XLU_DISP++, 0, 0, 1280, 960, G_TX_RENDERTILE, 2240, 1600, 576, 597);
+    //gSPTextureRectangle(POLY_XLU_DISP++, 0, 0, 1280, 960, G_TX_RENDERTILE, 2240, 1600, 576, 597);
+    // TODO: Do correct math to fix it
+    gSPWideTextureRectangle(POLY_XLU_DISP++, x, 0, x + abs(x), 960, G_TX_RENDERTILE, 0, 0, 0, 0);
+    gSPWideTextureRectangle(POLY_XLU_DISP++, 0, 0, w, 960, G_TX_RENDERTILE, 2240, 1600, 576, 597);
     gDPPipeSync(POLY_XLU_DISP++);
 
     CLOSE_DISPS(gfxCtx, "../z_actor.c", 6183);

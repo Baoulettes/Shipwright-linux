@@ -17,7 +17,7 @@ void EnBom_Draw(Actor* thisx, GlobalContext* globalCtx);
 
 void EnBom_Move(EnBom* this, GlobalContext* globalCtx);
 void EnBom_WaitForRelease(EnBom* this, GlobalContext* globalCtx);
-static Color_RGBA8 flashRed = { 255, 50, 50, 0 };
+static s16 flashRed[] = { 255, 0, 0 };
 const ActorInit En_Bom_InitVars = {
     ACTOR_EN_BOM,
     ACTORCAT_EXPLOSIVE,
@@ -231,45 +231,33 @@ void EnBom_Update(Actor* thisx, GlobalContext* globalCtx2) {
     s32 pad;
     GlobalContext* globalCtx = globalCtx2;
     EnBom* this = (EnBom*)thisx;
-
     thisx->gravity = -1.2f;
 
     if (this->timer != 0) {
         this->timer--;
     }
-
     if (this->timer >= 67) {
         Audio_PlayActorSound2(thisx, NA_SE_PL_TAKE_OUT_SHIELD);
-        //Actor_SetScale(thisx, 0.01f);
         Actor_SetScale(thisx, 0.3f);
     }
-
     if ((thisx->xzDistToPlayer >= 20.0f) || (ABS(thisx->yDistToPlayer) >= 80.0f)) {
         this->bumpOn = true;
     }
-
     this->actionFunc(this, globalCtx);
-
     Actor_UpdateBgCheckInfo(globalCtx, thisx, 5.0f, 10.0f, 15.0f, 0x1F);
-
     if (thisx->params == BOMB_BODY) {
-        //if (this->timer < 63) {
-        if (this->timer < 60003) {
+        if (this->timer < 63) {
             dustAccel.y = 0.2f;
-
             // spawn spark effect on even frames
             effPos = thisx->world.pos;
             effPos.y += 17.0f;
             if ((globalCtx->gameplayFrames % 2) == 0) {
                 EffectSsGSpk_SpawnFuse(globalCtx, thisx, &effPos, &effVelocity, &effAccel);
             }
-
             Audio_PlayActorSound2(thisx, NA_SE_IT_BOMB_IGNIT - SFX_FLAG);
-
             effPos.y += 3.0f;
             func_8002829C(globalCtx, &effPos, &effVelocity, &dustAccel, &dustColor, &dustColor, 50, 5);
         }
-
         if ((this->bombCollider.base.acFlags & AC_HIT) || ((this->bombCollider.base.ocFlags1 & OC1_HIT) &&
                                                            (this->bombCollider.base.oc->category == ACTORCAT_ENEMY))) {
             this->timer = 0;
@@ -281,48 +269,40 @@ void EnBom_Update(Actor* thisx, GlobalContext* globalCtx2) {
                 this->timer = 100;
             }
         }
-
         dustAccel.y = 0.2f;
         effPos = thisx->world.pos;
         effPos.y += 10.0f;
-
         // double bomb flash speed and adjust red color at certain times during the countdown
         if ((this->timer == 3) || (this->timer == 20) || (this->timer == 40)) {
             thisx->shape.rot.z = 0;
+            Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 0x50);
             this->flashSpeedScale >>= 1;
         }
-
         if ((this->timer < 100) && ((this->timer & (this->flashSpeedScale + 1)) != 0)) {
             Math_SmoothStepToF(&this->flashIntensity, 140.0f, 1.0f, 140.0f / this->flashSpeedScale, 0.0f);
         } else {
             Math_SmoothStepToF(&this->flashIntensity, 0.0f, 1.0f, 140.0f / this->flashSpeedScale, 0.0f);
         }
+        Actor_SetColorFilter(&this->actor,0x4000,this->flashIntensity,0,8);
 
+        //printf("%f \n",this->flashIntensity);
         if (this->timer < 3) {
             Actor_SetScale(thisx, thisx->scale.x + 0.2f);
         }
-
         if (this->timer == 0) {
             effPos = thisx->world.pos;
-
             effPos.y += 10.0f;
             if (Actor_HasParent(thisx, globalCtx)) {
                 effPos.y += 30.0f;
             }
-
             EffectSsBomb2_SpawnLayered(globalCtx, &effPos, &effVelocity, &bomb2Accel, 100, (thisx->shape.rot.z * 6) + 19);
-
             effPos.y = thisx->floorHeight;
             if (thisx->floorHeight > BGCHECK_Y_MIN) {
                 EffectSsBlast_SpawnWhiteShockwave(globalCtx, &effPos, &effVelocity, &effAccel);
             }
-
             Audio_PlayActorSound2(thisx, NA_SE_IT_BOMB_EXPLOSION);
-
             globalCtx->envCtx.adjLight1Color[0] = globalCtx->envCtx.adjLight1Color[1] = globalCtx->envCtx.adjLight1Color[2] = 250;
-
             globalCtx->envCtx.adjAmbientColor[0] = globalCtx->envCtx.adjAmbientColor[1] = globalCtx->envCtx.adjAmbientColor[2] = 250;
-
             Camera_AddQuake(&globalCtx->mainCamera, 2, 0xB, 8);
             thisx->params = BOMB_EXPLOSION;
             this->timer = 10;
@@ -330,17 +310,13 @@ void EnBom_Update(Actor* thisx, GlobalContext* globalCtx2) {
             EnBom_SetupAction(this, EnBom_Explode);
         }
     }
-
     Actor_SetFocus(thisx, 20.0f);
-
     if (thisx->params <= BOMB_BODY) {
         Collider_UpdateCylinder(thisx, &this->bombCollider);
-
         // if link is not holding the bomb anymore and bump conditions are met, subscribe to OC
         if (!Actor_HasParent(thisx, globalCtx) && this->bumpOn) {
             CollisionCheck_SetOC(globalCtx, &globalCtx->colChkCtx, &this->bombCollider.base);
         }
-
         CollisionCheck_SetAC(globalCtx, &globalCtx->colChkCtx, &this->bombCollider.base);
     }
 
@@ -377,7 +353,7 @@ void EnBom_Draw(Actor* thisx, GlobalContext* globalCtx) {
 
         Matrix_Translate(0.0f, -670.0f, 0.0f, MTXMODE_APPLY);
         //gDPSetPrimColor(POLY_XLU_DISP++, 0, 128, 0, 255, 255, 255);
-        gDPPipeSync(POLY_XLU_DISP++);
+        //gDPPipeSync(POLY_XLU_DISP++);
         //gSPTexture(POLY_XLU_DISP++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
         //gDPSetEnvColor(POLY_XLU_DISP++, 0, 255, 255, 255);
         //gDPSetBlendColor(POLY_XLU_DISP++, 0, 255, 255, 255);
@@ -385,16 +361,19 @@ void EnBom_Draw(Actor* thisx, GlobalContext* globalCtx) {
         //gDPSetColorDither(POLY_XLU_DISP++, G_CD_DISABLE);
         //gDPSetRenderMode(POLY_XLU_DISP++, G_RM_PASS, G_RM_AA_ZB_XLU_SURF2);
         gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 648), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        gSPDisplayList(POLY_XLU_DISP++, gGiBombDL);
 
+        gSPDisplayList(POLY_XLU_DISP++, gGiBombDL);
+        Actor_SetColorFilter(&this->actor,0x4000,this->flashIntensity,0,8);
+        //gDPPipeSync(POLY_OPA_DISP++);
         //gSPDisplayList(POLY_XLU_DISP++, gGiZoraSapphireSettingDL);
 
+        
 
         //gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 934), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         //gSPDisplayList(POLY_XLU_DISP++, gGiBombDL);
         //Actor_SetColorFilter(&this->actor, 0, 255, 0, 12);
         Collider_UpdateSpheres(0, &this->explosionCollider);
-        //gDPPipeSync(POLY_XLU_DISP++);
+        //
     }
 
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_en_bom.c", 951);

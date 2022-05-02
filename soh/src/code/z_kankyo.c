@@ -2264,6 +2264,29 @@ Color_RGB8 sSandstormEnvColors[] = {
     { 50, 40, 0 },
 };
 
+Gfx* gFieldSandstormDL_Custom = NULL;
+
+void Environment_PatchSandstorm(GlobalContext* globalCtx) {
+    if (gFieldSandstormDL_Custom) return;
+
+    gFieldSandstormDL_Custom = ResourceMgr_PatchGfxByName(gFieldSandstormDL, -3);
+
+    const Gfx gFSPatchDL[2] = { gsSPEndDisplayList() };
+    bool patched = false;
+    Gfx* cmd = gFieldSandstormDL_Custom;
+    int id = 0;
+
+    while (!patched) {
+        const uint32_t opcode = cmd->words.w0 >> 24;
+        if (opcode == G_TEXRECT) {
+            gFieldSandstormDL_Custom[id] = gFSPatchDL[0];
+            patched = true;
+        }
+        ++cmd;
+        id++;
+    }
+}
+
 void Environment_DrawSandstorm(GlobalContext* globalCtx, u8 sandstormState) {
     s32 primA1;
     s32 envA1;
@@ -2276,6 +2299,8 @@ void Environment_DrawSandstorm(GlobalContext* globalCtx, u8 sandstormState) {
     u16 sp96;
     u16 sp94;
     u16 sp92;
+
+    Environment_PatchSandstorm(globalCtx);
 
     switch (sandstormState) {
         case 3:
@@ -2383,8 +2408,11 @@ void Environment_DrawSandstorm(GlobalContext* globalCtx, u8 sandstormState) {
                Gfx_TwoTexScroll(globalCtx->state.gfxCtx, 0, (u32)sp96 % 0x1000, 0, 0x200, 0x20, 1, (u32)sp94 % 0x1000,
                                 0xFFF - ((u32)sp92 % 0x1000), 0x100, 0x40));
     gDPSetTextureLUT(POLY_XLU_DISP++, G_TT_NONE);
-    gSPDisplayList(POLY_XLU_DISP++, gFieldSandstormDL);
-
+    //gSPDisplayList(POLY_XLU_DISP++, gFieldSandstormDL);
+    gSPDisplayList(POLY_XLU_DISP++, gFieldSandstormDL_Custom);
+    gSPWideTextureRectangle(POLY_XLU_DISP++, OTRGetRectDimensionFromLeftEdge(0) << 2, 0,
+                            OTRGetRectDimensionFromRightEdge(SCREEN_WIDTH) << 2, 0x03C0, G_TX_RENDERTILE, 0, 0, 0x008C,
+                            -0x008C);
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_kankyo.c", 4068);
 
     D_8015FDB0 += (s32)sp98;

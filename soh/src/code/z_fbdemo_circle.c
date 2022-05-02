@@ -147,7 +147,7 @@ void TransitionCircle_Draw(void* thisx, Gfx** gfxP) {
 
     modelView = this->modelView[this->frame];
 
-    this->color.rgba = 0xFFFFFFFF;
+    //this->color.rgba = 0xFFFFFFFF;
 
     this->frame ^= 1;
     gDPPipeSync(gfx++);

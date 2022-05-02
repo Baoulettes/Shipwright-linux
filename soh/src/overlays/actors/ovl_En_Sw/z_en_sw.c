@@ -94,8 +94,7 @@ s32 func_80B0BE20(EnSw* this, CollisionPoly* poly) {
     EnSw_CrossProduct(&this->unk_370, &sp44, &this->unk_37C);
     temp_f0 = Math3D_Vec3fMagnitude(&this->unk_37C);
     if (temp_f0 < 0.001f) {
-        temp_f0 = 0.001f;
-        //return 1;
+        return 0;
     }
     this->unk_37C.x = this->unk_37C.x * (1.0f / temp_f0);
     this->unk_37C.y = this->unk_37C.y * (1.0f / temp_f0);
@@ -118,8 +117,7 @@ s32 func_80B0BE20(EnSw* this, CollisionPoly* poly) {
     this->unk_3D8.zw = 0.0f;
     this->unk_3D8.ww = 1.0f;
     Matrix_MtxFToYXZRotS(&this->unk_3D8, &this->actor.world.rot, 0);
-    //! @bug: Does not return.
-    return 1;
+    //! @bug: Does not return. <- then do it ?!
 }
 
 CollisionPoly* func_80B0C020(GlobalContext* globalCtx, Vec3f* arg1, Vec3f* arg2, Vec3f* arg3, s32* arg4) {
@@ -249,7 +247,7 @@ void EnSw_Init(Actor* thisx, GlobalContext* globalCtx) {
     Collider_SetJntSph(globalCtx, &this->collider, &this->actor, &sJntSphInit, this->sphs);
     CollisionCheck_SetInfo2(&this->actor.colChkInfo, DamageTable_Get(0xE), &D_80B0F074);
     this->actor.scale.x = 0.02f;
-
+    
     if (((thisx->params & 0xE000) >> 0xD) == 0) {
         this->actor.world.rot.x = 0;
         this->actor.world.rot.z = 0;
@@ -396,21 +394,21 @@ s32 func_80B0CCF4(EnSw* this, f32* arg1, GlobalContext* globalCtx) {
     MtxF sp2C;
 
     if (this->actor.floorPoly == NULL) {
-        return true;
-    } else {
-        floorPoly = this->actor.floorPoly;
-        floorPolyNormal.x = COLPOLY_GET_NORMAL(floorPoly->normal.x);
-        floorPolyNormal.y = COLPOLY_GET_NORMAL(floorPoly->normal.y);
-        floorPolyNormal.z = COLPOLY_GET_NORMAL(floorPoly->normal.z);
-        Matrix_RotateAxis(*arg1, &floorPolyNormal, MTXMODE_NEW);
-        Matrix_MultVec3f(&this->unk_370, &floorPolyNormal);
+        return false;
     }
+
+    floorPoly = this->actor.floorPoly;
+    floorPolyNormal.x = COLPOLY_GET_NORMAL(floorPoly->normal.x);
+    floorPolyNormal.y = COLPOLY_GET_NORMAL(floorPoly->normal.y);
+    floorPolyNormal.z = COLPOLY_GET_NORMAL(floorPoly->normal.z);
+    Matrix_RotateAxis(*arg1, &floorPolyNormal, MTXMODE_NEW);
+    Matrix_MultVec3f(&this->unk_370, &floorPolyNormal);
+    
     this->unk_370 = floorPolyNormal;
     EnSw_CrossProduct(&this->unk_370, &this->unk_364, &this->unk_37C);
     temp_f0 = Math3D_Vec3fMagnitude(&this->unk_37C);
     if (temp_f0 < 0.001f) {
-        temp_f0 = 0.002f;
-        //return true;
+        return false;
     }
     temp_f0 = 1.0f / temp_f0;
     this->unk_37C.x *= temp_f0;
@@ -897,6 +895,23 @@ void EnSw_Update(Actor* thisx, GlobalContext* globalCtx) {
     func_80B0C9F0(this, globalCtx); //Death function, to set colors etc.
     this->actionFunc(this, globalCtx);
     func_80B0CBE8(this, globalCtx);
+
+    if (this->actor.floorPoly == NULL) {
+        printf("[Error : floorPoly is NULL][Coordinates: X:%f | Y:%f | Z:%f][Rotation: X:%d | Y:%d | Z:%d]\n",
+            this->actor.home.pos.x,this->actor.home.pos.y,this->actor.home.pos.z,
+            thisx->shape.rot.x,thisx->shape.rot.y,thisx->shape.rot.z);
+
+
+            this->actor.world.pos.z -= 0.8f;
+        
+    } else {
+        if (this->actor.home.pos.y < 270 && this->actor.home.pos.y < 265) {
+            //printf("[Shape Rotation: X:%d | Y:%d | Z:%d]\n",      thisx->shape.rot.x,     thisx->shape.rot.y,     thisx->shape.rot.z);
+            //printf("[Home  Rotation: X:%d | Y:%d | Z:%d]\n",  this->actor.home.rot.x, this->actor.home.rot.y, this->actor.home.rot.z);
+            //printf("[World Rotation: X:%d | Y:%d | Z:%d]\n", this->actor.world.rot.x,this->actor.world.rot.y,this->actor.world.rot.z);
+        }
+        
+    }
 }
 
 s32 EnSw_OverrideLimbDraw(GlobalContext* globalCtx, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, void* thisx) {

@@ -18,6 +18,10 @@ struct SoHConfigType {
     struct {
         bool show = false;
     } graphics;
+
+    struct {
+        bool uiedit = false;
+    } cosmetics;
 };
 
 enum SeqPlayers {

@@ -295,12 +295,15 @@ void func_8009638C(Gfx** displayList, void* source, void* tlut, u16 width, u16 h
         bg->b.frameH = height * 4;
         guS2DInitBg(bg);
         
-        gDPSetOtherMode(displayListHead++, mode0 | G_TL_TILE | G_TD_CLAMP | G_TP_NONE | G_CYC_COPY | G_PM_NPRIMITIVE,
+        gDPSetOtherMode(displayListHead++, mode0 | G_TL_TILE | G_TD_CLAMP | G_TP_NONE | G_CYC_FILL | G_PM_NPRIMITIVE,
                         G_AC_THRESHOLD | G_ZS_PIXEL | G_RM_NOOP | G_RM_NOOP2);
 
         gDPSetFillColor(displayListHead++, GPACK_RGBA5551(0, 0, 0, 1) << 16 | GPACK_RGBA5551(0, 0, 0, 1));
         gDPFillWideRectangle(displayListHead++, OTRGetRectDimensionFromLeftEdge(0), 0,
                          OTRGetRectDimensionFromRightEdge(SCREEN_WIDTH), SCREEN_HEIGHT);
+
+        gDPSetOtherMode(displayListHead++, mode0 | G_TL_TILE | G_TD_CLAMP | G_TP_NONE | G_CYC_COPY | G_PM_NPRIMITIVE,
+                        G_AC_THRESHOLD | G_ZS_PIXEL | G_RM_NOOP | G_RM_NOOP2);
 
         gDPLoadMultiTile(displayListHead++, bg->b.imagePtr, 0,
             G_TX_RENDERTILE, G_IM_FMT_RGBA, G_IM_SIZ_16b, 320, 0, 0, 0, 0 + 31,
