@@ -725,7 +725,7 @@ void Minimap_Draw(GlobalContext* globalCtx) {
 
                     gDPSetCombineMode(OVERLAY_DISP++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
                     if (CVar_GetS32("gHudColors", 1) == 2) {//Overworld minimap
-                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCMinimapPrimR", 255), CVar_GetS32("gCCMinimapPrimG", 255), CVar_GetS32("gCCMinimapPrimB", 255), interfaceCtx->magicAlpha);
+                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCMinimapPrimR", 255), CVar_GetS32("gCCMinimapPrimG", 255), CVar_GetS32("gCCMinimapPrimB", 255), interfaceCtx->minimapAlpha);
                     } else {
                         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_MINIMAP_COLOR(0), R_MINIMAP_COLOR(1), R_MINIMAP_COLOR(2), interfaceCtx->minimapAlpha);
                     }
@@ -742,7 +742,6 @@ void Minimap_Draw(GlobalContext* globalCtx) {
                                            (oWMiniMapX + gMapData->owMinimapWidth[mapIndex]) << 2,
                                            (oWMiniMapY + gMapData->owMinimapHeight[mapIndex]) << 2, G_TX_RENDERTILE, 0,
                                             0, 1 << 10, 1 << 10);
-
                     if (CVar_GetS32("gHudColors", 1) != 2) {//This need to be added else it will color dungeon entrance icon too. (it re-init prim color to default color)
                         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_MINIMAP_COLOR(0), R_MINIMAP_COLOR(1), R_MINIMAP_COLOR(2), interfaceCtx->minimapAlpha);
                     }

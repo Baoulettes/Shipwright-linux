@@ -3283,6 +3283,7 @@ void Interface_Draw(GlobalContext* globalCtx) {
             OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, gRupeeCounterIconTex, 16, 16, OTRGetRectDimensionFromLeftEdge(26+(Left_HUD_Margin*-1)),
                                           206+(Bottom_HUD_Margin), 16, 16, 1 << 10, 1 << 10);
 
+
             switch (globalCtx->sceneNum) {
                 case SCENE_BMORI1:
                 case SCENE_HIDAN:

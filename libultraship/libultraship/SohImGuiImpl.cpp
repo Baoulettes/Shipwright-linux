@@ -317,9 +317,6 @@ namespace SohImGui {
     int ClampFloatToInt(float value, int min, int max){
         return fmin(fmax(value,min),max);
     }
-    float ClampIntToFloat(int value, float min, float max){
-        return fmin(fmax(value,min),max);
-    }
 
     void Init(WindowImpl window_impl) {
         impl = window_impl;
@@ -394,7 +391,7 @@ namespace SohImGui {
         }
     }
     
-    void EnhancementColorEdit3(std::string text, std::string cvarName, float ColorRGB[3]) {
+    void EnhancementColor3(std::string text, std::string cvarName, float ColorRGB[3]) {
         if (ImGui::ColorEdit3(text.c_str(), ColorRGB)) {
             CVar_SetS32((cvarName+"R").c_str(), ClampFloatToInt(ColorRGB[0]*255,0,255));
             CVar_SetS32((cvarName+"G").c_str(), ClampFloatToInt(ColorRGB[1]*255,0,255));
@@ -618,24 +615,24 @@ namespace SohImGui {
             if (ImGui::BeginMenu("Cosmetics")) {
                 if (ImGui::BeginMenu("Tunics")) {
                     EnhancementCheckbox("Custom colors on tunics", "gUseTunicsCol");
-                    EnhancementColorEdit3("Kokiri Tunic", "gTunic_Kokiri_", kokiri_col);
-                    EnhancementColorEdit3("Goron Tunic", "gTunic_Goron_", goron_col);
-                    EnhancementColorEdit3("Zora Tunic", "gTunic_Zora_", zora_col);
+                    EnhancementColor3("Kokiri Tunic", "gTunic_Kokiri_", kokiri_col);
+                    EnhancementColor3("Goron Tunic", "gTunic_Goron_", goron_col);
+                    EnhancementColor3("Zora Tunic", "gTunic_Zora_", zora_col);
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Navi")) {
                     EnhancementCheckbox("Custom colors for Navi", "gUseNaviCol");
-                    EnhancementColorEdit3("Navi Idle Inner", "gNavi_Idle_Inner_", navi_idle_i_col);
-                    EnhancementColorEdit3("Navi Idle Outer", "gNavi_Idle_Outer_", navi_idle_o_col);
+                    EnhancementColor3("Navi Idle Inner", "gNavi_Idle_Inner_", navi_idle_i_col);
+                    EnhancementColor3("Navi Idle Outer", "gNavi_Idle_Outer_", navi_idle_o_col);
                     ImGui::Separator();
-                    EnhancementColorEdit3("Navi NPC Inner", "gNavi_NPC_Inner_", navi_npc_i_col);
-                    EnhancementColorEdit3("Navi NPC Outer", "gNavi_NPC_Outer_", navi_npc_o_col);
+                    EnhancementColor3("Navi NPC Inner", "gNavi_NPC_Inner_", navi_npc_i_col);
+                    EnhancementColor3("Navi NPC Outer", "gNavi_NPC_Outer_", navi_npc_o_col);
                     ImGui::Separator();
-                    EnhancementColorEdit3("Navi Enemy Inner", "gNavi_Enemy_Inner_", navi_enemy_i_col);
-                    EnhancementColorEdit3("Navi Enemy Outer", "gNavi_Enemy_Outer_", navi_enemy_o_col);
+                    EnhancementColor3("Navi Enemy Inner", "gNavi_Enemy_Inner_", navi_enemy_i_col);
+                    EnhancementColor3("Navi Enemy Outer", "gNavi_Enemy_Outer_", navi_enemy_o_col);
                     ImGui::Separator();
-                    EnhancementColorEdit3("Navi Prop Inner", "gNavi_Prop_Inner_", navi_prop_i_col);
-                    EnhancementColorEdit3("Navi Prop Outer", "gNavi_Prop_Outer_", navi_prop_o_col);
+                    EnhancementColor3("Navi Prop Inner", "gNavi_Prop_Inner_", navi_prop_i_col);
+                    EnhancementColor3("Navi Prop Outer", "gNavi_Prop_Outer_", navi_prop_o_col);
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Interface")) {
@@ -644,26 +641,26 @@ namespace SohImGui {
                     EnhancementRadioButton("Custom Colors", "gHudColors", 2);
                     if (ImGui::BeginMenu("Edit HUD Colors")) {
                         if (ImGui::BeginMenu("Hearts")) {
-                            EnhancementColorEdit3("Hearts normals", "gCCHeartsPrim", hearts_colors);
-                            EnhancementColorEdit3("Hearts double def", "gDDCCHeartsPrim", hearts_dd_colors);
+                            EnhancementColor3("Hearts normals", "gCCHeartsPrim", hearts_colors);
+                            EnhancementColor3("Hearts double def", "gDDCCHeartsPrim", hearts_dd_colors);
                             ImGui::EndMenu();
                         }
                         if (ImGui::BeginMenu("Buttons")) {
-                            EnhancementColorEdit3("A Buttons", "gCCABtnPrim", a_btn_colors);
-                            EnhancementColorEdit3("B Buttons", "gCCBBtnPrim", b_btn_colors);
-                            EnhancementColorEdit3("C Buttons", "gCCCBtnPrim", c_btn_colors);
-                            EnhancementColorEdit3("Start Buttons", "gCCStartBtnPrim", start_btn_colors);
+                            EnhancementColor3("A Buttons", "gCCABtnPrim", a_btn_colors);
+                            EnhancementColor3("B Buttons", "gCCBBtnPrim", b_btn_colors);
+                            EnhancementColor3("C Buttons", "gCCCBtnPrim", c_btn_colors);
+                            EnhancementColor3("Start Buttons", "gCCStartBtnPrim", start_btn_colors);
                             ImGui::EndMenu();
                         }
                         if (ImGui::BeginMenu("Magic Bar")) {
-                            EnhancementColorEdit3("Magic bar borders", "gCCMagicBorderPrim", magic_border_colors);
-                            EnhancementColorEdit3("Magic bar main color", "gCCMagicPrim", magic_remaining_colors);
-                            EnhancementColorEdit3("Magic bar being used", "gCCMagicUsePrim", magic_use_colors);
+                            EnhancementColor3("Magic bar borders", "gCCMagicBorderPrim", magic_border_colors);
+                            EnhancementColor3("Magic bar main color", "gCCMagicPrim", magic_remaining_colors);
+                            EnhancementColor3("Magic bar being used", "gCCMagicUsePrim", magic_use_colors);
                             ImGui::EndMenu();
                         }
                         if (ImGui::BeginMenu("Misc")) {
-                            EnhancementColorEdit3("Minimap color", "gCCMinimapPrim", minimap_colors);
-                            EnhancementColorEdit3("Rupee icon color", "gCCRupeePrim", rupee_colors);
+                            EnhancementColor3("Minimap color", "gCCMinimapPrim", minimap_colors);
+                            EnhancementColor3("Rupee icon color", "gCCRupeePrim", rupee_colors);
                             ImGui::EndMenu();
                         }
                         ImGui::EndMenu();
@@ -674,17 +671,17 @@ namespace SohImGui {
             ImGui::EndMenu();
             }
             
-        if (Game::Settings.cosmetics.uiedit) {
-            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
-            ImGui::Begin("Interface modifier", nullptr, ImGuiWindowFlags_None);
-            EnhancementCheckbox("Use margins", "gHUDMargins");
-            EnhancementSliderInt("Top : %dx", "##UIMARGINT", "gHUDMargin_T", -20, 20, "");
-            EnhancementSliderInt("Left: %dx", "##UIMARGINL", "gHUDMargin_L", -25, 25, "");
-            EnhancementSliderInt("Right: %dx", "##UIMARGINR", "gHUDMargin_R", -25, 25, "");
-            EnhancementSliderInt("Bottom: %dx", "##UIMARGINB", "gHUDMargin_B", -20, 20, "");
-            ImGui::End();
-            ImGui::PopStyleColor();
-        }
+            if (Game::Settings.cosmetics.uiedit) {
+                ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
+                ImGui::Begin("Interface modifier", nullptr, ImGuiWindowFlags_None);
+                EnhancementCheckbox("Use margins", "gHUDMargins");
+                EnhancementSliderInt("Top : %dx", "##UIMARGINT", "gHUDMargin_T", -20, 20, "");
+                EnhancementSliderInt("Left: %dx", "##UIMARGINL", "gHUDMargin_L", -25, 25, "");
+                EnhancementSliderInt("Right: %dx", "##UIMARGINR", "gHUDMargin_R", -25, 25, "");
+                EnhancementSliderInt("Bottom: %dx", "##UIMARGINB", "gHUDMargin_B", -20, 20, "");
+                ImGui::End();
+                ImGui::PopStyleColor();
+            }
 
             if (CVar_GetS32("gLanguages", 0) == 0) {
                 SelectedLanguage = 0;
@@ -707,7 +704,7 @@ namespace SohImGui {
 
                 ImGui::Text("Debug");
                 ImGui::Separator();
-
+                EnhancementSliderInt("gDbgIntVal: %d", "##MapStage", "gDbgIntVal", 1, 99, "");
                 EnhancementCheckbox("Hide build infos", "gBuildInfos");
                 EnhancementCheckbox("Debug Mode (L + R + Z)", "gDebugEnabled");
                 EnhancementCheckbox("Debug Camera (DPad < + R)", "gDebugCamera");

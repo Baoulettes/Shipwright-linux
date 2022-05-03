@@ -1033,19 +1033,18 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
         shiftBottomY = 0x1000;
 
         //if this card is bosses cards, has translation and that is not using English language.
-        if (titleCtx->isBossCard == 1 && titleCtx->hasTranslation == 1 && gSaveContext.language != LANGUAGE_ENG) {
+        if (titleCtx->isBossCard && titleCtx->hasTranslation && gSaveContext.language != LANGUAGE_ENG) {
+            textureLanguageOffset = (width * height * gSaveContext.language);
             if (gSaveContext.language == LANGUAGE_GER) {
-                textureLanguageOffset = (width * height * gSaveContext.language);
                 shiftTopY = 0x400;
                 shiftBottomY = 0x1400;
             } else if (gSaveContext.language == LANGUAGE_FRA) {
-                textureLanguageOffset = (width * height * gSaveContext.language);
                 shiftTopY = 0x800;
                 shiftBottomY = 0x1800;
             }
         }
 
-        gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + (uintptr_t)textureLanguageOffset + (uintptr_t)shiftTopY, G_IM_FMT_IA, G_IM_SIZ_8b,
+        gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + textureLanguageOffset + shiftTopY, G_IM_FMT_IA, G_IM_SIZ_8b,
                             width, height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                             G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
@@ -1057,7 +1056,7 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
         // If texture is bigger than 0x1000, display the rest
         // for Boss Title card the the bottom part of it.
         if (height > 0) {
-            gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + (uintptr_t)textureLanguageOffset + (uintptr_t)shiftBottomY, G_IM_FMT_IA,
+            gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + textureLanguageOffset + shiftBottomY, G_IM_FMT_IA,
                                 G_IM_SIZ_8b, width, height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                 G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 

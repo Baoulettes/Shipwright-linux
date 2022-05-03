@@ -117,7 +117,6 @@ void EnBom_Init(Actor* thisx, GlobalContext* globalCtx) {
 
 void EnBom_Destroy(Actor* thisx, GlobalContext* globalCtx) {
     EnBom* this = (EnBom*)thisx;
-
     Collider_DestroyJntSph(globalCtx, &this->explosionCollider);
     Collider_DestroyCylinder(globalCtx, &this->bombCollider);
 }
@@ -216,7 +215,6 @@ void EnBom_Explode(EnBom* this, GlobalContext* globalCtx) {
             player->interactRangeActor = NULL;
             player->stateFlags1 &= ~0x800;
         }
-
         Actor_Kill(&this->actor);
     }
 }
@@ -275,7 +273,6 @@ void EnBom_Update(Actor* thisx, GlobalContext* globalCtx2) {
         // double bomb flash speed and adjust red color at certain times during the countdown
         if ((this->timer == 3) || (this->timer == 20) || (this->timer == 40)) {
             thisx->shape.rot.z = 0;
-            Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 0x50);
             this->flashSpeedScale >>= 1;
         }
         if ((this->timer < 100) && ((this->timer & (this->flashSpeedScale + 1)) != 0)) {
@@ -283,7 +280,7 @@ void EnBom_Update(Actor* thisx, GlobalContext* globalCtx2) {
         } else {
             Math_SmoothStepToF(&this->flashIntensity, 0.0f, 1.0f, 140.0f / this->flashSpeedScale, 0.0f);
         }
-        Actor_SetColorFilter(&this->actor,0x4000,this->flashIntensity,0,8);
+        
 
         //printf("%f \n",this->flashIntensity);
         if (this->timer < 3) {
@@ -342,36 +339,9 @@ void EnBom_Draw(Actor* thisx, GlobalContext* globalCtx) {
     OPEN_DISPS(globalCtx->state.gfxCtx, "../z_en_bom.c", 913);
     frames = globalCtx->gameplayFrames;
     if (thisx->params == BOMB_BODY) {
-        //POLY_XLU_DISP = func_800937C0(POLY_XLU_DISP);
-        //func_80093D18(globalCtx->state.gfxCtx);
-        //Matrix_ReplaceRotation(&globalCtx->billboardMtxF);
-        //func_8002EBCC(thisx, globalCtx, 0);
-
-        //gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 928), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        //gSPDisplayList(POLY_OPA_DISP++, gBombCapDL);
-        //Matrix_RotateZYX(0x4000, 0, 0, MTXMODE_APPLY);
-
         Matrix_Translate(0.0f, -670.0f, 0.0f, MTXMODE_APPLY);
-        //gDPSetPrimColor(POLY_XLU_DISP++, 0, 128, 0, 255, 255, 255);
-        //gDPPipeSync(POLY_XLU_DISP++);
-        //gSPTexture(POLY_XLU_DISP++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON);
-        //gDPSetEnvColor(POLY_XLU_DISP++, 0, 255, 255, 255);
-        //gDPSetBlendColor(POLY_XLU_DISP++, 0, 255, 255, 255);
-        //gDPSetAlphaDither(POLY_XLU_DISP++, G_AD_DISABLE);
-        //gDPSetColorDither(POLY_XLU_DISP++, G_CD_DISABLE);
-        //gDPSetRenderMode(POLY_XLU_DISP++, G_RM_PASS, G_RM_AA_ZB_XLU_SURF2);
         gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 648), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-
         gSPDisplayList(POLY_XLU_DISP++, gGiBombDL);
-        Actor_SetColorFilter(&this->actor,0x4000,this->flashIntensity,0,8);
-        //gDPPipeSync(POLY_OPA_DISP++);
-        //gSPDisplayList(POLY_XLU_DISP++, gGiZoraSapphireSettingDL);
-
-        
-
-        //gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 934), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        //gSPDisplayList(POLY_XLU_DISP++, gGiBombDL);
-        //Actor_SetColorFilter(&this->actor, 0, 255, 0, 12);
         Collider_UpdateSpheres(0, &this->explosionCollider);
         //
     }
