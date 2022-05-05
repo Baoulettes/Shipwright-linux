@@ -539,6 +539,7 @@ void DbCamera_Init(DbCamera* dbCamera, Camera* cameraPtr) {
     dbCamera->unk_6C.x = 0;
     dbCamera->unk_6C.y = 0;
     dbCamera->unk_6C.z = 0;
+
 }
 
 void DbgCamera_Enable(DbCamera* dbCamera, Camera* cam) {

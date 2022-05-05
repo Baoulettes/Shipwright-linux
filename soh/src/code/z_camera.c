@@ -6787,6 +6787,11 @@ void Camera_Init(Camera* camera, View* view, CollisionContext* colCtx, GlobalCon
     s16 curUID;
     s16 j;
 
+    if (CVar_GetS32("gDebugCamera", 0) != 1) {
+        //This prevent some issue to rise if a person want to use ocarina outside dbg cam.
+        dbg_camera_pad_n = 1;
+    }
+
     memset(camera, 0, sizeof(*camera));
     if (sInitRegs) {
         for (i = 0; i < sOREGInitCnt; i++) {

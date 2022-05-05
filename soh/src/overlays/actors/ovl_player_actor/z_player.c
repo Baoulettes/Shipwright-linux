@@ -19,6 +19,7 @@
 #include "overlays/effects/ovl_Effect_Ss_Fhg_Flash/z_eff_ss_fhg_flash.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "objects/object_link_child/object_link_child.h"
+#include "objects/object_link_boy/object_link_boy.h"
 #include "textures/icon_item_24_static/icon_item_24_static.h"
 
 typedef struct {
@@ -10897,8 +10898,7 @@ void Player_DrawGameplay(GlobalContext* globalCtx, Player* this, s32 lod, Gfx* c
 void Player_Draw(Actor* thisx, GlobalContext* globalCtx2) {
     GlobalContext* globalCtx = globalCtx2;
     Player* this = (Player*)thisx;
-
-     Vec3f pos;
+    Vec3f pos;
     Vec3s rot;
     f32 scale;
 

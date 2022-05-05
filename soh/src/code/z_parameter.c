@@ -3204,6 +3204,50 @@ const char* digitTextures[] =
     gCounterDigit4Tex, gCounterDigit5Tex, gCounterDigit6Tex, gCounterDigit7Tex, gCounterDigit8Tex
 };
 
+void Days_interface(GlobalContext* globalCtx, InterfaceContext* interfaceCtx) {
+    bool fullUi = !CVar_GetS32("gMinimalUI", 0) || !R_MINIMAP_DISABLED || globalCtx->pauseCtx.state != 0;
+    int RectSize_w = 16; //This is the size used for current time to be sure the middle of the icon will be on 12 when it's 12.
+    int RectSize_h = 16;
+    int ScreenXCenter = (SCREEN_WIDTH/2)-RectSize_w;
+    int RectFarLeft = -80;
+    int RectFarRight = 80;
+    int CursorPosition = ((gSaveContext.dayTime/800)*2)-RectFarRight;
+    int Cursor_color[] = {180,180,180};
+    int YposGeneral = 193;
+    int i = 0;
+    //printf("Day time : %d \n",CursorPosition);
+    //gSaveContext.dayTime = CVar_GetS32("gDbgIntVal", 0)*655;
+
+    OPEN_DISPS(globalCtx->state.gfxCtx, "../z_parameter.c", 3405);
+    if (fullUi) {
+        // Left Icon
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha/2);
+        gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, gEmptyCRightArrowTex, 32, 32, ScreenXCenter+RectFarLeft,YposGeneral+2+(Bottom_HUD_Margin), 32, 32, 1 << 10, 1 << 10);
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[0], 8, 8, ScreenXCenter+RectFarLeft+11, YposGeneral+(Bottom_HUD_Margin), 8, 8, 1 << 10, 1 << 10);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[0], 8, 8, ScreenXCenter+RectFarLeft+16, YposGeneral+(Bottom_HUD_Margin), 8, 8, 1 << 10, 1 << 10);
+
+        // Right Icon
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha/2);
+        gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, gEmptyCLeftArrowTex, 32, 32, ScreenXCenter+RectFarRight+2,YposGeneral+2+(Bottom_HUD_Margin), 32, 32, 1 << 10, 1 << 10);
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[1], 8, 8, ScreenXCenter+RectFarRight+13, YposGeneral+(Bottom_HUD_Margin), 8, 8, 1 << 10, 1 << 10);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[2], 8, 8, ScreenXCenter+RectFarRight+17, YposGeneral+(Bottom_HUD_Margin), 8, 8, 1 << 10, 1 << 10);
+
+        // Center icons
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[1], 8, 8, ScreenXCenter+RectSize_w-6, YposGeneral+(Bottom_HUD_Margin), 8, 8, 1 << 10, 1 << 10);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, (u8*)_gAmmoDigit0Tex[2], 8, 8, ScreenXCenter+RectSize_w-1, YposGeneral+(Bottom_HUD_Margin), 8, 8, 1 << 10, 1 << 10);
+
+        // Cursor Icon
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, Cursor_color[0], Cursor_color[1], Cursor_color[2], interfaceCtx->magicAlpha/2);
+        gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
+        OVERLAY_DISP = Gfx_TextureIA8(OVERLAY_DISP, gEmptyCDownArrowTex, 32, 32, ScreenXCenter+CursorPosition,YposGeneral-1+(Bottom_HUD_Margin), 32, 32, 1 << 10, 1 << 10);
+
+    }
+    CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_parameter.c", 4269);
+}
 void Interface_Draw(GlobalContext* globalCtx) {
     static s16 magicArrowEffectsR[] = { 255, 100, 255 };
     static s16 magicArrowEffectsG[] = { 0, 100, 255 };
@@ -3265,6 +3309,26 @@ void Interface_Draw(GlobalContext* globalCtx) {
         func_80094520(globalCtx->state.gfxCtx);
 
         if (fullUi) {
+            PauseContext* pauseCtx = &globalCtx->pauseCtx;
+            if(CVar_GetS32("gShowClock", 0) != 0){
+                //Day cycle interface. (useless ... ?)
+                Days_interface(globalCtx, interfaceCtx);
+            }
+            /*if(CVar_GetS32("gAlwaysTick", 0) != 0 && pauseCtx->state >= 1){
+                if(CVar_GetS32("gTickMultiplier", 0) != 0 && CVar_GetS32("gDivideTime", 0) != 0){
+                    gSaveContext.dayTime += (CVar_GetS32("gTickMultiplier", 0)/3);
+                    gSaveContext.skyboxTime += (CVar_GetS32("gTickMultiplier", 0)/3);
+                } else if(CVar_GetS32("gTickMultiplier", 0) != 0 && CVar_GetS32("gDivideTime", 0) != 1){
+                    gSaveContext.dayTime += (CVar_GetS32("gTickMultiplier", 0)/3);
+                    gSaveContext.skyboxTime += (CVar_GetS32("gTickMultiplier", 0)/3);
+                } else if(CVar_GetS32("gTickMultiplier", 0) == 0 ) {
+                    gSaveContext.dayTime = gSaveContext.dayTime;
+                } else {
+                    gSaveContext.dayTime += 2.0f;
+                    gSaveContext.skyboxTime += 2.0f;
+                }
+            }*/
+            
             // Rupee Icon
             s16* rColor;
 

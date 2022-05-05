@@ -305,7 +305,6 @@ void EnSw_Init(Actor* thisx, GlobalContext* globalCtx) {
     } else {
         this->actionFunc = func_80B0D590;
     }
-
 }
 
 void EnSw_Destroy(Actor* thisx, GlobalContext* globalCtx) {
@@ -807,12 +806,7 @@ s32 func_80B0E430(EnSw* this, f32 arg1, s16 arg2, s32 arg3, GlobalContext* globa
     } else {
         this->unk_440 = 0;
     }
-    if (this->actor.wallPoly == NULL && this->actor.floorPoly == NULL){
-        Math_SmoothStepToS(&this->actor.shape.rot.y, this->unk_444, 4, arg2, arg2);
-    } else {
-        Math_SmoothStepToS(&this->actor.shape.rot.z, this->unk_444, 4, arg2, arg2);
-    }
-
+    Math_SmoothStepToS(&this->actor.shape.rot.z, this->unk_444, 4, arg2, arg2);
     this->actor.world.rot = this->actor.shape.rot;
     if (this->actor.shape.rot.z == this->unk_444) {
         return 1;

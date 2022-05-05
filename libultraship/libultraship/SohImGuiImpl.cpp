@@ -560,16 +560,22 @@ namespace SohImGui {
                 EnhancementCheckbox("Minimal UI", "gMinimalUI");
                 EnhancementCheckbox("MM Bunny Hood", "gMMBunnyHood");
                 EnhancementCheckbox("Visual Stone of Agony", "gVisualAgony");
-
                 EnhancementCheckbox("Always show dungeon entrances", "gAlwaysShowDungeonMinimapIcon");
-                
+                EnhancementCheckbox("Show clock", "gShowClock");
+                EnhancementCheckbox("Save Last Entrance", "gSaveEntrance");
+                //EnhancementSliderInt("Time speed: %dx (Req. time always flow)", "##TickMul", "gTickMultiplier", 0, 500, "");
+                //EnhancementCheckbox("Time always flow", "gAlwaysTick");
+
                 ImGui::Text("Graphics");
                 ImGui::Separator();
                 EnhancementCheckbox("N64 Mode", "gN64Mode");
                 EnhancementCheckbox("Animated Link in Pause Menu", "gPauseLiveLink");
                 EnhancementCheckbox("Disable LOD", "gDisableLOD");
+                EnhancementCheckbox("Disable Black Bars", "gDisableBlackBars");
                 EnhancementCheckbox("Enable 3D Dropped items", "gNewDrops");
                 EnhancementCheckbox("Dynamic Wallet Icon", "gDynamicWalletIcon");
+                
+                HOOK(ImGui::MenuItem("Anti-aliasing", nullptr, &Game::Settings.graphics.show));
 
                 if (ImGui::BeginMenu("Fixes")) {
                     EnhancementCheckbox("Fix L&R Pause menu", "gUniformLR");
@@ -597,11 +603,6 @@ namespace SohImGui {
                 EnhancementCheckbox("Unrestricted Items", "gNoRestrictItems");
                 EnhancementCheckbox("Freeze Time", "gFreezeTime");
 
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Graphics")) {
-                HOOK(ImGui::MenuItem("Anti-aliasing", nullptr, &Game::Settings.graphics.show));
                 ImGui::EndMenu();
             }
 
@@ -704,7 +705,7 @@ namespace SohImGui {
 
                 ImGui::Text("Debug");
                 ImGui::Separator();
-                EnhancementSliderInt("gDbgIntVal: %d", "##MapStage", "gDbgIntVal", 1, 99, "");
+                EnhancementSliderInt("gDbgIntVal: %d", "##MapStage", "gDbgIntVal", 0, 100, "");
                 EnhancementCheckbox("Hide build infos", "gBuildInfos");
                 EnhancementCheckbox("Debug Mode (L + R + Z)", "gDebugEnabled");
                 EnhancementCheckbox("Debug Camera (DPad < + R)", "gDebugCamera");
