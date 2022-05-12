@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
 #include <limits>
 #include <vector>
+#include <cstring>
 
 class BitConverter
 {

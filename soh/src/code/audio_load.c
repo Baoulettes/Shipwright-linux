@@ -1372,6 +1372,9 @@ SoundFontSample* AudioLoad_GetFontSample(s32 fontId, s32 instId) {
     return ret;
 }
 
+void AudioLoad_Unused2(void) {
+}
+
 void AudioLoad_FinishSlowLoad(AudioSlowLoad* slowLoad) {
     SoundFontSample* sample;
 
@@ -2114,6 +2117,15 @@ void AudioLoad_LoadPermanentSamples(void) {
             AudioLoad_PreloadSamplesForFont(fontId, false, &relocInfo);
         }
     }
+}
+
+void AudioLoad_Unused3(void) {
+}
+
+void AudioLoad_Unused4(void) {
+}
+
+void AudioLoad_Unused5(void) {
 }
 
 void AudioLoad_ScriptLoad(s32 tableType, s32 id, s8* isDone) {

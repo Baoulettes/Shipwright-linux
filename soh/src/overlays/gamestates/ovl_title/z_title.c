@@ -11,7 +11,7 @@
 #include "textures/nintendo_rogo_static/nintendo_rogo_static.h"
 #include <soh/Enhancements/bootcommands.h>
 #include "GameVersions.h"
-#include "SohHooks.h"
+#include "Cvar.h"
 
 const char* GetGameVersionString();
 
@@ -55,7 +55,7 @@ void Title_PrintBuildInfo(Gfx** gfxp) {
     *gfxp = g;
 }
 
-const char* quotes[12] = {
+const char* quotes[11] = {
     "My boy! This peace is what all true warriors strive for!",
     "Hmm. How can we help?",
     "Zelda! Duke Onkled is under attack by the evil forces of Ganon!",
@@ -72,7 +72,7 @@ const char* quotes[12] = {
 
 char* SetQuote() {
     srand(time(NULL));
-    int randomQuote = rand() % 12;
+    int randomQuote = rand() % 11;
     return quotes[randomQuote];
 }
 
@@ -200,8 +200,9 @@ void Title_Draw(TitleContext* this) {
         COMBINED, ENVIRONMENT, COMBINED, 0, PRIMITIVE, 0);
     gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 170, 255, 255, 255);
     gDPSetEnvColor(POLY_OPA_DISP++, 0, 0, 255, 128);
+
     gDPLoadMultiBlock(POLY_OPA_DISP++, nintendo_rogo_static_Tex_001800, 0x100, 1, G_IM_FMT_I, G_IM_SIZ_8b, 32, 32, 0,
-            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 5, 2, 11);
+        G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 5, 2, 11);
 
     for (idx = 0, y = 94; idx < 16; idx++, y += 2)
     {
@@ -235,9 +236,10 @@ void Title_Main(GameState* thisx) {
         Gfx* gfx = POLY_OPA_DISP;
         s32 pad;
 
-        if (CVar_GetS32("gBuildInfos", 0) != 1) {
+        if (CVar_GetS32("gSOHSplashscreen",0)!=0) {
             Title_PrintBuildInfo(&gfx);
-        };
+        }
+        
         POLY_OPA_DISP = gfx;
     }
 
@@ -268,7 +270,11 @@ void Title_Init(GameState* thisx) {
 
     quote = SetQuote();
 
+    //this->staticSegment = GameState_Alloc(&this->state, size, "../z_title.c", 611);
     osSyncPrintf("z_title.c\n");
+    //ASSERT(this->staticSegment != NULL, "this->staticSegment != NULL", "../z_title.c", 614);
+
+    //ResourceMgr_CacheDirectory("nintendo_rogo_static*");
 
     // Disable vismono
     D_801614B0.a = 0;

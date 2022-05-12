@@ -27,8 +27,6 @@
 #define _icon_item_staticSegmentRomEnd 0
 #define _map_i_staticSegmentRomStart 0
 #define _map_i_staticSegmentRomEnd 0
-#define _map_48x85_staticSegmentRomStart 0
-#define _map_48x85_staticSegmentRomEnd 0
 #define _message_staticSegmentRomStart 0
 #define _message_staticSegmentRomEnd 0
 #define _do_action_staticSegmentRomStart 0

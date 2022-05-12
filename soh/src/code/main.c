@@ -132,6 +132,6 @@ void Main(void* arg) {
     osDestroyThread(&sGraphThread);
     func_800FBFD8();
     osSyncPrintf("mainproc 実行終了\n"); // "End of execution"
-    
+
     Heaps_Free();
 }

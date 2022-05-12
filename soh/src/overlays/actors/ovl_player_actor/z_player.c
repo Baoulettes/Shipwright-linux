@@ -19,7 +19,6 @@
 #include "overlays/effects/ovl_Effect_Ss_Fhg_Flash/z_eff_ss_fhg_flash.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "objects/object_link_child/object_link_child.h"
-#include "objects/object_link_boy/object_link_boy.h"
 #include "textures/icon_item_24_static/icon_item_24_static.h"
 
 typedef struct {
@@ -3991,6 +3990,7 @@ s32 func_80838A14(Player* this, GlobalContext* globalCtx) {
 
         return 1;
     }
+
     return 0;
 }
 
@@ -5489,6 +5489,7 @@ s32 func_8083C910(GlobalContext* globalCtx, Player* this, f32 arg2) {
             return 0;
         }
     }
+
     func_80838E70(globalCtx, this, arg2, this->actor.shape.rot.y);
     this->stateFlags1 |= PLAYER_STATE1_29;
     return 1;
@@ -5952,11 +5953,11 @@ void func_8083DFE0(Player* this, f32* arg1, s16* arg2) {
     s16 yawDiff = this->currentYaw - *arg2;
 
     if (this->swordState == 0) {
-      float maxSpeed = R_RUN_SPEED_LIMIT / 100.0f;
-      if (CVar_GetS32("gMMBunnyHood", 0) != 0 && this->currentMask == PLAYER_MASK_BUNNY) {
-          maxSpeed *= 1.5f;
-      }
-      this->linearVelocity = CLAMP(this->linearVelocity, -maxSpeed, maxSpeed);
+        float maxSpeed = R_RUN_SPEED_LIMIT / 100.0f;
+        if (CVar_GetS32("gMMBunnyHood", 0) != 0 && this->currentMask == PLAYER_MASK_BUNNY) {
+            maxSpeed *= 1.5f;
+        }
+        this->linearVelocity = CLAMP(this->linearVelocity, -maxSpeed, maxSpeed);
     }
 
     if (ABS(yawDiff) > 0x6000) {
@@ -6980,7 +6981,7 @@ void func_808409CC(GlobalContext* globalCtx, Player* this) {
                 if (sp34 < 4) {
                     if (((sp34 != 0) && (sp34 != 3)) || ((this->rightHandType == PLAYER_MODELTYPE_RH_SHIELD) &&
                         ((sp34 == 3) || Player_GetSwordHeld(this)))) {
-                        if ((sp34 == 0) && Player_HoldsTwoHandedWeapon(this)) {
+                        if ((sp34 == 1) && Player_HoldsTwoHandedWeapon(this) && CVar_GetS32("gTwoHandedIdle", 1) == 1) {
                             sp34 = 4;
                         }
                         sp38 = sp34 + 9;
@@ -9451,15 +9452,14 @@ void Player_Init(Actor* thisx, GlobalContext* globalCtx2) {
 
     if ((sp50 == 0) || (sp50 < -1)) {
         titleFileSize = scene->titleFile.vromEnd - scene->titleFile.vromStart;
-        //if ((titleFileSize != 0) && gSaveContext.showTitleCard) {
         if (gSaveContext.showTitleCard) {
             if ((gSaveContext.sceneSetupIndex < 4) &&
                 (gEntranceTable[((void)0, gSaveContext.entranceIndex) + ((void)0, gSaveContext.sceneSetupIndex)].field &
                     0x4000) &&
                 ((globalCtx->sceneNum != SCENE_DDAN) || (gSaveContext.eventChkInf[11] & 1)) &&
                 ((globalCtx->sceneNum != SCENE_NIGHT_SHOP) || (gSaveContext.eventChkInf[2] & 0x20))) {
-                //TitleCard_InitPlaceName(globalCtx, &globalCtx->actorCtx.titleCtx, this->giObjectSegment, 160, 120, 144, 24, 20);
-                TitleCard_InitPlaceName(globalCtx, &globalCtx->actorCtx.titleCtx, this->giObjectSegment, 160, 120, 144, 24, 20);
+                TitleCard_InitPlaceName(globalCtx, &globalCtx->actorCtx.titleCtx, this->giObjectSegment, 160, 120, 144,
+                    24, 20);
             }
         }
         gSaveContext.showTitleCard = true;
@@ -10266,7 +10266,7 @@ void func_80848C74(GlobalContext* globalCtx, Player* this) {
     }
 }
 
-void func_80848EF8(GlobalContext* globalCtx, Player* this) {
+void func_80848EF8(Player* this, GlobalContext* globalCtx) {
     if (CHECK_QUEST_ITEM(QUEST_STONE_OF_AGONY)) {
         f32 temp = 200000.0f - (this->unk_6A4 * 5.0f);
 
@@ -10276,22 +10276,15 @@ void func_80848EF8(GlobalContext* globalCtx, Player* this) {
 
         this->unk_6A0 += temp;
 
-        /*Prevent it on horse to workaround the icon on title screen.
-        But also when not on ground, during jump etc it will hide to properly
-        match the game. if you fly around no stone of agony for you! */
+        /*Prevent it on horse, while jumping and on title screen.
+        If you fly around no stone of agony for you! */
         if (CVar_GetS32("gVisualAgony", 0) !=0 && !this->stateFlags1) {
             int rectLeft    = OTRGetRectDimensionFromLeftEdge(26); //Left X Pos
             int rectTop     = 60; //Top Y Pos
             int rectWidth   = 24; //Texture Width
             int rectHeight  = 24; //Texture Heigh
             int DefaultIconA= 50; //Default icon alphe (55 on 255)
-            if (CVar_GetS32("gHUDMargins", 0) != 0) {
-                rectLeft = OTRGetRectDimensionFromLeftEdge(26+(CVar_GetS32("gHUDMargin_L", 0)*-1));
-                rectTop = 60+(CVar_GetS32("gHUDMargin_T", 0)*-1);
-            } else {
-                rectTop = 60;
-                rectLeft = OTRGetRectDimensionFromLeftEdge(26);
-            }
+
             OPEN_DISPS(globalCtx->state.gfxCtx, "../z_player.c", 2824);
             gDPPipeSync(OVERLAY_DISP++);
             gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, DefaultIconA);
@@ -10508,6 +10501,7 @@ void Player_UpdateCommon(Player* this, GlobalContext* globalCtx, Input* input) {
                 this->actor.velocity.x += this->windSpeed * Math_SinS(this->windDirection);
                 this->actor.velocity.z += this->windSpeed * Math_CosS(this->windDirection);
             }
+
             func_8002D7EC(&this->actor);
             func_80847BA0(globalCtx, this);
         }
@@ -10591,7 +10585,7 @@ void Player_UpdateCommon(Player* this, GlobalContext* globalCtx, Input* input) {
                 else {
                     this->fallStartHeight = this->actor.world.pos.y;
                 }
-                func_80848EF8(globalCtx,this);
+                func_80848EF8(this, globalCtx);
             }
         }
 
@@ -10835,6 +10829,7 @@ void Player_DrawGameplay(GlobalContext* globalCtx, Player* this, s32 lod, Gfx* c
 
     if ((overrideLimbDraw == func_80090014) && (this->currentMask != PLAYER_MASK_NONE)) {
         Mtx* sp70 = Graph_Alloc(globalCtx->state.gfxCtx, 2 * sizeof(Mtx));
+
         if (this->currentMask == PLAYER_MASK_BUNNY) {
             Vec3s sp68;
 
@@ -10852,6 +10847,7 @@ void Player_DrawGameplay(GlobalContext* globalCtx, Player* this, s32 lod, Gfx* c
             Matrix_SetTranslateRotateYXZ(97.0f, -1203.0f, 240.0f, &sp68);
             Matrix_ToMtx(sp70, "../z_player.c", 19279);
         }
+
         gSPDisplayList(POLY_OPA_DISP++, sMaskDlists[this->currentMask - 1]);
     }
 
@@ -10898,7 +10894,8 @@ void Player_DrawGameplay(GlobalContext* globalCtx, Player* this, s32 lod, Gfx* c
 void Player_Draw(Actor* thisx, GlobalContext* globalCtx2) {
     GlobalContext* globalCtx = globalCtx2;
     Player* this = (Player*)thisx;
-    Vec3f pos;
+
+     Vec3f pos;
     Vec3s rot;
     f32 scale;
 
@@ -10920,11 +10917,13 @@ void Player_Draw(Actor* thisx, GlobalContext* globalCtx2) {
         pos.y = -180.0f;
         pos.z = -40.0f;
         scale = 0.047f;
-  	}
+    }
+
     rot.y = 32300;
     rot.x = rot.z = 0;
 
     OPEN_DISPS(globalCtx->state.gfxCtx, "../z_player.c", 19346);
+
 
     if (!(this->stateFlags2 & PLAYER_STATE2_29)) {
         OverrideLimbDrawOpa overrideLimbDraw = func_80090014;

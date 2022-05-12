@@ -1,7 +1,6 @@
 #include "global.h"
 #include "message_data_static.h"
 #include "vt.h"
-#include "luslog.h"
 
 #include <string.h>
 
@@ -34,8 +33,8 @@ s16 sMessageHasSetSfx = false;
 u16 sOcarinaSongBitFlags = 0; // ocarina bit flags
 
 MessageTableEntry* sNesMessageEntryTablePtr;
-MessageTableEntry* sFraMessageEntryTablePtr;
 MessageTableEntry* sGerMessageEntryTablePtr;
+MessageTableEntry* sFraMessageEntryTablePtr;
 MessageTableEntry* sStaffMessageEntryTablePtr;
 
 char* _message_0xFFFC_nes;
@@ -94,7 +93,6 @@ void Message_ResetOcarinaNoteState(void) {
     sOcarinaNotesAlphaValues[0] = sOcarinaNotesAlphaValues[1] = sOcarinaNotesAlphaValues[2] =
         sOcarinaNotesAlphaValues[3] = sOcarinaNotesAlphaValues[4] = sOcarinaNotesAlphaValues[5] =
             sOcarinaNotesAlphaValues[6] = sOcarinaNotesAlphaValues[7] = sOcarinaNotesAlphaValues[8] = 0;
-
     sOcarinaNoteAPrimR = 80;
     sOcarinaNoteAPrimG = 255;
     sOcarinaNoteAPrimB = 150;
@@ -107,8 +105,6 @@ void Message_ResetOcarinaNoteState(void) {
     sOcarinaNoteCEnvR = 10;
     sOcarinaNoteCEnvG = 10;
     sOcarinaNoteCEnvB = 10;
-    
-
 }
 
 void Message_UpdateOcarinaGame(GlobalContext* globalCtx) {
@@ -204,16 +200,12 @@ void Message_DrawTextChar(GlobalContext* globalCtx, void* textureImage, Gfx** p)
     s16 x = msgCtx->textPosX;
     s16 y = msgCtx->textPosY;
 
-    //gSPInvalidateTexCache(gfx++, 0);
-    //gSPInvalidateTexCache(gfx++, msgCtx->textboxSegment);
     gSPInvalidateTexCache(gfx++, textureImage);
 
     gDPPipeSync(gfx++);
 
     sCharTexSize = (R_TEXT_CHAR_SCALE / 100.0f) * 16.0f;
     sCharTexScale = 1024.0f / (R_TEXT_CHAR_SCALE / 100.0f);
-
-    gDPSetOtherMode(gfx++, G_AD_DISABLE | G_CD_DISABLE | G_CK_NONE | G_TC_FILT | G_TF_POINT | G_TT_IA16 | G_TL_TILE | G_TD_CLAMP | G_TP_NONE | G_CYC_1CYCLE | G_PM_NPRIMITIVE, G_AC_NONE | G_ZS_PRIM | G_RM_XLU_SURF | G_RM_XLU_SURF2);
 
     gDPLoadTextureBlock_4b(gfx++, textureImage, G_IM_FMT_I, FONT_CHAR_TEX_WIDTH, FONT_CHAR_TEX_HEIGHT, 0,
                            G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
@@ -233,8 +225,6 @@ void Message_DrawTextChar(GlobalContext* globalCtx, void* textureImage, Gfx** p)
     gSPTextureRectangle(gfx++, x << 2, y << 2, (x + sCharTexSize) << 2, (y + sCharTexSize) << 2, G_TX_RENDERTILE, 0, 0,
                         sCharTexScale, sCharTexScale);
     *p = gfx;
-
-    gDPSetOtherMode(gfx++, G_AD_DISABLE | G_CD_DISABLE | G_CK_NONE | G_TC_FILT | G_TF_BILERP | G_TT_IA16 | G_TL_TILE | G_TD_CLAMP | G_TP_NONE | G_CYC_1CYCLE | G_PM_NPRIMITIVE, G_AC_NONE | G_ZS_PRIM | G_RM_XLU_SURF | G_RM_XLU_SURF2);
 }
 
 // resizes textboxes when opening them
@@ -276,11 +266,12 @@ void Message_GrowTextbox(MessageContext* msgCtx) {
 }
 
 void Message_FindMessage(GlobalContext* globalCtx, u16 textId) {
-    char* foundSeg;
-    char* nextSeg;
+    const char* foundSeg;
+    const char* nextSeg;
     MessageTableEntry* messageTableEntry = sNesMessageEntryTablePtr;
+    const char** languageSegmentTable;
     Font* font;
-    char* seg;
+    const char* seg;
 
     if (gSaveContext.language == LANGUAGE_GER)
         messageTableEntry = sGerMessageEntryTablePtr;
@@ -313,9 +304,11 @@ void Message_FindMessage(GlobalContext* globalCtx, u16 textId) {
         messageTableEntry++;
     }
 
+    // "Message not found!!!"
     osSyncPrintf(" メッセージが,見つからなかった！！！ = %x\n", textId);
     font = &globalCtx->msgCtx.font;
     messageTableEntry = sNesMessageEntryTablePtr;
+
     foundSeg = messageTableEntry->segment;
     font->charTexBuf[0] = messageTableEntry->typePos;
     messageTableEntry++;
@@ -341,7 +334,6 @@ void Message_FindCreditsMessage(GlobalContext* globalCtx, u16 textId) {
             nextSeg = messageTableEntry->segment;
             font->msgOffset = messageTableEntry->segment;
             font->msgLength = messageTableEntry->msgSize;
-		
             // "Message found!!!"
             osSyncPrintf(" メッセージが,見つかった！！！ = %x  (data=%x) (data0=%x) (data1=%x) (data2=%x) (data3=%x)\n",
                          textId, font->msgOffset, font->msgLength, foundSeg, seg, nextSeg);
@@ -438,19 +430,14 @@ void Message_SetTextColor(MessageContext* msgCtx, u16 colorParameter) {
 }
 
 void Message_DrawTextboxIcon(GlobalContext* globalCtx, Gfx** p, s16 x, s16 y) {
-
-	static s16 sIconPrimColors[][3] = {
-		{ 4, 84, 204 },
-		{ 45, 125, 255 },
-		{ 0, 200, 80 },
-		{ 50, 255, 130 },
-	};
-	static s16 sIconEnvColors[][3] = {
-		{ 0, 0, 0 },
-		{ 0, 70, 255 },
-		{ 0, 0, 0 },
-		{ 0, 255, 130 },
-	};
+    static s16 sIconPrimColors[][3] = {
+        { 0, 200, 80 },
+        { 50, 255, 130 },
+    };
+    static s16 sIconEnvColors[][3] = {
+        { 0, 0, 0 },
+        { 0, 255, 130 },
+    };
     static s16 sIconPrimR = 0;
     static s16 sIconPrimG = 200;
     static s16 sIconPrimB = 80;
@@ -459,46 +446,6 @@ void Message_DrawTextboxIcon(GlobalContext* globalCtx, Gfx** p, s16 x, s16 y) {
     static s16 sIconEnvR = 0;
     static s16 sIconEnvG = 0;
     static s16 sIconEnvB = 0;
-    if (CVar_GetS32("gHudColors", 1) == 0) {
-      sIconPrimColors[0][0] = 4;
-      sIconPrimColors[0][1] = 84;
-      sIconPrimColors[0][2] = 204;
-      sIconPrimColors[1][0] = 45;
-      sIconPrimColors[1][1] = 125;
-      sIconPrimColors[1][2] = 255;
-      sIconEnvColors[0][0] = 0;
-      sIconEnvColors[0][1] = 0;
-      sIconEnvColors[0][2] = 0;
-      sIconEnvColors[1][0] = 0;
-      sIconEnvColors[1][1] = 70;
-      sIconEnvColors[1][2] = 255;
-    } else if (CVar_GetS32("gHudColors", 1) == 1) {//Probably could emptied I need some testing there, I will do it later.
-      sIconPrimColors[0][0] = 4;
-      sIconPrimColors[0][1] = 200;
-      sIconPrimColors[0][2] = 80;
-      sIconPrimColors[1][0] = 50;
-      sIconPrimColors[1][1] = 255;
-      sIconPrimColors[1][2] = 130;
-      sIconEnvColors[0][0] = 0;
-      sIconEnvColors[0][1] = 0;
-      sIconEnvColors[0][2] = 0;
-      sIconEnvColors[1][0] = 0;
-      sIconEnvColors[1][1] = 255;
-      sIconEnvColors[1][2] = 130;
-    } else if (CVar_GetS32("gHudColors", 1) == 2) {
-      sIconPrimColors[0][0] = (CVar_GetS32("gCCABtnPrimR", 4)/255)*80;
-      sIconPrimColors[0][1] = (CVar_GetS32("gCCABtnPrimG", 200)/255)*80;
-      sIconPrimColors[0][2] = (CVar_GetS32("gCCABtnPrimB", 80)/255)*80;
-      sIconPrimColors[1][0] = CVar_GetS32("gCCABtnPrimR", 50);
-      sIconPrimColors[1][1] = CVar_GetS32("gCCABtnPrimG", 255);
-      sIconPrimColors[1][2] = CVar_GetS32("gCCABtnPrimB", 130);
-      sIconEnvColors[0][0] = 0;
-      sIconEnvColors[0][1] = 0;
-      sIconEnvColors[0][2] = 0;
-      sIconEnvColors[1][0] = 10;
-      sIconEnvColors[1][1] = 10;
-      sIconEnvColors[1][2] = 10;
-    }
     MessageContext* msgCtx = &globalCtx->msgCtx;
     Font* font = &msgCtx->font;
     Gfx* gfx = *p;
@@ -576,9 +523,9 @@ void Message_DrawTextboxIcon(GlobalContext* globalCtx, Gfx** p, s16 x, s16 y) {
     gDPSetCombineLERP(gfx++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0, PRIMITIVE,
                       ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
 
-
     gDPSetPrimColor(gfx++, 0, 0, sIconPrimR, sIconPrimG, sIconPrimB, 255);
     gDPSetEnvColor(gfx++, sIconEnvR, sIconEnvG, sIconEnvB, 255);
+
     gDPLoadTextureBlock_4b(gfx++, iconTexture, G_IM_FMT_I, FONT_CHAR_TEX_WIDTH, FONT_CHAR_TEX_HEIGHT, 0,
                            G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD,
                            G_TX_NOLOD);
@@ -1627,6 +1574,10 @@ void Message_OpenText(GlobalContext* globalCtx, u16 textId) {
         msgCtx->msgLength = font->msgLength;
         char* src = (uintptr_t)font->msgOffset;
         memcpy(font->msgBuf, src, font->msgLength);
+
+        // OTRTODO
+        //DmaMgr_SendRequest1(font->msgBuf, (uintptr_t)(_staff_message_data_staticSegmentRomStart + 4 + font->msgOffset),
+                            //font->msgLength, "../z_message_PAL.c", 1954);
     } else {
         Message_FindMessage(globalCtx, textId);
         msgCtx->msgLength = font->msgLength;
@@ -1890,6 +1841,7 @@ void Message_DrawTextBox(GlobalContext* globalCtx, Gfx** p) {
     MessageContext* msgCtx = &globalCtx->msgCtx;
     Gfx* gfx = *p;
 
+    gSPInvalidateTexCache(gfx++, msgCtx->textboxSegment);
     gDPPipeSync(gfx++);
     gDPSetPrimColor(gfx++, 0, 0, msgCtx->textboxColorRed, msgCtx->textboxColorGreen, msgCtx->textboxColorBlue,
                     msgCtx->textboxColorAlphaCurrent);
@@ -1999,7 +1951,8 @@ void Message_DrawMain(GlobalContext* globalCtx, Gfx** p) {
         gDPSetCombineLERP(gfx++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE,
                           0);
 
-        bool isB_Held = CVar_GetS32("gSkipText", 0) != 0 ? CHECK_BTN_ALL(globalCtx->state.input[0].cur.button, BTN_B) : CHECK_BTN_ALL(globalCtx->state.input[0].press.button, BTN_B);
+            bool isB_Held = CVar_GetS32("gSkipText", 0) != 0 ? CHECK_BTN_ALL(globalCtx->state.input[0].cur.button, BTN_B)
+                                                         : CHECK_BTN_ALL(globalCtx->state.input[0].press.button, BTN_B);
 
         switch (msgCtx->msgMode) {
             case MSGMODE_TEXT_START:
@@ -2874,27 +2827,13 @@ void Message_DrawMain(GlobalContext* globalCtx, Gfx** p) {
 
                     gDPPipeSync(gfx++);
                     if (sOcarinaNoteBuf[i] == OCARINA_NOTE_A) {
-                      if (CVar_GetS32("gHudColors", 1) == 0) { //A buttons :)
-                        gDPSetPrimColor(gfx++, 0, 0, 80, 150, 255, sOcarinaNotesAlphaValues[i]);
-                        gDPSetEnvColor(gfx++, 100, 200, 255, 0);
-                      } else if (CVar_GetS32("gHudColors", 1) == 1) {
-                        gDPSetPrimColor(gfx++, 0, 0, sOcarinaNoteAPrimR, sOcarinaNoteAPrimG, sOcarinaNoteAPrimB, sOcarinaNotesAlphaValues[i]);
+                        gDPSetPrimColor(gfx++, 0, 0, sOcarinaNoteAPrimR, sOcarinaNoteAPrimG, sOcarinaNoteAPrimB,
+                                        sOcarinaNotesAlphaValues[i]);
                         gDPSetEnvColor(gfx++, sOcarinaNoteAEnvR, sOcarinaNoteAEnvG, sOcarinaNoteAEnvB, 0);
-                      } else if (CVar_GetS32("gHudColors", 1) == 2) {
-                        gDPSetPrimColor(gfx++, 0, 0, CVar_GetS32("gCCABtnPrimR", 0), CVar_GetS32("gCCABtnPrimG", 0), CVar_GetS32("gCCABtnPrimB", 0), sOcarinaNotesAlphaValues[i]);
-                        gDPSetEnvColor(gfx++, CVar_GetS32("gCCABtnPrimR", 0)/2, CVar_GetS32("gCCABtnPrimG", 0)/2, CVar_GetS32("gCCABtnPrimB", 0)/2, 0);
-                      }
                     } else {
-                       if (CVar_GetS32("gHudColors", 1) == 0) { //C buttons :)
-                        gDPSetPrimColor(gfx++, 0, 0, sOcarinaNoteCPrimR, sOcarinaNoteCPrimG, sOcarinaNoteCPrimB, sOcarinaNotesAlphaValues[i]);
+                        gDPSetPrimColor(gfx++, 0, 0, sOcarinaNoteCPrimR, sOcarinaNoteCPrimG, sOcarinaNoteCPrimB,
+                                        sOcarinaNotesAlphaValues[i]);
                         gDPSetEnvColor(gfx++, sOcarinaNoteCEnvR, sOcarinaNoteCEnvG, sOcarinaNoteCEnvB, 0);
-                      } else if (CVar_GetS32("gHudColors", 1) == 1) {
-                        gDPSetPrimColor(gfx++, 0, 0, sOcarinaNoteCPrimR, sOcarinaNoteCPrimG, sOcarinaNoteCPrimB, sOcarinaNotesAlphaValues[i]);
-                        gDPSetEnvColor(gfx++, sOcarinaNoteCEnvR, sOcarinaNoteCEnvG, sOcarinaNoteCEnvB, 0);
-                      } else if (CVar_GetS32("gHudColors", 1) == 2) {
-                        gDPSetPrimColor(gfx++, 0, 0, CVar_GetS32("gCCCBtnPrimR", 0), CVar_GetS32("gCCCBtnPrimG", 0), CVar_GetS32("gCCCBtnPrimB", 0), sOcarinaNotesAlphaValues[i]);
-                        gDPSetEnvColor(gfx++, CVar_GetS32("gCCCBtnPrimR", 0)/2, CVar_GetS32("gCCCBtnPrimG", 0)/2, CVar_GetS32("gCCCBtnPrimB", 0)/2, 0);
-                      }
                     }
 
                     gDPLoadTextureBlock(gfx++, sOcarinaNoteTextures[sOcarinaNoteBuf[i]], G_IM_FMT_IA, G_IM_SIZ_8b, 16,
@@ -3306,7 +3245,7 @@ void Message_Update(GlobalContext* globalCtx) {
 
 void Message_SetTables(void) {
     OTRMessage_Init();
-
+    
     // OTRTODO
     //sNesMessageEntryTablePtr = sNesMessageEntryTable;
     //sGerMessageEntryTablePtr = sGerMessageEntryTable;

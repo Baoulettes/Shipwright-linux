@@ -1,11 +1,9 @@
 #include "Resource.h"
-#include "spdlog/spdlog.h"
 #include "DisplayList.h"
 #include "ResourceMgr.h"
 #include "Utils/BinaryReader.h"
 #include "Lib/tinyxml2/tinyxml2.h"
 #include "Lib/Fast3D/U64/PR/ultra64/gbi.h"
-//#include <iostream>
 
 namespace Ship
 {
@@ -39,27 +37,10 @@ namespace Ship
     {
         free(cachedGameAsset);
         cachedGameAsset = nullptr;
+
         for (size_t i = 0; i < patches.size(); i++)
         {
             std::string hashStr = resMgr->HashToString(patches[i].crc);
-
-           /* #ifdef __linux__
-              //std::cout << "hashStr = " << hashStr << std::endl;
-              // This hack is a temporary workaround around the kaladescope bug
-              // A segfault happens when you pause twice. See PR#28.
-              if (hashStr == "textures/icon_item_static/gItemNamePanelDL" ){
-                continue;
-              }
-              if (hashStr == "textures/icon_item_static/gLButtonIconDL" ){
-                continue;
-              }
-              if (hashStr == "textures/icon_item_static/gRButtonIconDL" ){
-                continue;
-              }
-              if (hashStr == "textures/icon_item_static/gCButtonIconsDL" ){
-                continue;
-              }
-            #endif/*/
             auto resShared = resMgr->GetCachedFile(hashStr);
             if (resShared != nullptr)
             {
@@ -71,7 +52,7 @@ namespace Ship
         }
 
         patches.clear();
-		
+
 #if _DEBUG
         if (file != nullptr)
             printf("Deconstructor called on file %s\n", file->path.c_str());

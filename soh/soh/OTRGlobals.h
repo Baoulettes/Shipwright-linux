@@ -21,11 +21,11 @@ private:
 #ifndef __cplusplus
 void InitOTR();
 void Graph_ProcessFrame(void (*run_one_game_iter)(void));
-void Graph_ProcessGfxCommands(Gfx* commands);
 void Graph_StartFrame();
+void Graph_ProcessGfxCommands(Gfx* commands);
 void OTRLogString(const char* src);
 void OTRGfxPrint(const char* str, void* printer, void (*printImpl)(void*, char));
-void OTRSetFrameDivisor(int divisor);
+void OTRGetPixelDepthPrepare(float x, float y);
 uint16_t OTRGetPixelDepth(float x, float y);
 int32_t OTRGetLastScancode();
 uint32_t ResourceMgr_GetGameVersion();
@@ -43,7 +43,7 @@ Vtx* ResourceMgr_LoadVtxByCRC(uint64_t crc);
 Vtx* ResourceMgr_LoadVtxByName(const char* path);
 CollisionHeader* ResourceMgr_LoadColByName(const char* path);
 uint64_t GetPerfCounter();
-struct SkeletonHeader* ResourceMgr_LoadSkeletonByName(char* path);
+struct SkeletonHeader* ResourceMgr_LoadSkeletonByName(const char* path);
 int ResourceMgr_OTRSigCheck(char* imgData);
 uint64_t osGetTime(void);
 uint32_t osGetCount(void);
@@ -66,4 +66,5 @@ int AudioPlayer_Buffered(void);
 int AudioPlayer_GetDesiredBuffered(void);
 void AudioPlayer_Play(const uint8_t* buf, uint32_t len);
 void AudioMgr_CreateNextAudioBuffer(s16* samples, u32 num_samples);
+int Controller_ShouldRumble(size_t i);
 #endif

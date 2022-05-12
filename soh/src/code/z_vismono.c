@@ -35,15 +35,15 @@ void VisMono_UpdateTexture(VisMono* this, u16* tex) {
     }
 }
 
-Gfx* VisMono_DrawTexture(VisMono* this, Gfx* gfx)
+Gfx* VisMono_DrawTexture(VisMono* this, Gfx* gfx) 
 {
 // OTRTODO
 #if 1
     s32 y;
     s32 height = 3;
     //u16* tex = D_0F000000;
-    u16* tex = SEG_ADDR(0xf, 0);
-    
+    u16* tex = SEG_ADDR(0xF, 0);
+
     gDPPipeSync(gfx++);
     gDPSetOtherMode(gfx++,
                     G_AD_DISABLE | G_CD_DISABLE | G_CK_NONE | G_TC_FILT | G_TF_POINT | G_TT_IA16 | G_TL_TILE |

@@ -236,14 +236,12 @@ f32 Audio_AdsrUpdate(AdsrState* adsr) {
                 adsr->action.s.state = ADSR_STATE_HANG;
                 break;
             }
-            [[fallthrough]];
             // fallthrough
         }
 
         case ADSR_STATE_START_LOOP:
             adsr->envIndex = 0;
             adsr->action.s.state = ADSR_STATE_LOOP;
-            [[fallthrough]];
             // fallthrough
 
         retry:
@@ -278,7 +276,6 @@ f32 Audio_AdsrUpdate(AdsrState* adsr) {
             if (adsr->action.s.state != ADSR_STATE_FADE) {
                 break;
             }
-            [[fallthrough]];
             // fallthrough
 
         case ADSR_STATE_FADE:
@@ -286,7 +283,6 @@ f32 Audio_AdsrUpdate(AdsrState* adsr) {
             if (--adsr->delay <= 0) {
                 adsr->action.s.state = ADSR_STATE_LOOP;
             }
-            [[fallthrough]];
             // fallthrough
 
         case ADSR_STATE_HANG:

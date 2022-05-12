@@ -106,7 +106,7 @@ s32 ObjTsubo_SnapToFloor(ObjTsubo* this, GlobalContext* globalCtx) {
     f32 floorY;
 
     pos.x = this->actor.world.pos.x;
-    pos.y = this->actor.world.pos.y + 10.0f;
+    pos.y = this->actor.world.pos.y + 20.0f;
     pos.z = this->actor.world.pos.z;
     floorY = BgCheck_EntityRaycastFloor4(&globalCtx->colCtx, &floorPoly, &bgID, &this->actor, &pos);
     if (floorY > BGCHECK_Y_MIN) {

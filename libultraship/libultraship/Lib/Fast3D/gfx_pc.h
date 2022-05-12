@@ -10,7 +10,8 @@ struct GfxRenderingAPI;
 struct GfxWindowManagerAPI;
 
 struct XYWidthHeight {
-    int16_t x, y, width, height;
+    int16_t x, y;
+    uint32_t width, height;
 };
 
 struct GfxDimensions {
@@ -21,6 +22,7 @@ struct GfxDimensions {
 
 struct TextureCacheKey {
     const uint8_t* texture_addr;
+    const uint8_t* palette_addrs[2];
     uint8_t fmt, siz;
     uint8_t palette_index;
 
@@ -57,7 +59,6 @@ extern struct GfxDimensions gfx_current_window_dimensions; // The dimensions of 
 extern struct GfxDimensions gfx_current_dimensions; // The dimensions of the draw area the game draws to, before scaling (if applicable)
 extern struct XYWidthHeight gfx_current_game_window_viewport; // The area of the window the game is drawn to, (0, 0) is top-left corner
 extern uint32_t gfx_msaa_level;
-
 
 void gfx_init(struct GfxWindowManagerAPI* wapi, struct GfxRenderingAPI* rapi, const char* game_name, bool start_in_fullscreen);
 struct GfxRenderingAPI* gfx_get_current_rendering_api(void);

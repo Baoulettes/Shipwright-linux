@@ -52,3 +52,4 @@ namespace Ship {
 			uint32_t dwHeight;
 	};
 }
+

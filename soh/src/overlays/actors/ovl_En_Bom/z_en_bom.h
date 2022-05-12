@@ -17,11 +17,7 @@ typedef struct EnBom {
     /* 0x01FA */ s16 flashSpeedScale;
     /* 0x01FC */ f32 flashIntensity;
     /* 0x0200 */ u8 bumpOn;
-    /* 0x0150 */ LightInfo lightInfo;
-    /* 0x0160 */ LightNode* lightNode;
     /* 0x0204 */ EnBomActionFunc actionFunc;
-    Color_RGBA8 flashColor;
-    u8 unk_19E;
 } EnBom; // size = 0x0208
 
 typedef enum {

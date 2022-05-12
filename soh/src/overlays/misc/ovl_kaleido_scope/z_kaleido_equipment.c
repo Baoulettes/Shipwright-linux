@@ -32,7 +32,7 @@ void KaleidoScope_DrawEquipmentImage(GlobalContext* globalCtx, void* source, u32
     gDPPipeSync(POLY_KAL_DISP++);
     gDPSetCombineMode(POLY_KAL_DISP++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
     gDPSetTextureFilter(POLY_KAL_DISP++, G_TF_POINT);
-    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, pauseCtx->alpha); //Link env colour on pause menu
+    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, pauseCtx->alpha);
 
     curTexture = source;
     remainingSize = width * height * 2;
@@ -145,7 +145,7 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
     OPEN_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_equipment.c", 219);
 
     gDPPipeSync(POLY_KAL_DISP++);
-    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, ZREG(39), ZREG(40), ZREG(41), pauseCtx->alpha); //No idea
+    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, ZREG(39), ZREG(40), ZREG(41), pauseCtx->alpha);
     gDPSetEnvColor(POLY_KAL_DISP++, ZREG(43), ZREG(44), ZREG(45), 0);
 
     for (i = 0, j = 64; i < 4; i++, j += 4) {
@@ -544,14 +544,14 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
     func_800949A8(globalCtx->state.gfxCtx);
 
     gDPSetCombineMode(POLY_KAL_DISP++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
-    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, pauseCtx->alpha); //Equipement colour overlay.
+    gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, pauseCtx->alpha);
 
     for (rowStart = 0, j = 0, temp = 0, i = 0; i < 4; i++, rowStart += 4, j += 16) {
         gSPVertex(POLY_KAL_DISP++, &pauseCtx->equipVtx[j], 16, 0);
 
         if (LINK_AGE_IN_YEARS == YEARS_CHILD) {
             point = CUR_UPG_VALUE(sChildUpgrades[i]);
-            //if (1) {}
+            if (1) {}
             if ((point != 0) && (CUR_UPG_VALUE(sChildUpgrades[i]) != 0)) {
                 KaleidoScope_DrawQuadTextureRGBA32(globalCtx->state.gfxCtx,
                                                    gItemIcons[sChildUpgradeItemBases[i] + point - 1], 32, 32, 0);
@@ -578,12 +578,11 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
                 int itemId = ITEM_SWORD_KOKIRI + temp;
                 bool not_acquired = (gItemAgeReqs[itemId] != 9) && (gItemAgeReqs[itemId] != gSaveContext.linkAge);
                 if (not_acquired) {
-                    gsDPSetGrayscaleColor(POLY_KAL_DISP++, 100, 100, 100, 255);
+                    gsDPSetGrayscaleColor(POLY_KAL_DISP++, 109, 109, 109, 255);
                     gsSPGrayscale(POLY_KAL_DISP++, true);
                 }
                 KaleidoScope_DrawQuadTextureRGBA32(globalCtx->state.gfxCtx, gItemIcons[itemId], 32, 32, point);
                 gsSPGrayscale(POLY_KAL_DISP++, false);
-                //KaleidoScope_DrawQuadTextureRGBA32(globalCtx->state.gfxCtx, gItemIcons[ITEM_SWORD_KOKIRI + temp], 32, 32, point);
             }
         }
     }
@@ -603,7 +602,6 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
     gSPInvalidateTexCache(POLY_KAL_DISP++, pauseCtx->iconItemSegment);
     //gSPInvalidateTexCache(POLY_KAL_DISP++, pauseCtx->iconItem24Segment);
     gSPInvalidateTexCache(POLY_KAL_DISP++, pauseCtx->nameSegment);
-    //gSPInvalidateTexCache(POLY_KAL_DISP++, globalCtx->interfaceCtx.mapSegment);
 
     //gSPSegment(POLY_KAL_DISP++, 0x07, pauseCtx->playerSegment);
     gSPSegment(POLY_KAL_DISP++, 0x08, pauseCtx->iconItemSegment);

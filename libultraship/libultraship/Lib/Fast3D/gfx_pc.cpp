@@ -31,6 +31,8 @@
 #include "../StrHash64.h"
 #include "../../SohImGuiImpl.h"
 #include "../../Environment.h"
+#include "../../GameVersions.h"
+#include "../../ResourceMgr.h"
 
 // OTRTODO: fix header files for these
 extern "C" {
@@ -45,6 +47,8 @@ extern "C" {
 }
 
 using namespace std;
+
+#define SEG_ADDR(seg, addr) (addr | (seg << 24) | 1)
 
 #define SUPPORT_CHECK(x) assert(x)
 
@@ -125,7 +129,7 @@ static struct RSP {
 } rsp;
 
 static struct RDP {
-    const uint8_t *palette;
+    const uint8_t *palettes[2];
     struct {
         const uint8_t *addr;
         uint8_t siz;
@@ -145,6 +149,7 @@ static struct RDP {
         uint8_t cms, cmt;
         uint8_t shifts, shiftt;
         uint16_t uls, ult, lrs, lrt; // U10.2
+        uint16_t tmem; // 0-511, in 64-bit word units
         uint32_t line_size_bytes;
         uint8_t palette;
         uint8_t tmem_index; // 0 or 1 for offset 0 kB or offset 2 kB, respectively
@@ -209,7 +214,7 @@ static map<int, FBInfo> framebuffers;
 static set<pair<float, float>> get_pixel_depth_pending;
 static map<pair<float, float>, uint16_t> get_pixel_depth_cached;
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 // TODO: Properly implement for MSVC
 static unsigned long get_time(void)
 {
@@ -502,8 +507,22 @@ void gfx_texture_cache_clear()
     gfx_texture_cache.lru.clear();
 }
 
-static bool gfx_texture_cache_lookup(int i, TextureCacheNode **n, const uint8_t *orig_addr, uint32_t fmt, uint32_t siz, uint32_t palette_index) {
-    TextureCacheKey key = { orig_addr, fmt, siz, palette_index };
+static bool gfx_texture_cache_lookup(int i, int tile) {
+    uint8_t fmt = rdp.texture_tile[tile].fmt;
+    uint8_t siz = rdp.texture_tile[tile].siz;
+    uint32_t tmem_index = rdp.texture_tile[tile].tmem_index;
+
+    TextureCacheNode** n = &rendering_state.textures[i];
+    const uint8_t* orig_addr = rdp.loaded_texture[tmem_index].addr;
+    uint8_t palette_index = rdp.texture_tile[tile].palette;
+
+    TextureCacheKey key;
+    if (fmt == G_IM_FMT_CI) {
+        key = { orig_addr, { rdp.palettes[0], rdp.palettes[1] }, fmt, siz, palette_index };
+    } else {
+        key = { orig_addr, { }, fmt, siz, palette_index };
+    }
+
     auto it = gfx_texture_cache.map.find(key);
 
     if (it != gfx_texture_cache.map.end()) {
@@ -712,9 +731,8 @@ static void import_texture_i4(int tile) {
     gfx_rapi->upload_texture(rgba32_buf, width, height);
     // DumpTexture(rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].otr_path, rgba32_buf, width, height);
 }
-/*
+
 static void import_texture_i8(int tile) {
-    //uint8_t rgba32_buf[16384];
     uint8_t rgba32_buf[16384];
     const uint8_t* addr = rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].addr;
     uint32_t size_bytes = rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].size_bytes;
@@ -739,27 +757,8 @@ static void import_texture_i8(int tile) {
 
     gfx_rapi->upload_texture(rgba32_buf, width, height);
     // DumpTexture(rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].otr_path, rgba32_buf, width, height);
-}*/
-static void import_texture_i8(int tile) {
-    uint8_t rgba32_buf[16384];
-
-    for (uint32_t i = 0; i < rdp.loaded_texture[tile].size_bytes; i++) {
-        uint8_t intensity = rdp.loaded_texture[tile].addr[i];
-        uint8_t r = intensity;
-        uint8_t g = intensity;
-        uint8_t b = intensity;
-        uint8_t a = intensity;
-        rgba32_buf[4*i + 0] = r;
-        rgba32_buf[4*i + 1] = g;
-        rgba32_buf[4*i + 2] = b;
-        rgba32_buf[4*i + 3] = a;
-    }
-
-    uint32_t width = rdp.texture_tile[tile].line_size_bytes;
-    uint32_t height = rdp.loaded_texture[tile].size_bytes / rdp.texture_tile[tile].line_size_bytes;
-
-    gfx_rapi->upload_texture(rgba32_buf, width, height);
 }
+
 
 static void import_texture_ci4(int tile) {
     uint8_t rgba32_buf[32768];
@@ -767,7 +766,8 @@ static void import_texture_ci4(int tile) {
     uint32_t size_bytes = rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].size_bytes;
     uint32_t full_image_line_size_bytes = rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].full_image_line_size_bytes;
     uint32_t line_size_bytes = rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].line_size_bytes;
-    const uint8_t *palette = rdp.palette + rdp.texture_tile[tile].palette * 16 * 2; // 16 pixel entries, 16 bits each
+    uint32_t pal_idx = rdp.texture_tile[tile].palette; // 0-15
+    const uint8_t *palette = rdp.palettes[pal_idx / 8] + (pal_idx % 8) * 16 * 2; // 16 pixel entries, 16 bits each
     SUPPORT_CHECK(full_image_line_size_bytes == line_size_bytes);
 
     for (uint32_t i = 0; i < size_bytes * 2; i++) {
@@ -802,7 +802,7 @@ static void import_texture_ci8(int tile) {
     {
         for (uint32_t k = 0; k < line_size_bytes; i++, k++, j++) {
             uint8_t idx = addr[j];
-            uint16_t col16 = (rdp.palette[idx * 2] << 8) | rdp.palette[idx * 2 + 1]; // Big endian load
+            uint16_t col16 = (rdp.palettes[idx / 128][(idx % 128) * 2] << 8) | rdp.palettes[idx / 128][(idx % 128) * 2 + 1]; // Big endian load
             uint8_t a = col16 & 1;
             uint8_t r = col16 >> 11;
             uint8_t g = (col16 >> 6) & 0x1f;
@@ -826,13 +826,12 @@ static void import_texture_ci8(int tile) {
     // DumpTexture(rdp.loaded_texture[rdp.texture_tile[tile].tmem_index].otr_path, rgba32_buf, width, height);
 }
 
-
 static void import_texture(int i, int tile) {
     uint8_t fmt = rdp.texture_tile[tile].fmt;
     uint8_t siz = rdp.texture_tile[tile].siz;
     uint32_t tmem_index = rdp.texture_tile[tile].tmem_index;
 
-    if (gfx_texture_cache_lookup(i, &rendering_state.textures[i], rdp.loaded_texture[tmem_index].addr, fmt, siz, rdp.texture_tile[tile].palette))
+    if (gfx_texture_cache_lookup(i, tile))
     {
         return;
     }
@@ -1211,7 +1210,6 @@ static void gfx_sp_tri1(uint8_t vtx1_idx, uint8_t vtx2_idx, uint8_t vtx3_idx, bo
 
     uint64_t cc_id = rdp.combine_mode;
 
-    //bool use_alpha = (rdp.other_mode_l & (3 << 18)) == G_BL_1MA || (rdp.other_mode_l & (3 << 16)) == G_BL_1MA;
     bool use_alpha = (rdp.other_mode_l & (3 << 20)) == (G_BL_CLR_MEM << 20) && (rdp.other_mode_l & (3 << 16)) == (G_BL_1MA << 16);
     bool use_fog = (rdp.other_mode_l >> 30) == G_BL_CLR_FOG;
     bool texture_edge = (rdp.other_mode_l & CVG_X_ALPHA) == CVG_X_ALPHA;
@@ -1509,7 +1507,7 @@ static void gfx_adjust_viewport_or_scissor(XYWidthHeight *area) {
         area->y = SCREEN_HEIGHT - area->y;
         area->y *= RATIO_Y;
 
-        if (!game_renders_to_framebuffer || (gfx_msaa_level > 1 && gfx_current_dimensions.width == (uint32_t)gfx_current_game_window_viewport.width && gfx_current_dimensions.height == (uint32_t)gfx_current_game_window_viewport.height)) {
+        if (!game_renders_to_framebuffer || (gfx_msaa_level > 1 && gfx_current_dimensions.width == gfx_current_game_window_viewport.width && gfx_current_dimensions.height == gfx_current_game_window_viewport.height)) {
             area->x += gfx_current_game_window_viewport.x;
             area->y += gfx_current_window_dimensions.height - (gfx_current_game_window_viewport.y + gfx_current_game_window_viewport.height);
         }
@@ -1656,6 +1654,7 @@ static void gfx_dp_set_tile(uint8_t fmt, uint32_t siz, uint32_t line, uint32_t t
         int bp = 0;
     }
 
+    rdp.texture_tile[tile].tmem = tmem;
     //rdp.texture_tile[tile].tmem_index = tmem / 256; // tmem is the 64-bit word offset, so 256 words means 2 kB
     rdp.texture_tile[tile].tmem_index = tmem != 0; // assume one texture is loaded at address 0 and another texture at any other address
     rdp.textures_changed[0] = true;
@@ -1672,10 +1671,19 @@ static void gfx_dp_set_tile_size(uint8_t tile, uint16_t uls, uint16_t ult, uint1
 }
 
 static void gfx_dp_load_tlut(uint8_t tile, uint32_t high_index) {
-    //SUPPORT_CHECK(tile == G_TX_LOADTILE);
-    //SUPPORT_CHECK(rdp.texture_to_load.siz == G_IM_SIZ_16b);
+    SUPPORT_CHECK(tile == G_TX_LOADTILE);
+    SUPPORT_CHECK(rdp.texture_to_load.siz == G_IM_SIZ_16b);
 
-    rdp.palette = rdp.texture_to_load.addr;
+    SUPPORT_CHECK((rdp.texture_tile[tile].tmem == 256 && (high_index <= 127 || high_index == 255)) || (rdp.texture_tile[tile].tmem == 384 && high_index == 127));
+
+    if (rdp.texture_tile[tile].tmem == 256) {
+        rdp.palettes[0] = rdp.texture_to_load.addr;
+        if (high_index == 255) {
+            rdp.palettes[1] = rdp.texture_to_load.addr + 2 * 128;
+        }
+    } else {
+        rdp.palettes[1] = rdp.texture_to_load.addr;
+    }
 }
 
 static void gfx_dp_load_block(uint8_t tile, uint32_t uls, uint32_t ult, uint32_t lrs, uint32_t dxt) {
@@ -1797,6 +1805,13 @@ static inline uint32_t alpha_comb(uint32_t a, uint32_t b, uint32_t c, uint32_t d
     return (a & 7) | ((b & 7) << 3) | ((c & 7) << 6) | ((d & 7) << 9);
 }
 
+static void gfx_dp_set_grayscale_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    rdp.grayscale_color.r = r;
+    rdp.grayscale_color.g = g;
+    rdp.grayscale_color.b = b;
+    rdp.grayscale_color.a = a;
+}
+
 static void gfx_dp_set_env_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     rdp.env_color.r = r;
     rdp.env_color.g = g;
@@ -1817,13 +1832,6 @@ static void gfx_dp_set_fog_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     rdp.fog_color.g = g;
     rdp.fog_color.b = b;
     rdp.fog_color.a = a;
-}
-
-static void gfx_dp_set_grayscale_color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    rdp.grayscale_color.r = r;
-    rdp.grayscale_color.g = g;
-    rdp.grayscale_color.b = b;
-    rdp.grayscale_color.a = a;
 }
 
 static void gfx_dp_set_fill_color(uint32_t packed_color) {
@@ -2145,8 +2153,16 @@ static void gfx_run_dl(Gfx* cmd) {
                 uintptr_t mtxAddr = cmd->words.w1;
 
                 // OTRTODO: Temp way of dealing with gMtxClear. Need something more elegant in the future...
-                if (mtxAddr == 0x0012DB21 || mtxAddr == 0x0012DB41)
-                    mtxAddr = clearMtx;
+                uint32_t gameVersion = Ship::GlobalCtx2::GetInstance()->GetResourceManager()->GetGameVersion();
+                if (gameVersion == OOT_PAL_GC) {
+                    if (mtxAddr == SEG_ADDR(0, 0x0FBC20)) {
+                        mtxAddr = clearMtx;
+                    }
+                } else {
+                    if (mtxAddr == SEG_ADDR(0, 0x12DB20) || mtxAddr == SEG_ADDR(0, 0x12DB40)) {
+                        mtxAddr = clearMtx;
+                    }
+                }
 
 #ifdef F3DEX_GBI_2
                 gfx_sp_matrix(C0(0, 8) ^ G_MTX_PUSH, (const int32_t *) seg_addr(mtxAddr));
@@ -2407,8 +2423,6 @@ static void gfx_run_dl(Gfx* cmd) {
                 cmd++;
                 uint64_t hash = ((uint64_t)cmd->words.w0 << 32) + (uint64_t)cmd->words.w1;
                 ResourceMgr_GetNameByCRC(hash, fileName);
-
-
 #if _DEBUG && 0
                 char* tex = ResourceMgr_LoadTexByCRC(hash);
                 ResourceMgr_GetNameByCRC(hash, fileName);
@@ -2483,7 +2497,6 @@ static void gfx_run_dl(Gfx* cmd) {
                 rdp.grayscale = cmd->words.w1;
                 break;
             }
-            //break;
             case G_LOADBLOCK:
                 gfx_dp_load_block(C1(24, 3), C0(12, 12), C0(0, 12), C1(12, 12), C1(0, 12));
                 break;
@@ -2556,7 +2569,7 @@ static void gfx_run_dl(Gfx* cmd) {
                 gfx_dp_texture_rectangle(ulx, uly, lrx, lry, tile, uls, ult, dsdx, dtdy, opcode == G_TEXRECTFLIP);
                 break;
             }
-			case G_TEXRECT_WIDE:
+            case G_TEXRECT_WIDE:
             {
                 int32_t lrx, lry, tile, ulx, uly;
                 uint32_t uls, ult, dsdx, dtdy;
@@ -2714,7 +2727,7 @@ void gfx_start_frame(void) {
     }
     gfx_prev_dimensions = gfx_current_dimensions;
 
-    bool different_size = gfx_current_dimensions.width != (uint32_t)gfx_current_game_window_viewport.width || gfx_current_dimensions.height != (uint32_t)gfx_current_game_window_viewport.height;
+    bool different_size = gfx_current_dimensions.width != gfx_current_game_window_viewport.width || gfx_current_dimensions.height != gfx_current_game_window_viewport.height;
     if (different_size || gfx_msaa_level > 1) {
         game_renders_to_framebuffer = true;
         if (different_size) {
@@ -2761,7 +2774,7 @@ void gfx_run(Gfx *commands) {
         gfx_rapi->clear_framebuffer();
 
         if (gfx_msaa_level > 1) {
-            bool different_size = gfx_current_dimensions.width != (uint32_t)gfx_current_game_window_viewport.width || gfx_current_dimensions.height != (uint32_t)gfx_current_game_window_viewport.height;
+            bool different_size = gfx_current_dimensions.width != gfx_current_game_window_viewport.width || gfx_current_dimensions.height != gfx_current_game_window_viewport.height;
 
             if (different_size) {
                 gfx_rapi->resolve_msaa_color_buffer(game_framebuffer_msaa_resolved, game_framebuffer);
@@ -2813,7 +2826,7 @@ void gfx_reset_framebuffer() {
 static void adjust_pixel_depth_coordinates(float& x, float& y) {
     x = x * RATIO_Y - (SCREEN_WIDTH * RATIO_Y - gfx_current_dimensions.width) / 2;
     y *= RATIO_Y;
-    if (!game_renders_to_framebuffer || (gfx_msaa_level > 1 && gfx_current_dimensions.width == (uint32_t)gfx_current_game_window_viewport.width && gfx_current_dimensions.height == (uint32_t)gfx_current_game_window_viewport.height)) {
+    if (!game_renders_to_framebuffer || (gfx_msaa_level > 1 && gfx_current_dimensions.width == gfx_current_game_window_viewport.width && gfx_current_dimensions.height == gfx_current_game_window_viewport.height)) {
         x += gfx_current_game_window_viewport.x;
         y += gfx_current_window_dimensions.height - (gfx_current_game_window_viewport.y + gfx_current_game_window_viewport.height);
     }
@@ -2825,17 +2838,17 @@ void gfx_get_pixel_depth_prepare(float x, float y) {
 }
 
 uint16_t gfx_get_pixel_depth(float x, float y) {
-  adjust_pixel_depth_coordinates(x, y);
+    adjust_pixel_depth_coordinates(x, y);
 
-  if (auto it = get_pixel_depth_cached.find(make_pair(x, y)); it != get_pixel_depth_cached.end()) {
-      return it->second;
-  }
+    if (auto it = get_pixel_depth_cached.find(make_pair(x, y)); it != get_pixel_depth_cached.end()) {
+        return it->second;
+    }
 
-  get_pixel_depth_pending.emplace(x, y);
+    get_pixel_depth_pending.emplace(x, y);
 
-  map<pair<float, float>, uint16_t> res = gfx_rapi->get_pixel_depth(game_renders_to_framebuffer ? game_framebuffer : 0, get_pixel_depth_pending);
-  get_pixel_depth_cached.merge(res);
-  get_pixel_depth_pending.clear();
+    map<pair<float, float>, uint16_t> res = gfx_rapi->get_pixel_depth(game_renders_to_framebuffer ? game_framebuffer : 0, get_pixel_depth_pending);
+    get_pixel_depth_cached.merge(res);
+    get_pixel_depth_pending.clear();
 
-  return get_pixel_depth_cached.find(make_pair(x, y))->second;
+    return get_pixel_depth_cached.find(make_pair(x, y))->second;
 }

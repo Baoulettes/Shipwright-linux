@@ -619,7 +619,7 @@ bool ZFile::AddDeclarationChecks(uint32_t address, const std::string& varName)
 	assert(GETSEGNUM(address) == 0);
 	assert(varName != "");
 #ifdef DEVELOPMENT
-	if (address == 0x000000)
+	if (address == 0x0000)
 	{
 		[[maybe_unused]] int32_t bp = 0;
 	}
@@ -821,29 +821,32 @@ void ZFile::GenerateSourceHeaderFiles()
 	if (Globals::Instance->verbosity >= VerbosityLevel::VERBOSITY_INFO)
 		printf("Writing H file: %s\n", headerFilename.c_str());
 
-	if (Globals::Instance->fileMode != ZFileMode::ExtractDirectory) {
+	if (Globals::Instance->fileMode != ZFileMode::ExtractDirectory)
 		File::WriteAllText(headerFilename, formatter.GetOutput());
-	} else if (Globals::Instance->sourceOutputPath != "") {
+	else if (Globals::Instance->sourceOutputPath != "")
+	{
 		std::string xmlPath = xmlFilePath.string();
 		xmlPath = StringHelper::Replace(xmlPath, "\\", "/");
 		auto pathList = StringHelper::Split(xmlPath, "/");
 		std::string outPath = "";
-
+		
 		for (int i = 0; i < 3; i++)
 			outPath += pathList[i] + "/";
 
-		for (int i = 5; i < pathList.size(); i++) {
-			if (i == pathList.size() - 1) {
+		for (int i = 5; i < pathList.size(); i++)
+		{
+			if (i == pathList.size() - 1)
+			{
 				outPath += Path::GetFileNameWithoutExtension(pathList[i]) + "/";
 				outPath += outName.string() + ".h";
-			} else {
+			}
+			else
 				outPath += pathList[i];
-			}
 
-			if (i < pathList.size() - 1) {
+			if (i < pathList.size() - 1)
 				outPath += "/";
-			}
 		}
+
 		File::WriteAllText(outPath, formatter.GetOutput());
 	}
 }

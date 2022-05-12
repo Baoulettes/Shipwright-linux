@@ -11,7 +11,6 @@
 #include <wrl/client.h>
 #include <dxgi1_3.h>
 #include <dxgi1_4.h>
-
 #include <versionhelpers.h>
 
 #include <shellscalingapi.h>
@@ -565,12 +564,14 @@ void gfx_dxgi_create_factory_and_device(bool debug, int d3d_version, bool (*crea
     } else {
         ThrowIfFailed(dxgi.CreateDXGIFactory1(__uuidof(IDXGIFactory2), &dxgi.factory));
     }
+
     {
         ComPtr<IDXGIFactory4> factory4;
         if (dxgi.factory->QueryInterface(__uuidof(IDXGIFactory4), &factory4) == S_OK) {
             dxgi.dxgi1_4 = true;
         }
     }
+
     ComPtr<IDXGIAdapter1> adapter;
     for (UINT i = 0; dxgi.factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; i++) {
         DXGI_ADAPTER_DESC1 desc;

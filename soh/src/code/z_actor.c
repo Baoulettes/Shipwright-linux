@@ -334,37 +334,37 @@ void func_8002BE98(TargetContext* targetCtx, s32 actorCategory, GlobalContext* g
 
 void func_8002BF60(TargetContext* targetCtx, Actor* actor, s32 actorCategory, GlobalContext* globalCtx) {
     NaviColor* naviColor = &sNaviColorList[actorCategory];
-    if (actorCategory == ACTORCAT_PLAYER && CVar_GetS32("gUseNaviCol",0) == 1 ) {
-        naviColor->inner.r = CVar_GetS32("gNavi_Idle_Inner_R", naviColor->inner.r);
-        naviColor->inner.g = CVar_GetS32("gNavi_Idle_Inner_G", naviColor->inner.g);
-        naviColor->inner.b = CVar_GetS32("gNavi_Idle_Inner_B", naviColor->inner.b);
-        naviColor->outer.r = CVar_GetS32("gNavi_Idle_Outer_R", naviColor->outer.r);
-        naviColor->outer.g = CVar_GetS32("gNavi_Idle_Outer_G", naviColor->outer.g);
-        naviColor->outer.b = CVar_GetS32("gNavi_Idle_Outer_B", naviColor->outer.b);
+    if (actorCategory == ACTORCAT_PLAYER) {
+        naviColor->inner.r = CVar_GetS32("gNavi_Idle_Inner_Red", naviColor->inner.r);
+        naviColor->inner.g = CVar_GetS32("gNavi_Idle_Inner_Green", naviColor->inner.g);
+        naviColor->inner.b = CVar_GetS32("gNavi_Idle_Inner_Blue", naviColor->inner.b);
+        naviColor->outer.r = CVar_GetS32("gNavi_Idle_Outer_Red", naviColor->outer.r);
+        naviColor->outer.g = CVar_GetS32("gNavi_Idle_Outer_Green", naviColor->outer.g);
+        naviColor->outer.b = CVar_GetS32("gNavi_Idle_Outer_Blue", naviColor->outer.b);
     }
-    if (actorCategory == ACTORCAT_NPC && CVar_GetS32("gUseNaviCol",0) == 1 ) {
-        naviColor->inner.r = CVar_GetS32("gNavi_NPC_Inner_R", naviColor->inner.r);
-        naviColor->inner.g = CVar_GetS32("gNavi_NPC_Inner_G", naviColor->inner.g);
-        naviColor->inner.b = CVar_GetS32("gNavi_NPC_Inner_B", naviColor->inner.b);
-        naviColor->outer.r = CVar_GetS32("gNavi_NPC_Outer_R", naviColor->outer.r);
-        naviColor->outer.g = CVar_GetS32("gNavi_NPC_Outer_G", naviColor->outer.g);
-        naviColor->outer.b = CVar_GetS32("gNavi_NPC_Outer_B", naviColor->outer.b);
+    if (actorCategory == ACTORCAT_NPC) {
+        naviColor->inner.r = CVar_GetS32("gNavi_NPC_Inner_Red", naviColor->inner.r);
+        naviColor->inner.g = CVar_GetS32("gNavi_NPC_Inner_Green", naviColor->inner.g);
+        naviColor->inner.b = CVar_GetS32("gNavi_NPC_Inner_Blue", naviColor->inner.b);
+        naviColor->outer.r = CVar_GetS32("gNavi_NPC_Outer_Red", naviColor->outer.r);
+        naviColor->outer.g = CVar_GetS32("gNavi_NPC_Outer_Green", naviColor->outer.g);
+        naviColor->outer.b = CVar_GetS32("gNavi_NPC_Outer_Blue", naviColor->outer.b);
     }
-    if (actorCategory == ACTORCAT_BOSS && CVar_GetS32("gUseNaviCol",0) == 1 || actorCategory == ACTORCAT_ENEMY && CVar_GetS32("gUseNaviCol",0) == 1 ) {
-        naviColor->inner.r = CVar_GetS32("gNavi_Enemy_Inner_R", naviColor->inner.r);
-        naviColor->inner.g = CVar_GetS32("gNavi_Enemy_Inner_G", naviColor->inner.g);
-        naviColor->inner.b = CVar_GetS32("gNavi_Enemy_Inner_B", naviColor->inner.b);
-        naviColor->outer.r = CVar_GetS32("gNavi_Enemy_Outer_R", naviColor->outer.r);
-        naviColor->outer.g = CVar_GetS32("gNavi_Enemy_Outer_G", naviColor->outer.g);
-        naviColor->outer.b = CVar_GetS32("gNavi_Enemy_Outer_B", naviColor->outer.b);
+    if (actorCategory == ACTORCAT_BOSS || actorCategory == ACTORCAT_ENEMY) {
+        naviColor->inner.r = CVar_GetS32("gNavi_Enemy_Inner_Red", naviColor->inner.r);
+        naviColor->inner.g = CVar_GetS32("gNavi_Enemy_Inner_Green", naviColor->inner.g);
+        naviColor->inner.b = CVar_GetS32("gNavi_Enemy_Inner_Blue", naviColor->inner.b);
+        naviColor->outer.r = CVar_GetS32("gNavi_Enemy_Outer_Red", naviColor->outer.r);
+        naviColor->outer.g = CVar_GetS32("gNavi_Enemy_Outer_Green", naviColor->outer.g);
+        naviColor->outer.b = CVar_GetS32("gNavi_Enemy_Outer_Blue", naviColor->outer.b);
     }
-    if (actorCategory == ACTORCAT_PROP && CVar_GetS32("gUseNaviCol",0) == 1 ) {
-        naviColor->inner.r = CVar_GetS32("gNavi_Prop_Inner_R", naviColor->inner.r);
-        naviColor->inner.g = CVar_GetS32("gNavi_Prop_Inner_G", naviColor->inner.g);
-        naviColor->inner.b = CVar_GetS32("gNavi_Prop_Inner_B", naviColor->inner.b);
-        naviColor->outer.r = CVar_GetS32("gNavi_Prop_Outer_R", naviColor->outer.r);
-        naviColor->outer.g = CVar_GetS32("gNavi_Prop_Outer_G", naviColor->outer.g);
-        naviColor->outer.b = CVar_GetS32("gNavi_Prop_Outer_B", naviColor->outer.b);
+    if (actorCategory == ACTORCAT_PROP) {
+        naviColor->inner.r = CVar_GetS32("gNavi_Prop_Inner_Red", naviColor->inner.r);
+        naviColor->inner.g = CVar_GetS32("gNavi_Prop_Inner_Green", naviColor->inner.g);
+        naviColor->inner.b = CVar_GetS32("gNavi_Prop_Inner_Blue", naviColor->inner.b);
+        naviColor->outer.r = CVar_GetS32("gNavi_Prop_Outer_Red", naviColor->outer.r);
+        naviColor->outer.g = CVar_GetS32("gNavi_Prop_Outer_Green", naviColor->outer.g);
+        naviColor->outer.b = CVar_GetS32("gNavi_Prop_Outer_Blue", naviColor->outer.b);
     }
     targetCtx->naviRefPos.x = actor->focus.pos.x;
     targetCtx->naviRefPos.y = actor->focus.pos.y + (actor->targetArrowOffset * actor->scale.y);
@@ -762,21 +762,22 @@ void TitleCard_InitBossName(GlobalContext* globalCtx, TitleCardContext* titleCtx
 
     if (ResourceMgr_OTRSigCheck(texture))
         texture = ResourceMgr_LoadTexByName(texture);
-    titleCtx->isBossCard = true;
-    titleCtx->hasTranslation = hasTranslation;   
+
     titleCtx->texture = texture;
+    titleCtx->isBossCard = true;
+    titleCtx->hasTranslation = hasTranslation;
     titleCtx->x = x;
     titleCtx->y = y;
     titleCtx->width = width;
     titleCtx->height = height;
     titleCtx->durationTimer = 80;
     titleCtx->delayTimer = 0;
-
 }
 
-void TitleCard_InitPlaceName(GlobalContext* globalCtx, TitleCardContext* titleCtx, char* texture, s32 x, s32 y,
+void TitleCard_InitPlaceName(GlobalContext* globalCtx, TitleCardContext* titleCtx, void* texture, s32 x, s32 y,
                              s32 width, s32 height, s32 delay) {
     SceneTableEntry* loadedScene = globalCtx->loadedScene;
+
   //  size_t size = loadedScene->titleFile.vromEnd - loadedScene->titleFile.vromStart;
     switch (globalCtx->sceneNum) {
         case SCENE_YDAN:
@@ -981,8 +982,9 @@ void TitleCard_InitPlaceName(GlobalContext* globalCtx, TitleCardContext* titleCt
 
     titleCtx->texture = ResourceMgr_LoadTexByName(texture);
 
-    titleCtx->isBossCard = 0;
-    titleCtx->hasTranslation = 0;
+    //titleCtx->texture = texture;
+    titleCtx->isBossCard = false;
+    titleCtx->hasTranslation = false;
     titleCtx->x = x;
     titleCtx->y = y;
     titleCtx->width = width;
@@ -1006,6 +1008,7 @@ void TitleCard_Update(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
 void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
     s32 width;
     s32 height;
+    s32 unused;
     s32 titleX;
     s32 doubleWidth;
     s32 titleY;
@@ -1013,6 +1016,7 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
     s32 textureLanguageOffset;
     s32 shiftTopY;
     s32 shiftBottomY;
+
     if (titleCtx->alpha != 0) {
         width = titleCtx->width;
         height = titleCtx->height;
@@ -1024,9 +1028,6 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
 
         height = (width * height > 0x1000) ? 0x1000 / width : height;
         titleSecondY = titleY + (height * 4);
-
-        WORLD_OVERLAY_DISP = func_80093808(WORLD_OVERLAY_DISP);
-        gDPSetPrimColor(WORLD_OVERLAY_DISP++, 0, 0, (u8)titleCtx->intensity, (u8)titleCtx->intensity, (u8)titleCtx->intensity, (u8)titleCtx->alpha);
 
         textureLanguageOffset = 0x0;
         shiftTopY = 0x0;
@@ -1044,25 +1045,33 @@ void TitleCard_Draw(GlobalContext* globalCtx, TitleCardContext* titleCtx) {
             }
         }
 
-        gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + textureLanguageOffset + shiftTopY, G_IM_FMT_IA, G_IM_SIZ_8b,
+        // WORLD_OVERLAY_DISP Goes over POLY_XLU_DISP but under POLY_KAL_DISP
+        WORLD_OVERLAY_DISP = func_80093808(WORLD_OVERLAY_DISP);
+
+        gDPSetPrimColor(WORLD_OVERLAY_DISP++, 0, 0, (u8)titleCtx->intensity, (u8)titleCtx->intensity, (u8)titleCtx->intensity,
+                        (u8)titleCtx->alpha);
+
+        gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + textureLanguageOffset + shiftTopY, G_IM_FMT_IA,
+                            G_IM_SIZ_8b,
                             width, height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                             G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-
+        //Removing the -1 there remove the gap between top and bottom textures.
         gSPTextureRectangle(WORLD_OVERLAY_DISP++, titleX, titleY, ((doubleWidth * 2) + titleX) - 4, titleY + (height * 4),
                             G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
 
         height = titleCtx->height - height;
 
         // If texture is bigger than 0x1000, display the rest
-        // for Boss Title card the the bottom part of it.
         if (height > 0) {
-            gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + textureLanguageOffset + shiftBottomY, G_IM_FMT_IA,
+            gDPLoadTextureBlock(WORLD_OVERLAY_DISP++, (uintptr_t)titleCtx->texture + textureLanguageOffset + shiftBottomY,
+                                G_IM_FMT_IA,
                                 G_IM_SIZ_8b, width, height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
                                 G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-
+            //Removing the -1 there remove the gap between top and bottom textures.
             gSPTextureRectangle(WORLD_OVERLAY_DISP++, titleX, titleSecondY, ((doubleWidth * 2) + titleX) - 4,
                                 titleSecondY + (height * 4), G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
         }
+
         CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_actor.c", 2880);
     }
 }
@@ -1162,6 +1171,7 @@ void Actor_Destroy(Actor* actor, GlobalContext* globalCtx) {
 
 void func_8002D7EC(Actor* actor) {
     f32 speedRate = R_UPDATE_RATE * 0.5f;
+
     actor->world.pos.x += (actor->velocity.x * speedRate) + actor->colChkInfo.displacement.x;
     actor->world.pos.y += (actor->velocity.y * speedRate) + actor->colChkInfo.displacement.y;
     actor->world.pos.z += (actor->velocity.z * speedRate) + actor->colChkInfo.displacement.z;
@@ -2566,12 +2576,10 @@ void func_80030FA8(GraphicsContext* gfxCtx) {
     float ratio = OTRGetAspectRatio();
 
     gDPSetTileSize(POLY_XLU_DISP++, G_TX_RENDERTILE, 384, 224, 892, 732);
-    //gSPTextureRectangle(POLY_XLU_DISP++, 0, 0, 1280, 960, G_TX_RENDERTILE, 2240, 1600, 576, 597);
     // TODO: Do correct math to fix it
     gSPWideTextureRectangle(POLY_XLU_DISP++, x, 0, x + abs(x), 960, G_TX_RENDERTILE, 0, 0, 0, 0);
     gSPWideTextureRectangle(POLY_XLU_DISP++, 0, 0, w, 960, G_TX_RENDERTILE, 2240, 1600, 576, 597);
     gDPPipeSync(POLY_XLU_DISP++);
-
     CLOSE_DISPS(gfxCtx, "../z_actor.c", 6183);
 }
 
@@ -4263,8 +4271,6 @@ s32 func_80035124(Actor* actor, GlobalContext* globalCtx) {
 
     return ret;
 }
-
-#include "z_cheap_proc.c"
 
 u8 func_800353E8(GlobalContext* globalCtx) {
     Player* player = GET_PLAYER(globalCtx);

@@ -1172,7 +1172,7 @@ void Gameplay_Draw(GlobalContext* globalCtx) {
 
                 //goto Gameplay_Draw_DrawOverlayElements;
             }
-            //else 
+            //else
             {
                 s32 sp80;
 
@@ -1473,7 +1473,7 @@ void Gameplay_InitEnvironment(GlobalContext* globalCtx, s16 skyboxId) {
     Environment_Init(globalCtx, &globalCtx->envCtx, 0);
 }
 
-void Gameplay_InitScene(GlobalContext* globalCtx, s32 spawn) 
+void Gameplay_InitScene(GlobalContext* globalCtx, s32 spawn)
 {
     globalCtx->curSpawn = spawn;
     globalCtx->linkActorEntry = NULL;

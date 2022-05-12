@@ -332,7 +332,6 @@ void EnItem00_SetupAction(EnItem00* this, EnItem00ActionFunc actionFunc) {
     this->actionFunc = actionFunc;
 }
 
-
 void EnItem00_Init(Actor* thisx, GlobalContext* globalCtx) {
     EnItem00* this = (EnItem00*)thisx;
     s32 pad;
@@ -341,7 +340,7 @@ void EnItem00_Init(Actor* thisx, GlobalContext* globalCtx) {
     s32 getItemId = GI_NONE;
     s16 spawnParam8000 = this->actor.params & 0x8000;
     s32 pad1;
-	
+
     this->collectibleFlag = (this->actor.params & 0x3F00) >> 8;
 
     this->actor.params &= 0xFF;
@@ -604,7 +603,7 @@ void EnItem00_Init(Actor* thisx, GlobalContext* globalCtx) {
             this->actor.world.rot.x = 0x4000;
             break;
     }
-    
+
     this->unk_156 = 0;
     ActorShape_Init(&this->actor.shape, yOffset, ActorShadow_DrawCircle, shadowScale);
     this->actor.shape.shadowAlpha = 180;
@@ -717,7 +716,7 @@ void func_8001DFC8(EnItem00* this, GlobalContext* globalCtx) {
 		    this->actor.shape.rot.y = DroppedItemRot;
 		}
 	}
-
+	
     if ((this->actor.params <= ITEM00_RUPEE_RED) || ((this->actor.params == ITEM00_HEART) && (this->unk_15A < 0)) ||
         (this->actor.params == ITEM00_HEART_PIECE)) {
         this->actor.shape.rot.y += 960;
@@ -770,6 +769,7 @@ void func_8001E1C8(EnItem00* this, GlobalContext* globalCtx) {
     if (this->actor.params <= ITEM00_RUPEE_RED) {
         this->actor.shape.rot.y += 960;
     }
+
     if (globalCtx->gameplayFrames & 1) {
         effectPos.x = this->actor.world.pos.x + Rand_CenteredFloat(10.0f);
         effectPos.y = this->actor.world.pos.y + Rand_CenteredFloat(10.0f);
@@ -889,22 +889,21 @@ void EnItem00_Update(Actor* thisx, GlobalContext* globalCtx) {
     u32* temp;
     EnItem00* this = (EnItem00*)thisx;
     s32 pad;
-    if (this->unk_15A > 0) {
-        this->unk_15A--;
-    }
-    
+
 	if (CVar_GetS32("gNewDrops", 0) !=0) { //Update 3D Model rotation on frame update :)
 		DroppedItemRot += 100;
 	}
-	
+
+    if (this->unk_15A > 0) {
+        this->unk_15A--;
+    }
+
     if ((this->unk_15A > 0) && (this->unk_15A < 41) && (this->unk_154 <= 0)) {
         this->unk_156 = this->unk_15A;
     }
 
     this->actionFunc(this, globalCtx);
     Math_SmoothStepToF(&this->actor.scale.x, this->scale, 0.1f, this->scale * 0.1f, 0.0f);
-    
-    
     temp = &D_80157D90;
 
     this->actor.scale.z = this->actor.scale.x;
@@ -964,9 +963,11 @@ void EnItem00_Update(Actor* thisx, GlobalContext* globalCtx) {
             return;
         }
     }
+
     if (globalCtx->gameOverCtx.state != GAMEOVER_INACTIVE) {
         return;
     }
+
     switch (this->actor.params) {
         case ITEM00_RUPEE_GREEN:
             Item_Give(globalCtx, ITEM_RUPEE_GREEN);
@@ -1086,6 +1087,7 @@ void EnItem00_Update(Actor* thisx, GlobalContext* globalCtx) {
     this->actor.speedXZ = 0;
     this->actor.velocity.y = 0;
     this->actor.gravity = 0;
+
     Actor_SetScale(&this->actor, this->scale);
 
     this->getItemId = GI_NONE;
@@ -1230,7 +1232,6 @@ void EnItem00_Draw(Actor* thisx, GlobalContext* globalCtx) {
                 break;
         }
     }
-
 }
 
 /**
@@ -1358,8 +1359,7 @@ s16 func_8001F404(s16 dropId) {
     if (dropId == ITEM00_HEART && gSaveContext.healthCapacity == gSaveContext.health) {
         return ITEM00_RUPEE_GREEN;
     }
-    //Force drop to be this one.
-    //dropId= ITEM00_RUPEE_ORANGE;
+
     return dropId;
 }
 
@@ -1525,7 +1525,7 @@ void Item_DropCollectibleRandom(GlobalContext* globalCtx, Actor* fromActor, Vec3
             params = 0xA * 0x10;
             dropTableIndex = 0x0;
             dropId = ITEM00_RUPEE_RED;
-        }  else {
+        } else {
             return;
         }
     }

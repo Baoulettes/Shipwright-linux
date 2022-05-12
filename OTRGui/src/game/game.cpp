@@ -67,13 +67,13 @@ void OTRGame::init(){
 		mat.shader = shader;
 	}
 
-	if(fs::exists("soh.exe") && !fs::exists("oot.otr")) {
+	if((fs::exists("soh.exe") || fs::exists("soh.elf")) && !fs::exists("oot.otr")) {
 		hide_second_btn = true;
 		sohFolder = ".";
 	}
 }
 
-void ExtractRom() 
+void ExtractRom()
 {
 	WriteResult result;
 
@@ -87,10 +87,11 @@ void ExtractRom()
 		if (MoonUtils::exists("Extract")) MoonUtils::rm("Extract");
 
 		MoonUtils::mkdir("Extract");
-		MoonUtils::copy("tmp/baserom/Audiobank", "Extract/Audiobank");
-		MoonUtils::copy("tmp/baserom/Audioseq", "Extract/Audioseq");
-		MoonUtils::copy("tmp/baserom/Audiotable", "Extract/Audiotable");
-		MoonUtils::copy("tmp/baserom/version", "Extract/version");
+		//MoonUtils::copy("tmp/baserom/Audiobank", "Extract/Audiobank");
+		//MoonUtils::copy("tmp/baserom/Audioseq", "Extract/Audioseq");
+		//MoonUtils::copy("tmp/baserom/Audiotable", "Extract/Audiotable");
+		//MoonUtils::copy("tmp/baserom/version", "Extract/version");
+		MoonUtils::write("Extract/version", (char*)&version.crc, sizeof(version.crc));
 
 		MoonUtils::copy("assets/game/", "Extract/assets/");
 

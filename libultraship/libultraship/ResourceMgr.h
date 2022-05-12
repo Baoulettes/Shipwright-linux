@@ -28,7 +28,7 @@ namespace Ship
 		std::string HashToString(uint64_t Hash);
 
 		void InvalidateResourceCache();
-		
+
 		uint32_t GetGameVersion();
 		void SetGameVersion(uint32_t newGameVersion);
 		std::shared_ptr<File> LoadFileAsync(std::string FilePath);

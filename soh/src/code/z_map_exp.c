@@ -4,7 +4,6 @@
 #include "textures/parameter_static/parameter_static.h"
 #include "textures/map_i_static/map_i_static.h"
 #include "textures/map_grand_static/map_grand_static.h"
-#include "luslog.h"
 
 MapData* gMapData;
 
@@ -12,11 +11,6 @@ s16 sPlayerInitialPosX = 0;
 s16 sPlayerInitialPosZ = 0;
 s16 sPlayerInitialDirection = 0;
 s16 sEntranceIconMapIndex = 0;
-
-s16 Top_MM_Margin = 0;
-s16 Left_MM_Margin = 0;
-s16 Right_MM_Margin = 0;
-s16 Bottom_MM_Margin = 0;
 
 void Map_SavePlayerInitialInfo(GlobalContext* globalCtx) {
     Player* player = GET_PLAYER(globalCtx);
@@ -34,10 +28,12 @@ void Map_SetPaletteData(GlobalContext* globalCtx, s16 room) {
     if (interfaceCtx->mapRoomNum == room) {
         interfaceCtx->mapPaletteIndex = paletteIndex;
     }
-    //osSyncPrintf(VT_FGCOL(YELLOW));
+
+    osSyncPrintf(VT_FGCOL(YELLOW));
     // "PALETE Set"
-    //osSyncPrintf("ＰＡＬＥＴＥセット 【 i=%x : room=%x 】Room_Inf[%d][4]=%x  ( map_palete_no = %d )\n", paletteIndex, room, mapIndex, gSaveContext.sceneFlags[mapIndex].rooms, interfaceCtx->mapPaletteIndex);
-    //osSyncPrintf(VT_RST);
+    osSyncPrintf("ＰＡＬＥＴＥセット 【 i=%x : room=%x 】Room_Inf[%d][4]=%x  ( map_palete_no = %d )\n", paletteIndex,
+                 room, mapIndex, gSaveContext.sceneFlags[mapIndex].rooms, interfaceCtx->mapPaletteIndex);
+    osSyncPrintf(VT_RST);
 
     interfaceCtx->mapPalette[paletteIndex * 2] = 2;
     interfaceCtx->mapPalette[paletteIndex * 2 + 1] = 0xBF;
@@ -403,9 +399,9 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
                     extendedMapIndex = 0x17;
                 }
             }
-            //osSyncPrintf(VT_FGCOL(BLUE));
-            //osSyncPrintf("ＫＫＫ＝%d\n", extendedMapIndex);
-            //osSyncPrintf(VT_RST);
+            osSyncPrintf(VT_FGCOL(BLUE));
+            osSyncPrintf("ＫＫＫ＝%d\n", extendedMapIndex);
+            osSyncPrintf(VT_RST);
             sEntranceIconMapIndex = extendedMapIndex;
             //DmaMgr_SendRequest1(interfaceCtx->mapSegment,
                                 //(uintptr_t)_map_grand_staticSegmentRomStart + gMapData->owMinimapTexOffset[extendedMapIndex],
@@ -415,9 +411,6 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
                 memcpy(globalCtx->interfaceCtx.mapSegment, ResourceMgr_LoadTexByName(minimapTableOW[sEntranceIconMapIndex]), gMapData->owMinimapTexSize[mapIndex]);
 
             interfaceCtx->unk_258 = mapIndex;
-            OPEN_DISPS(globalCtx->state.gfxCtx, "../z_map_exp.c", 626);
-            gSPInvalidateTexCache(OVERLAY_DISP++, interfaceCtx->mapSegment);
-            CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_map_exp.c", 782);
             break;
         case SCENE_YDAN:
         case SCENE_DDAN:
@@ -437,10 +430,11 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
         case SCENE_MIZUSIN_BS:
         case SCENE_JYASINBOSS:
         case SCENE_HAKADAN_BS:
-            //osSyncPrintf(VT_FGCOL(YELLOW));
+            osSyncPrintf(VT_FGCOL(YELLOW));
             // "Deku Tree Dungeon MAP Texture DMA"
-            //osSyncPrintf("デクの樹ダンジョンＭＡＰ テクスチャＤＭＡ(%x) scene_id_offset=%d  VREG(30)=%d\n", room, mapIndex, VREG(30));
-            //osSyncPrintf(VT_RST);
+            osSyncPrintf("デクの樹ダンジョンＭＡＰ テクスチャＤＭＡ(%x) scene_id_offset=%d  VREG(30)=%d\n", room,
+                         mapIndex, VREG(30));
+            osSyncPrintf(VT_RST);
             //DmaMgr_SendRequest1(globalCtx->interfaceCtx.mapSegment,
                                 //(uintptr_t)_map_i_staticSegmentRomStart +
                                     //((gMapData->dgnMinimapTexIndexOffset[mapIndex] + room) * 0xFF0),
@@ -451,10 +445,7 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
             R_COMPASS_OFFSET_X = gMapData->roomCompassOffsetX[mapIndex][room];
             R_COMPASS_OFFSET_Y = gMapData->roomCompassOffsetY[mapIndex][room];
             Map_SetFloorPalettesData(globalCtx, VREG(30));
-            //osSyncPrintf("ＭＡＰ 各階ＯＮチェック\n"); // "MAP Individual Floor ON Check"
-            OPEN_DISPS(globalCtx->state.gfxCtx, "../z_map_exp.c", 626);
-            gSPInvalidateTexCache(OVERLAY_DISP++, interfaceCtx->mapSegment);
-            CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_map_exp.c", 782);
+            osSyncPrintf("ＭＡＰ 各階ＯＮチェック\n"); // "MAP Individual Floor ON Check"
             break;
     }
 }
@@ -462,8 +453,9 @@ void Map_InitData(GlobalContext* globalCtx, s16 room) {
 void Map_InitRoomData(GlobalContext* globalCtx, s16 room) {
     s32 mapIndex = gSaveContext.mapIndex;
     InterfaceContext* interfaceCtx = &globalCtx->interfaceCtx;
-    //LUS_LOG(1,("＊＊＊＊＊＊＊\n＊＊＊＊＊＊＊\nroom_no=%d (%d)(%d)\n＊＊＊＊＊＊＊\n＊＊＊＊＊＊＊\n", room, mapIndex, globalCtx->sceneNum));
-    //osSyncPrintf("＊＊＊＊＊＊＊\n＊＊＊＊＊＊＊\nroom_no=%d (%d)(%d)\n＊＊＊＊＊＊＊\n＊＊＊＊＊＊＊\n", room, mapIndex, globalCtx->sceneNum);
+
+    osSyncPrintf("＊＊＊＊＊＊＊\n＊＊＊＊＊＊＊\nroom_no=%d (%d)(%d)\n＊＊＊＊＊＊＊\n＊＊＊＊＊＊＊\n", room,
+                 mapIndex, globalCtx->sceneNum);
 
     if (room >= 0) {
         switch (globalCtx->sceneNum) {
@@ -486,11 +478,13 @@ void Map_InitRoomData(GlobalContext* globalCtx, s16 room) {
             case SCENE_JYASINBOSS:
             case SCENE_HAKADAN_BS:
                 gSaveContext.sceneFlags[mapIndex].rooms |= gBitFlags[room];
-                //LUS_LOG(1,("ＲＯＯＭ＿ＩＮＦ＝%d\n", gSaveContext.sceneFlags[mapIndex].rooms));
+                osSyncPrintf("ＲＯＯＭ＿ＩＮＦ＝%d\n", gSaveContext.sceneFlags[mapIndex].rooms);
                 interfaceCtx->mapRoomNum = room;
                 interfaceCtx->unk_25A = mapIndex;
                 Map_SetPaletteData(globalCtx, room);
-                //LUS_LOG(1,("Room=%d\n", room)); // "Room Room = %d"
+                osSyncPrintf(VT_FGCOL(YELLOW));
+                osSyncPrintf("部屋部屋＝%d\n", room); // "Room Room = %d"
+                osSyncPrintf(VT_RST);
                 Map_InitData(globalCtx, room);
                 break;
         }
@@ -519,7 +513,8 @@ void Map_Init(GlobalContext* globalCtx) {
 
     interfaceCtx->mapSegment = GameState_Alloc(&globalCtx->state, 0x1000, "../z_map_exp.c", 457);
     // "ＭＡＰ texture initialization scene_data_ID=%d mapSegment=%x"
-    //LUS_LOG(1,("mapSegment=%x", interfaceCtx->mapSegment));
+    osSyncPrintf("\n\n\nＭＡＰ テクスチャ初期化   scene_data_ID=%d\nmapSegment=%x\n\n", globalCtx->sceneNum,
+                 interfaceCtx->mapSegment, globalCtx);
     ASSERT(interfaceCtx->mapSegment != NULL, "parameter->mapSegment != NULL", "../z_map_exp.c", 459);
 
     switch (globalCtx->sceneNum) {
@@ -605,32 +600,35 @@ void Minimap_DrawCompassIcons(GlobalContext* globalCtx) {
         func_80094A14(globalCtx->state.gfxCtx);
 
         gSPMatrix(OVERLAY_DISP++, &gMtxClear, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                          PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
         gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
         gDPSetCombineMode(OVERLAY_DISP++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
-        tempX = player->actor.world.pos.x+Right_MM_Margin;
-        tempZ = player->actor.world.pos.z+Bottom_MM_Margin;
+        tempX = player->actor.world.pos.x;
+        tempZ = player->actor.world.pos.z;
         tempX /= R_COMPASS_SCALE_X;
         tempZ /= R_COMPASS_SCALE_Y;
-        Matrix_Translate(OTRGetDimensionFromRightEdge((R_COMPASS_OFFSET_X+(Right_MM_Margin*10) + tempX) / 10.0f), (R_COMPASS_OFFSET_Y+((Bottom_MM_Margin*10)*-1) - tempZ) / 10.0f, 0.0f, MTXMODE_NEW);
+        Matrix_Translate(OTRGetDimensionFromRightEdge((R_COMPASS_OFFSET_X + tempX) / 10.0f), (R_COMPASS_OFFSET_Y - tempZ) / 10.0f, 0.0f, MTXMODE_NEW);
         Matrix_Scale(0.4f, 0.4f, 0.4f, MTXMODE_APPLY);
         Matrix_RotateX(-1.6f, MTXMODE_APPLY);
         tempX = (0x7FFF - player->actor.shape.rot.y) / 0x400;
         Matrix_RotateY(tempX / 10.0f, MTXMODE_APPLY);
-        gSPMatrix(OVERLAY_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_map_exp.c", 585), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        gSPMatrix(OVERLAY_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_map_exp.c", 585),
+                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 200, 255, 0, 255);
         gSPDisplayList(OVERLAY_DISP++, gCompassArrowDL);
 
-        tempX = sPlayerInitialPosX+Right_MM_Margin;
-        tempZ = sPlayerInitialPosZ+Bottom_MM_Margin;
+        tempX = sPlayerInitialPosX;
+        tempZ = sPlayerInitialPosZ;
         tempX /= R_COMPASS_SCALE_X;
         tempZ /= R_COMPASS_SCALE_Y;
-        Matrix_Translate(OTRGetDimensionFromRightEdge((R_COMPASS_OFFSET_X+(Right_MM_Margin*10) + tempX) / 10.0f), (R_COMPASS_OFFSET_Y+((Bottom_MM_Margin*10)*-1) - tempZ) / 10.0f, 0.0f, MTXMODE_NEW);
+        Matrix_Translate(OTRGetDimensionFromRightEdge((R_COMPASS_OFFSET_X + tempX) / 10.0f), (R_COMPASS_OFFSET_Y - tempZ) / 10.0f, 0.0f, MTXMODE_NEW);
         Matrix_Scale(VREG(9) / 100.0f, VREG(9) / 100.0f, VREG(9) / 100.0f, MTXMODE_APPLY);
         Matrix_RotateX(VREG(52) / 10.0f, MTXMODE_APPLY);
         Matrix_RotateY(sPlayerInitialDirection / 10.0f, MTXMODE_APPLY);
-        gSPMatrix(OVERLAY_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_map_exp.c", 603), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        gSPMatrix(OVERLAY_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_map_exp.c", 603),
+                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0xFF, 200, 0, 0, 255);
         gSPDisplayList(OVERLAY_DISP++, gCompassArrowDL);
@@ -664,20 +662,17 @@ void Minimap_Draw(GlobalContext* globalCtx) {
                                       TEXEL0, 0, PRIMITIVE, 0);
 
                     if (CHECK_DUNGEON_ITEM(DUNGEON_MAP, mapIndex)) {
-                        if (CVar_GetS32("gHudColors", 1) == 2) { //Dungeon minimap
-                            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCMinimapPrimR", 255), CVar_GetS32("gCCMinimapPrimG", 255), CVar_GetS32("gCCMinimapPrimB", 255), interfaceCtx->magicAlpha);
-                        } else {
-                            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 100, 255, 255, interfaceCtx->minimapAlpha);
-                        }
+                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 100, 255, 255, interfaceCtx->minimapAlpha);
+
+                        gSPInvalidateTexCache(OVERLAY_DISP++, interfaceCtx->mapSegment);
                         gDPLoadTextureBlock_4b(OVERLAY_DISP++, interfaceCtx->mapSegment, G_IM_FMT_I, 96, 85, 0,
                                                G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                                G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
-                        const s16 dgnMiniMapX = OTRGetRectDimensionFromRightEdge(R_DGN_MINIMAP_X + Right_MM_Margin);
-                        const s16 dgnMiniMapY = R_DGN_MINIMAP_Y + Bottom_MM_Margin;
+                        const s16 dgnMiniMapX = OTRGetRectDimensionFromRightEdge(R_DGN_MINIMAP_X);
 
-                        gSPWideTextureRectangle(OVERLAY_DISP++, dgnMiniMapX << 2, dgnMiniMapY << 2,
-                                            (dgnMiniMapX + 96) << 2, (dgnMiniMapY + 85) << 2, G_TX_RENDERTILE,
+                        gSPWideTextureRectangle(OVERLAY_DISP++, dgnMiniMapX << 2, R_DGN_MINIMAP_Y << 2,
+                                            (dgnMiniMapX + 96) << 2, (R_DGN_MINIMAP_Y + 85) << 2, G_TX_RENDERTILE,
                                             0, 0, 1 << 10, 1 << 10);
                     }
 
@@ -689,7 +684,7 @@ void Minimap_Draw(GlobalContext* globalCtx) {
                 }
 
                 if (CHECK_BTN_ALL(globalCtx->state.input[0].press.button, BTN_L) && !Gameplay_InCsMode(globalCtx)) {
-                    //osSyncPrintf("Game_play_demo_mode_check=%d\n", Gameplay_InCsMode(globalCtx));
+                    osSyncPrintf("Game_play_demo_mode_check=%d\n", Gameplay_InCsMode(globalCtx));
                     // clang-format off
                     if (!R_MINIMAP_DISABLED) { Audio_PlaySoundGeneral(NA_SE_SY_CAMERA_ZOOM_UP, &D_801333D4, 4,
                                                                       &D_801333E0, &D_801333E0, &D_801333E8); }
@@ -724,40 +719,39 @@ void Minimap_Draw(GlobalContext* globalCtx) {
                     func_80094520(globalCtx->state.gfxCtx);
 
                     gDPSetCombineMode(OVERLAY_DISP++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
-                    if (CVar_GetS32("gHudColors", 1) == 2) {//Overworld minimap
-                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCMinimapPrimR", 255), CVar_GetS32("gCCMinimapPrimG", 255), CVar_GetS32("gCCMinimapPrimB", 255), interfaceCtx->minimapAlpha);
-                    } else {
-                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_MINIMAP_COLOR(0), R_MINIMAP_COLOR(1), R_MINIMAP_COLOR(2), interfaceCtx->minimapAlpha);
-                    }
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_MINIMAP_COLOR(0), R_MINIMAP_COLOR(1), R_MINIMAP_COLOR(2),
+                                    interfaceCtx->minimapAlpha);
 
                     gDPLoadTextureBlock_4b(OVERLAY_DISP++, interfaceCtx->mapSegment, G_IM_FMT_IA,
                                            gMapData->owMinimapWidth[mapIndex], gMapData->owMinimapHeight[mapIndex], 0,
                                            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                            G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
-                    const s16 oWMiniMapX = OTRGetRectDimensionFromRightEdge(R_OW_MINIMAP_X + Right_MM_Margin);
-                    const s16 oWMiniMapY = R_OW_MINIMAP_Y + Bottom_MM_Margin;
+                    const s16 oWMiniMapX = OTRGetRectDimensionFromRightEdge(R_OW_MINIMAP_X);
 
-                    gSPWideTextureRectangle(OVERLAY_DISP++, oWMiniMapX << 2, oWMiniMapY << 2,
+                    gSPWideTextureRectangle(OVERLAY_DISP++, oWMiniMapX << 2, R_OW_MINIMAP_Y << 2,
                                            (oWMiniMapX + gMapData->owMinimapWidth[mapIndex]) << 2,
-                                           (oWMiniMapY + gMapData->owMinimapHeight[mapIndex]) << 2, G_TX_RENDERTILE, 0,
+                                           (R_OW_MINIMAP_Y + gMapData->owMinimapHeight[mapIndex]) << 2, G_TX_RENDERTILE, 0,
                                             0, 1 << 10, 1 << 10);
-                    if (CVar_GetS32("gHudColors", 1) != 2) {//This need to be added else it will color dungeon entrance icon too. (it re-init prim color to default color)
-                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, R_MINIMAP_COLOR(0), R_MINIMAP_COLOR(1), R_MINIMAP_COLOR(2), interfaceCtx->minimapAlpha);
-                    }
 
-                    if (((globalCtx->sceneNum != SCENE_SPOT01) && (globalCtx->sceneNum != SCENE_SPOT04) && (globalCtx->sceneNum != SCENE_SPOT08)) || (LINK_AGE_IN_YEARS != YEARS_ADULT)) {
+                    if (((globalCtx->sceneNum != SCENE_SPOT01) && (globalCtx->sceneNum != SCENE_SPOT04) &&
+                         (globalCtx->sceneNum != SCENE_SPOT08)) ||
+                        (LINK_AGE_IN_YEARS != YEARS_ADULT)) {
                         s16 IconSize = 8;
-                        s16 PosX = gMapData->owEntranceIconPosX[sEntranceIconMapIndex]+Right_MM_Margin;
-                        s16 PosY = gMapData->owEntranceIconPosY[sEntranceIconMapIndex]+Bottom_MM_Margin;
-                        if (CVar_GetS32("gFixDungeonMinimapIcon", 1) != 0){ //gFixDungeonMinimapIcon fix both Y position of visible icon and hide these non needed.
-                            PosY = PosY+1024; //No idea why and how Original value work but this does actually fix them all.
+                        s16 PosX = gMapData->owEntranceIconPosX[sEntranceIconMapIndex];
+                        s16 PosY = gMapData->owEntranceIconPosY[sEntranceIconMapIndex];
+                        //gFixDungeonMinimapIcon fix both Y position of visible icon and hide these non needed.
+                        if (CVar_GetS32("gFixDungeonMinimapIcon", 1) != 0){
+                            //No idea why and how Original value work but this does actually fix them all.
+                            PosY = PosY+1024;
                         }
                         s16 TopLeftX = OTRGetRectDimensionFromRightEdge(PosX) << 2;
                         s16 TopLeftY = PosY << 2;
                         s16 TopLeftW = OTRGetRectDimensionFromRightEdge(PosX + IconSize) << 2;
                         s16 TopLeftH = (PosY + IconSize) << 2;
-                        if ((gMapData->owEntranceFlag[sEntranceIconMapIndex] == 0xFFFF) || ((gMapData->owEntranceFlag[sEntranceIconMapIndex] != 0xFFFF) && (gSaveContext.infTable[26] & gBitFlags[gMapData->owEntranceFlag[mapIndex]]))) {
+                        if ((gMapData->owEntranceFlag[sEntranceIconMapIndex] == 0xFFFF) ||
+                            ((gMapData->owEntranceFlag[sEntranceIconMapIndex] != 0xFFFF) &&
+                             (gSaveContext.infTable[26] & gBitFlags[gMapData->owEntranceFlag[mapIndex]]))) {
                             if (gMapData->owEntranceIconPosY[sEntranceIconMapIndex] << 2 != 0 && CVar_GetS32("gFixDungeonMinimapIcon", 1) != 0){
                                 gDPLoadTextureBlock(OVERLAY_DISP++, gMapDungeonEntranceIconTex, G_IM_FMT_RGBA, G_IM_SIZ_16b,
                                                     IconSize, IconSize, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
@@ -771,14 +765,15 @@ void Minimap_Draw(GlobalContext* globalCtx) {
                             gSPWideTextureRectangle(OVERLAY_DISP++, TopLeftX, TopLeftY, TopLeftW, TopLeftH, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                         } 
                     }
-					if ((globalCtx->sceneNum == SCENE_SPOT08) && (gSaveContext.infTable[26] & gBitFlags[9])) {
+
+                    if ((globalCtx->sceneNum == SCENE_SPOT08) && (gSaveContext.infTable[26] & gBitFlags[9])) {
                         gDPLoadTextureBlock(OVERLAY_DISP++, gMapDungeonEntranceIconTex, G_IM_FMT_RGBA, G_IM_SIZ_16b, 8,
                                             8, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK,
                                             G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
-                        const s16 entranceX = OTRGetRectDimensionFromRightEdge(270);
+                        const s16 entranceX = OTRGetRectDimensionFromRightEdge(270);  
 
-                        gSPWideTextureRectangle(OVERLAY_DISP++, entranceX << 2, 154 << 2, (entranceX + 32) << 2, (154 + 8) << 2,
+                        gSPWideTextureRectangle(OVERLAY_DISP++, entranceX << 2, 154 << 2, (entranceX + 32) << 2, (154 + 8) << 2, 
                                                 G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
                     }
 
@@ -814,18 +809,6 @@ void Map_Update(GlobalContext* globalCtx) {
     s16 floor;
     s16 i;
 
-    if (CVar_GetS32("gHUDMargins", 0) != 0) {
-        Top_MM_Margin = CVar_GetS32("gHUDMargin_T", 0);
-        Left_MM_Margin = CVar_GetS32("gHUDMargin_L", 0);
-        Right_MM_Margin = CVar_GetS32("gHUDMargin_R", 0);
-        Bottom_MM_Margin = CVar_GetS32("gHUDMargin_B", 0);
-    } else {
-        Top_MM_Margin = 0;
-        Left_MM_Margin = 0;
-        Right_MM_Margin = 0;
-        Bottom_MM_Margin = 0;
-    }
-
     if ((globalCtx->pauseCtx.state == 0) && (globalCtx->pauseCtx.debugState == 0)) {
         switch (globalCtx->sceneNum) {
             case SCENE_YDAN:
@@ -860,7 +843,8 @@ void Map_Update(GlobalContext* globalCtx) {
 
                 if (interfaceCtx->mapRoomNum != sLastRoomNum) {
                     // "Current floor = %d Current room = %x Number of rooms = %d"
-                    //osSyncPrintf("現在階＝%d  現在部屋＝%x  部屋数＝%d\n", floor, interfaceCtx->mapRoomNum, gMapData->switchEntryCount[mapIndex]);
+                    osSyncPrintf("現在階＝%d  現在部屋＝%x  部屋数＝%d\n", floor, interfaceCtx->mapRoomNum,
+                                 gMapData->switchEntryCount[mapIndex]);
                     sLastRoomNum = interfaceCtx->mapRoomNum;
                 }
 
@@ -868,10 +852,10 @@ void Map_Update(GlobalContext* globalCtx) {
                     if ((interfaceCtx->mapRoomNum == gMapData->switchFromRoom[mapIndex][i]) &&
                         (floor == gMapData->switchFromFloor[mapIndex][i])) {
                         interfaceCtx->mapRoomNum = gMapData->switchToRoom[mapIndex][i];
-                        //osSyncPrintf(VT_FGCOL(YELLOW));
+                        osSyncPrintf(VT_FGCOL(YELLOW));
                         // "Layer switching = %x"
-                        //osSyncPrintf("階層切替＝%x\n", interfaceCtx->mapRoomNum);
-                        //osSyncPrintf(VT_RST);
+                        osSyncPrintf("階層切替＝%x\n", interfaceCtx->mapRoomNum);
+                        osSyncPrintf(VT_RST);
                         Map_InitData(globalCtx, interfaceCtx->mapRoomNum);
                         gSaveContext.sunsSongState = SUNSSONG_INACTIVE;
                         Map_SavePlayerInitialInfo(globalCtx);

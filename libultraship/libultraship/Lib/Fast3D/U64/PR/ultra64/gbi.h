@@ -176,12 +176,6 @@
 #define G_SETGRAYSCALE       0x39
 #define G_SETINTENSITY       0x40
 
-// Effects
-enum GFXEffects {
-    NONE, GRAYOUT, SEPIA
-};
-
-
 /*
  * The following commands are the "generated" RDP commands; the user
  * never sees them, the RSP microcode generates them.
@@ -3172,8 +3166,6 @@ _DW({                                   \
     _SHIFTL(c, 24, 8), (unsigned int)(d)                \
 }
 
-
-
 #define DPRGBColor(pkt, cmd, r, g, b, a)                \
             gDPSetColor(pkt, cmd,                   \
             (_SHIFTL(r, 24, 8) | _SHIFTL(g, 16, 8) |    \
@@ -3201,7 +3193,6 @@ _DW({                                   \
             gDPSetColor(pkt, G_SETFILLCOLOR, (d))
 #define gsDPSetFillColor(d)                     \
             gsDPSetColor(G_SETFILLCOLOR, (d))
-
 #define gDPSetPrimDepth(pkt, z, dz)                 \
         gDPSetColor(pkt, G_SETPRIMDEPTH,            \
                 _SHIFTL(z, 16, 16) | _SHIFTL(dz, 0, 16))
@@ -4244,6 +4235,17 @@ _DW({                                   \
         G_TX_LOADTILE, 0 , 0, 0, 0, 0, 0, 0);           \
     gDPLoadSync(pkt);                       \
     gDPLoadTLUTCmd(pkt, G_TX_LOADTILE, 255);            \
+    gDPPipeSync(pkt);                       \
+})
+
+#define gDPLoadTLUT_pal128(pkt, pal, dram)              \
+_DW({                                   \
+    gDPSetTextureImage(pkt, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, dram);  \
+    gDPTileSync(pkt);                       \
+    gDPSetTile(pkt, 0, 0, 0, 256 + ((pal)&1)*128,   \
+        G_TX_LOADTILE, 0 , 0, 0, 0, 0, 0, 0);           \
+    gDPLoadSync(pkt);                       \
+    gDPLoadTLUTCmd(pkt, G_TX_LOADTILE, 127);            \
     gDPPipeSync(pkt);                       \
 })
 

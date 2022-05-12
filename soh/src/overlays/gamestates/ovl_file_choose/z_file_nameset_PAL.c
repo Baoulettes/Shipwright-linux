@@ -511,8 +511,9 @@ void FileChoose_UpdateKeyboardCursor(GameState* thisx) {
     FileChooseContext* this = (FileChooseContext*)thisx;
     Input* input = &this->state.input[0];
     s16 prevKbdX;
-    this->kbdButton = 99;
     bool dpad = CVar_GetS32("gDpadPauseName", 0);
+
+    this->kbdButton = 99;
 
     if (this->kbdY != 5) {
         if ((this->stickRelX < -30) || (dpad && CHECK_BTN_ALL(input->press.button, BTN_DLEFT))) {
@@ -663,8 +664,17 @@ void FileChoose_UpdateOptionsMenu(GameState* thisx) {
         this->configMode = CM_OPTIONS_TO_MAIN;
         sramCtx->readBuff[0] = gSaveContext.audioSetting;
         sramCtx->readBuff[1] = gSaveContext.zTargetSetting;
+        osSyncPrintf("ＳＡＶＥ");
         Sram_WriteSramHeader(sramCtx);
+        osSyncPrintf(VT_FGCOL(YELLOW));
+        osSyncPrintf("sram->read_buff[2] = J_N = %x\n", sramCtx->readBuff[2]);
+        osSyncPrintf("sram->read_buff[2] = J_N = %x\n", &sramCtx->readBuff[2]);
+        osSyncPrintf("Na_SetSoundOutputMode = %d\n", gSaveContext.audioSetting);
+        osSyncPrintf("Na_SetSoundOutputMode = %d\n", gSaveContext.audioSetting);
+        osSyncPrintf("Na_SetSoundOutputMode = %d\n", gSaveContext.audioSetting);
+        osSyncPrintf(VT_RST);
         func_800F6700(gSaveContext.audioSetting);
+        osSyncPrintf("終了\n");
         return;
     }
 
@@ -681,7 +691,7 @@ void FileChoose_UpdateOptionsMenu(GameState* thisx) {
         } else {
             gSaveContext.zTargetSetting ^= 1;
         }
-     } else if ((this->stickRelX > 30) || (dpad && CHECK_BTN_ALL(input->press.button, BTN_DRIGHT))) {
+    } else if ((this->stickRelX > 30) || (dpad && CHECK_BTN_ALL(input->press.button, BTN_DRIGHT))) {
         Audio_PlaySoundGeneral(NA_SE_SY_FSEL_CURSOR, &D_801333D4, 4, &D_801333E0, &D_801333E0, &D_801333E8);
 
         if (sSelectedSetting == FS_SETTING_AUDIO) {
@@ -790,6 +800,7 @@ void FileChoose_DrawOptionsImpl(GameState* thisx) {
     s16 i;
     s16 j;
     s16 vtx;
+
     OPEN_DISPS(this->state.gfxCtx, "../z_file_nameset_PAL.c", 848);
 
     cursorRed = ABS(cursorPrimRed - cursorPrimColors[cursorPulseDir][0]) / cursorFlashTimer;
