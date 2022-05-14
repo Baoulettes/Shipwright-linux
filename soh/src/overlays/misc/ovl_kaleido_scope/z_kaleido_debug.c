@@ -2,7 +2,7 @@
 #include "textures/parameter_static/parameter_static.h"
 
 // Positions of each input section in the editor
-static u16 sSectionPositions[][2] = {
+static u16 sSectionPositions_JPN[][2] = {
     { 64, 15 },   { 144, 15 },  { 170, 15 },  { 78, 35 },   { 104, 35 },  { 130, 35 },  { 156, 35 },  { 182, 35 },
     { 208, 35 },  { 78, 50 },   { 104, 50 },  { 130, 50 },  { 156, 50 },  { 182, 50 },  { 208, 50 },  { 78, 65 },
     { 104, 65 },  { 130, 65 },  { 156, 65 },  { 182, 65 },  { 208, 65 },  { 78, 80 },   { 104, 80 },  { 130, 80 },
@@ -15,6 +15,99 @@ static u16 sSectionPositions[][2] = {
     { 126, 149 }, { 138, 149 }, { 78, 166 },  { 90, 166 },  { 102, 166 }, { 114, 166 }, { 126, 166 }, { 138, 166 },
     { 150, 166 }, { 162, 166 }, { 174, 166 }, { 186, 166 }, { 198, 166 }, { 210, 166 }, { 210, 149 }, { 222, 149 },
     { 234, 149 }, { 78, 185 },  { 90, 185 },  { 145, 185 }, { 210, 185 },
+};
+static u16 sSectionPositions_ENG[][2] = {
+    //Rupee     //Hearts
+    { 64, 15 }, { 188, 15 }, { 208, 15 }, 
+    //Items
+    { 78, 35 }, { 104, 35 }, { 130, 35 }, { 156, 35 }, { 182, 35 }, { 208, 35 },
+    { 78, 50 }, { 104, 50 }, { 130, 50 }, { 156, 50 }, { 182, 50 }, { 208, 50 },
+    { 78, 65 }, { 104, 65 }, { 130, 65 }, { 156, 65 }, { 182, 65 }, { 208, 65 },
+    { 78, 80 }, { 104, 80 }, { 130, 80 }, { 156, 80 }, { 182, 80 }, { 208, 80 }, 
+    //Keys
+    { 78, 98 }, { 88, 98 }, { 98, 98 }, { 108, 98 }, { 118, 98 }, { 128, 98 },
+    { 138, 98 }, { 148, 98 }, { 158, 98 }, { 168, 98 }, { 178, 98 }, { 188, 98 },
+    { 198, 98 }, { 208, 98 }, { 218, 98 }, { 228, 98 }, { 238, 98 },  
+    //Upgrades
+    { 78, 115 }, { 90, 115 }, { 102, 115 }, { 114, 115 }, { 126, 115 }, { 138, 115 }, { 150, 115 }, { 162, 115 }, 
+    //Equipments
+    { 260, 115 }, { 272, 115 }, { 281, 115 }, { 298, 115 },
+    //Maps
+    { 78, 132 }, { 90, 132 }, { 102, 132 }, { 114, 132 }, { 126, 132 }, { 138, 132 },
+    { 150, 132 }, { 162, 132 }, { 174, 132 }, { 186, 132 }, { 198, 132 }, { 210, 132 },
+    //Medallions
+    { 78, 149 }, { 90, 149 }, { 102, 149 }, { 114, 149 }, { 126, 149 }, { 138, 149 },
+    //Songs
+    { 78, 166 },  { 90, 166 },  { 102, 166 }, { 114, 166 }, { 126, 166 }, { 138, 166 }, 
+    { 150, 166 }, { 162, 166 }, { 174, 166 }, { 186, 166 }, { 198, 166 }, { 210, 166 }, 
+    //Stones
+    { 210, 149 }, { 222, 149 }, { 234, 149 },
+    //Collects
+    { 78, 185 },  { 90, 185 }, 
+    //GoldenSkull //POH
+    { 145, 185 }, { 228, 185 },
+};
+static u16 sSectionPositions_GER[][2] = {
+    //Rupee     //Hearts
+    { 64, 15 }, { 188, 15 }, { 208, 15 }, 
+    //Items
+    { 78, 35 }, { 104, 35 }, { 130, 35 }, { 156, 35 }, { 182, 35 }, { 208, 35 },
+    { 78, 50 }, { 104, 50 }, { 130, 50 }, { 156, 50 }, { 182, 50 }, { 208, 50 },
+    { 78, 65 }, { 104, 65 }, { 130, 65 }, { 156, 65 }, { 182, 65 }, { 208, 65 },
+    { 78, 80 }, { 104, 80 }, { 130, 80 }, { 156, 80 }, { 182, 80 }, { 208, 80 }, 
+    //Keys
+    { 78, 98 }, { 88, 98 }, { 98, 98 }, { 108, 98 }, { 118, 98 }, { 128, 98 },
+    { 138, 98 }, { 148, 98 }, { 158, 98 }, { 168, 98 }, { 178, 98 }, { 188, 98 },
+    { 198, 98 }, { 208, 98 }, { 218, 98 }, { 228, 98 }, { 238, 98 },  
+    //Upgrades
+    { 78, 115 }, { 90, 115 }, { 102, 115 }, { 114, 115 }, { 126, 115 }, { 138, 115 }, { 150, 115 }, { 162, 115 }, 
+    //Equipments
+    { 260, 115 }, { 272, 115 }, { 281, 115 }, { 298, 115 },
+    //Maps
+    { 78, 132 }, { 90, 132 }, { 102, 132 }, { 114, 132 }, { 126, 132 }, { 138, 132 },
+    { 150, 132 }, { 162, 132 }, { 174, 132 }, { 186, 132 }, { 198, 132 }, { 210, 132 },
+    //Medallions
+    { 78, 149 }, { 90, 149 }, { 102, 149 }, { 114, 149 }, { 126, 149 }, { 138, 149 },
+    //Songs
+    { 78, 166 },  { 90, 166 },  { 102, 166 }, { 114, 166 }, { 126, 166 }, { 138, 166 }, 
+    { 150, 166 }, { 162, 166 }, { 174, 166 }, { 186, 166 }, { 198, 166 }, { 210, 166 }, 
+    //Stones
+    { 210, 149 }, { 222, 149 }, { 234, 149 },
+    //Collects
+    { 78, 185 },  { 90, 185 }, 
+    //GoldenSkull //POH
+    { 145, 185 }, { 228, 185 },
+};
+static u16 sSectionPositions_FRA[][2] = {
+    //Rupee     //Hearts
+    { 64, 15 }, { 188, 15 }, { 208, 15 }, 
+    //Items
+    { 78, 35 }, { 104, 35 }, { 130, 35 }, { 156, 35 }, { 182, 35 }, { 208, 35 },
+    { 78, 50 }, { 104, 50 }, { 130, 50 }, { 156, 50 }, { 182, 50 }, { 208, 50 },
+    { 78, 65 }, { 104, 65 }, { 130, 65 }, { 156, 65 }, { 182, 65 }, { 208, 65 },
+    { 78, 80 }, { 104, 80 }, { 130, 80 }, { 156, 80 }, { 182, 80 }, { 208, 80 }, 
+    //Keys
+    { 78, 98 }, { 88, 98 }, { 98, 98 }, { 108, 98 }, { 118, 98 }, { 128, 98 },
+    { 138, 98 }, { 148, 98 }, { 158, 98 }, { 168, 98 }, { 178, 98 }, { 188, 98 },
+    { 198, 98 }, { 208, 98 }, { 218, 98 }, { 228, 98 }, { 238, 98 },  
+    //Upgrades
+    { 78, 115 }, { 90, 115 }, { 102, 115 }, { 114, 115 }, { 126, 115 }, { 138, 115 }, { 150, 115 }, { 162, 115 }, 
+    //Equipments
+    { 270, 115 }, { 282, 115 }, { 291, 115 }, { 308, 115 },
+    //Maps
+    { 78, 132 }, { 90, 132 }, { 102, 132 }, { 114, 132 }, { 126, 132 }, { 138, 132 },
+    { 150, 132 }, { 162, 132 }, { 174, 132 }, { 186, 132 }, { 198, 132 }, { 210, 132 },
+    //Medallions
+    { 78, 149 }, { 90, 149 }, { 102, 149 }, { 114, 149 }, { 126, 149 }, { 138, 149 },
+    //Songs
+    { 78, 166 },  { 90, 166 },  { 102, 166 }, { 114, 166 }, { 126, 166 }, { 138, 166 }, 
+    { 150, 166 }, { 162, 166 }, { 174, 166 }, { 186, 166 }, { 198, 166 }, { 210, 166 }, 
+    //Stones
+    { 220, 149 }, { 232, 149 }, { 244, 149 },
+    //Collects
+    { 78, 185 },  { 90, 185 }, 
+    //GoldenSkull //POH
+    { 145, 185 }, { 228, 185 },
 };
 
 // First section of each row in the editor (starting from the top)
@@ -34,7 +127,7 @@ static s16 sSlotItems[] = {
     ITEM_BOOMERANG, ITEM_LENS,          ITEM_BEAN,    ITEM_HAMMER,   ITEM_ARROW_LIGHT, ITEM_NAYRUS_LOVE,
 };
 
-void KaleidoScope_DrawDebugEditorText(Gfx** gfxp) {
+void KaleidoScope_DrawDebugEditorText_JPN(Gfx** gfxp) {
     GfxPrint printer;
     s32 pad[2];
 
@@ -78,6 +171,132 @@ void KaleidoScope_DrawDebugEditorText(Gfx** gfxp) {
     *gfxp = GfxPrint_Close(&printer);
     GfxPrint_Destroy(&printer);
 }
+void KaleidoScope_DrawDebugEditorText_ENG(Gfx** gfxp) {
+    GfxPrint printer;
+    s32 pad[2];
+
+    GfxPrint_Init(&printer);
+    GfxPrint_Open(&printer, *gfxp);
+
+    GfxPrint_SetPos(&printer, 3, 2);
+    GfxPrint_SetColor(&printer, 255, 60, 0, 255);
+    GfxPrint_Printf(&printer, "%s", "Rupee");
+    GfxPrint_SetPos(&printer, 17, 2);
+    GfxPrint_Printf(&printer, "%s", "Hearts");
+    GfxPrint_SetPos(&printer, 31, 3);
+    GfxPrint_Printf(&printer, "%s", "/4");
+    GfxPrint_SetPos(&printer, 4, 5);
+    GfxPrint_Printf(&printer, "%s", "Items");
+    GfxPrint_SetPos(&printer, 6, 13);
+    GfxPrint_Printf(&printer, "%s", "Key");
+    GfxPrint_SetPos(&printer, 1, 15);
+    GfxPrint_Printf(&printer, "%s", "Upgrades");
+    GfxPrint_SetPos(&printer, 22, 15);
+    GfxPrint_Printf(&printer, "%s", "Equipments");
+    GfxPrint_SetPos(&printer, 5, 17);
+    GfxPrint_Printf(&printer, "%s", "Maps");
+    GfxPrint_SetPos(&printer, 3, 19);
+    GfxPrint_Printf(&printer, "%s", "Medals");
+    GfxPrint_SetPos(&printer, 20, 19);
+    GfxPrint_Printf(&printer, "%s", "Stones");
+    GfxPrint_SetPos(&printer, 4, 21);
+    GfxPrint_Printf(&printer, "%s", "Songs");
+    GfxPrint_SetPos(&printer, 2, 24);
+    GfxPrint_Printf(&printer, "%s", "Collect");
+    GfxPrint_SetPos(&printer, 14, 24);
+    GfxPrint_Printf(&printer, "%s", "G.S");
+    GfxPrint_SetPos(&printer, 25, 24);
+    GfxPrint_Printf(&printer, "%s", "POH");
+    GfxPrint_SetPos(&printer, 30, 24);
+    GfxPrint_Printf(&printer, "%s", "/4");
+
+    *gfxp = GfxPrint_Close(&printer);
+    GfxPrint_Destroy(&printer);
+}
+void KaleidoScope_DrawDebugEditorText_GER(Gfx** gfxp) {
+    GfxPrint printer;
+    s32 pad[2];
+
+    GfxPrint_Init(&printer);
+    GfxPrint_Open(&printer, *gfxp);
+
+    GfxPrint_SetPos(&printer, 1, 2);
+    GfxPrint_SetColor(&printer, 255, 60, 0, 255);
+    GfxPrint_Printf(&printer, "%s", "Rubine");
+    GfxPrint_SetPos(&printer, 17, 2);
+    GfxPrint_Printf(&printer, "%s", "Herzen");
+    GfxPrint_SetPos(&printer, 31, 3);
+    GfxPrint_Printf(&printer, "%s", "/4");
+    GfxPrint_SetPos(&printer, 2, 5);
+    GfxPrint_Printf(&printer, "%s", "Artikel");
+    GfxPrint_SetPos(&printer, 0, 13);
+    GfxPrint_Printf(&printer, "%s", "Schlussel");
+    GfxPrint_SetPos(&printer, 2, 15);
+    GfxPrint_Printf(&printer, "%s", "Upgrade");
+    GfxPrint_SetPos(&printer, 22, 15);
+    GfxPrint_Printf(&printer, "%s", "Ausrustung");
+    GfxPrint_SetPos(&printer, 4, 17);
+    GfxPrint_Printf(&printer, "%s", "Karte");
+    GfxPrint_SetPos(&printer, 1, 19);
+    GfxPrint_Printf(&printer, "%s", "Amulette");
+    GfxPrint_SetPos(&printer, 20, 19);
+    GfxPrint_Printf(&printer, "%s", "Steine");
+    GfxPrint_SetPos(&printer, 4, 21);
+    GfxPrint_Printf(&printer, "%s", "Hymne");
+    GfxPrint_SetPos(&printer, 2, 24);
+    GfxPrint_Printf(&printer, "%s", "Collect");
+    GfxPrint_SetPos(&printer, 14, 24);
+    GfxPrint_Printf(&printer, "%s", "G.S");
+    GfxPrint_SetPos(&printer, 25, 24);
+    GfxPrint_Printf(&printer, "%s", "POH");
+    GfxPrint_SetPos(&printer, 30, 24);
+    GfxPrint_Printf(&printer, "%s", "/4");
+
+    *gfxp = GfxPrint_Close(&printer);
+    GfxPrint_Destroy(&printer);
+}
+void KaleidoScope_DrawDebugEditorText_FRA(Gfx** gfxp) {
+    GfxPrint printer;
+    s32 pad[2];
+
+    GfxPrint_Init(&printer);
+    GfxPrint_Open(&printer, *gfxp);
+
+    GfxPrint_SetPos(&printer, 3, 2);
+    GfxPrint_SetColor(&printer, 255, 60, 0, 255);
+    GfxPrint_Printf(&printer, "%s", "Rubis");
+    GfxPrint_SetPos(&printer, 17, 2);
+    GfxPrint_Printf(&printer, "%s", "Coeurs");
+    GfxPrint_SetPos(&printer, 31, 3);
+    GfxPrint_Printf(&printer, "%s", "/4");
+    GfxPrint_SetPos(&printer, 3, 5);
+    GfxPrint_Printf(&printer, "%s", "Objets");
+    GfxPrint_SetPos(&printer, 5, 13);
+    GfxPrint_Printf(&printer, "%s", "Clef");
+    GfxPrint_SetPos(&printer, 1, 15);
+    GfxPrint_Printf(&printer, "%s", "Upgrades");
+    GfxPrint_SetPos(&printer, 22, 15);
+    GfxPrint_Printf(&printer, "%s", "Equipements");
+    GfxPrint_SetPos(&printer, 3, 17);
+    GfxPrint_Printf(&printer, "%s", "Cartes");
+    GfxPrint_SetPos(&printer, 3, 19);
+    GfxPrint_Printf(&printer, "%s", "Medals");
+    GfxPrint_SetPos(&printer, 20, 19);
+    GfxPrint_Printf(&printer, "%s", "Pierres");
+    GfxPrint_SetPos(&printer, 3, 21);
+    GfxPrint_Printf(&printer, "%s", "Chants");
+    GfxPrint_SetPos(&printer, 2, 24);
+    GfxPrint_Printf(&printer, "%s", "Collect");
+    GfxPrint_SetPos(&printer, 14, 24);
+    GfxPrint_Printf(&printer, "%s", "G.S");
+    GfxPrint_SetPos(&printer, 25, 24);
+    GfxPrint_Printf(&printer, "%s", "POH");
+    GfxPrint_SetPos(&printer, 30, 24);
+    GfxPrint_Printf(&printer, "%s", "/4");
+
+    *gfxp = GfxPrint_Close(&printer);
+    GfxPrint_Destroy(&printer);
+}
 
 extern const char* digitTextures[];
 
@@ -111,7 +330,6 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     s32 dBtnInput = input->cur.button & (BTN_DUP | BTN_DDOWN | BTN_DLEFT | BTN_DRIGHT);
 
     OPEN_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_debug.c", 402);
-
     pauseCtx->stickRelX = input->rel.stick_x;
     pauseCtx->stickRelY = input->rel.stick_y;
 
@@ -120,7 +338,7 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     gDPSetRenderMode(POLY_KAL_DISP++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     gDPSetCombineMode(POLY_KAL_DISP++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
     gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 0, 0, 0, 220);
-    gDPFillRectangle(POLY_KAL_DISP++, 24, 12, 298, 228);
+    gDPFillRectangle(POLY_KAL_DISP++, 0, 5, 320, 235);
     gDPPipeSync(POLY_KAL_DISP++);
     gDPSetCombineLERP(POLY_KAL_DISP++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE, TEXEL0, 0,
                       PRIMITIVE, 0);
@@ -128,8 +346,17 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     gfxRef = POLY_KAL_DISP;
     gfx = Graph_GfxPlusOne(gfxRef);
     gSPDisplayList(OVERLAY_DISP++, gfx);
-
-    KaleidoScope_DrawDebugEditorText(&gfx);
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        if (gSaveContext.language == LANGUAGE_ENG) {
+            KaleidoScope_DrawDebugEditorText_ENG(&gfx);
+        } else if (gSaveContext.language == LANGUAGE_GER) {
+            KaleidoScope_DrawDebugEditorText_GER(&gfx);
+        } else {
+            KaleidoScope_DrawDebugEditorText_FRA(&gfx);
+        }
+    } else {
+        KaleidoScope_DrawDebugEditorText_JPN(&gfx);
+    }
 
     gSPEndDisplayList(gfx++);
     Graph_BranchDlist(gfxRef, gfx);
@@ -140,7 +367,7 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     gDPSetEnvColor(POLY_KAL_DISP++, 0, 0, 0, 0);
 
     // Current Health Quarter (X / 4)
-    KaleidoScope_DrawDigit(globalCtx, (gSaveContext.health % 0x10) / 4, 194, 15);
+    KaleidoScope_DrawDigit(globalCtx, (gSaveContext.health % 0x10) / 4, 240, 15);
 
     gDPPipeSync(POLY_KAL_DISP++);
     gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, 255);
@@ -175,9 +402,13 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
         spD8[3] -= 10;
     }
 
-    KaleidoScope_DrawDigit(globalCtx, spD8[2], 146, 15);
-    KaleidoScope_DrawDigit(globalCtx, spD8[3], 156, 15);
-
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        KaleidoScope_DrawDigit(globalCtx, spD8[2], 188, 15);
+        KaleidoScope_DrawDigit(globalCtx, spD8[3], 198, 15);
+    } else {
+        KaleidoScope_DrawDigit(globalCtx, spD8[2], 146, 15);
+        KaleidoScope_DrawDigit(globalCtx, spD8[3], 156, 15);
+    }
     // Health
     spD8[2] = 0;
     spD8[3] = gSaveContext.health / 0x10;
@@ -186,8 +417,13 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
         spD8[3] -= 10;
     }
 
-    KaleidoScope_DrawDigit(globalCtx, spD8[2], 172, 15);
-    KaleidoScope_DrawDigit(globalCtx, spD8[3], 182, 15);
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        KaleidoScope_DrawDigit(globalCtx, spD8[2], 210, 15);
+        KaleidoScope_DrawDigit(globalCtx, spD8[3], 220, 15);
+    } else {
+        KaleidoScope_DrawDigit(globalCtx, spD8[2], 172, 15);
+        KaleidoScope_DrawDigit(globalCtx, spD8[3], 182, 15);
+    }
 
     // Inventory
     for (slot = 0, i = 0, y = 35; i < 4; i++, y += 15) {
@@ -239,10 +475,21 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     }
 
     // Equipment
-    for (spD8[1] = 202, i = 0; i < 4; i++, spD8[1] += 12) {
-        KaleidoScope_DrawDigit(globalCtx, ALL_EQUIP_VALUE(i), spD8[1], 115);
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        if (gSaveContext.language == LANGUAGE_FRA) {
+            for (spD8[1] = 270, i = 0; i < 4; i++, spD8[1] += 12) {
+                KaleidoScope_DrawDigit(globalCtx, ALL_EQUIP_VALUE(i), spD8[1], 115);
+            }
+        } else {
+            for (spD8[1] = 260, i = 0; i < 4; i++, spD8[1] += 12) {
+                KaleidoScope_DrawDigit(globalCtx, ALL_EQUIP_VALUE(i), spD8[1], 115);
+            }
+        }
+    } else {
+        for (spD8[1] = 202, i = 0; i < 4; i++, spD8[1] += 12) {
+            KaleidoScope_DrawDigit(globalCtx, ALL_EQUIP_VALUE(i), spD8[1], 115);
+        }
     }
-
     // Dungeon Items
     for (spD8[1] = 78, i = 0; i < 12; i++, spD8[1] += 12) {
         spD8[2] = gSaveContext.inventory.dungeonItems[i] & gEquipMasks[0];
@@ -259,12 +506,32 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     }
 
     // Spiritual Stones
-    for (spD8[1] = 210, i = 0; i < 3; i++, spD8[1] += 12) {
-        spD8[2] = 0;
-        if (CHECK_QUEST_ITEM(QUEST_KOKIRI_EMERALD + i)) {
-            spD8[2] = 1;
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        if (gSaveContext.language == LANGUAGE_FRA) {
+            for (spD8[1] = 220, i = 0; i < 3; i++, spD8[1] += 12) {
+                spD8[2] = 0;
+                if (CHECK_QUEST_ITEM(QUEST_KOKIRI_EMERALD + i)) {
+                    spD8[2] = 1;
+                }
+                KaleidoScope_DrawDigit(globalCtx, spD8[2], spD8[1], 149);
+            }
+        } else {
+            for (spD8[1] = 210, i = 0; i < 3; i++, spD8[1] += 12) {
+                spD8[2] = 0;
+                if (CHECK_QUEST_ITEM(QUEST_KOKIRI_EMERALD + i)) {
+                    spD8[2] = 1;
+                }
+                KaleidoScope_DrawDigit(globalCtx, spD8[2], spD8[1], 149);
+            }
         }
-        KaleidoScope_DrawDigit(globalCtx, spD8[2], spD8[1], 149);
+    } else {
+        for (spD8[1] = 210, i = 0; i < 3; i++, spD8[1] += 12) {
+            spD8[2] = 0;
+            if (CHECK_QUEST_ITEM(QUEST_KOKIRI_EMERALD + i)) {
+                spD8[2] = 1;
+            }
+            KaleidoScope_DrawDigit(globalCtx, spD8[2], spD8[1], 149);
+        }
     }
 
     // Songs
@@ -303,10 +570,12 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     KaleidoScope_DrawDigit(globalCtx, spD8[2], 155, 185);
     KaleidoScope_DrawDigit(globalCtx, spD8[3], 165, 185);
 
-    // Heart Pieces (X / 4)
-    KaleidoScope_DrawDigit(globalCtx, ((gSaveContext.inventory.questItems & 0xF0000000) & 0xF0000000) >> 0x1C, 210,
-                           185);
-
+    // POH Count (X / 4)
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        KaleidoScope_DrawDigit(globalCtx, ((gSaveContext.inventory.questItems & 0xF0000000) & 0xF0000000) >> 0x1C, 230, 185);
+    } else {
+        KaleidoScope_DrawDigit(globalCtx, ((gSaveContext.inventory.questItems & 0xF0000000) & 0xF0000000) >> 0x1C, 210, 185);
+    }
     // Handles navigating the menu to different sections with the D-Pad
     // When the same direction is held, registers the input periodically based on a timer
     if (dBtnInput == prevDBtnInput) {
@@ -627,24 +896,48 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
     gDPSetCombineMode(POLY_KAL_DISP++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
     gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 0, 0, 200, 120);
 
-    if (curSection == 0) {
-        gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions[curSection][0], sSectionPositions[curSection][1],
-                         sSectionPositions[curSection][0] + 45, sSectionPositions[curSection][1] + 16);
-    } else if ((curSection >= 0x1B) || (curSection == 0x5B)) {
-        gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions[curSection][0] - 2, sSectionPositions[curSection][1],
-                         sSectionPositions[curSection][0] + 14, sSectionPositions[curSection][1] + 16);
+    if (CVar_GetS32("gDbgMenuTranslation", 1) != 0) {
+        if (gSaveContext.language == LANGUAGE_ENG) {
+            if (curSection == 0) {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_ENG[curSection][0], sSectionPositions_ENG[curSection][1], sSectionPositions_ENG[curSection][0] + 45, sSectionPositions_ENG[curSection][1] + 16);
+            } else if ((curSection >= 0x1B) || (curSection == 0x5B)) {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_ENG[curSection][0] - 2, sSectionPositions_ENG[curSection][1], sSectionPositions_ENG[curSection][0] + 14, sSectionPositions_ENG[curSection][1] + 16);
+            } else {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_ENG[curSection][0] - 4, sSectionPositions_ENG[curSection][1], sSectionPositions_ENG[curSection][0] + 24, sSectionPositions_ENG[curSection][1] + 16);
+            }
+        } else if (gSaveContext.language == LANGUAGE_GER) {
+            if (curSection == 0) {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_GER[curSection][0], sSectionPositions_GER[curSection][1], sSectionPositions_GER[curSection][0] + 45, sSectionPositions_GER[curSection][1] + 16);
+            } else if ((curSection >= 0x1B) || (curSection == 0x5B)) {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_GER[curSection][0] - 2, sSectionPositions_GER[curSection][1], sSectionPositions_GER[curSection][0] + 14, sSectionPositions_GER[curSection][1] + 16);
+            } else {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_GER[curSection][0] - 4, sSectionPositions_GER[curSection][1], sSectionPositions_GER[curSection][0] + 24, sSectionPositions_GER[curSection][1] + 16);
+            } 
+        } else {
+            if (curSection == 0) {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_FRA[curSection][0], sSectionPositions_FRA[curSection][1], sSectionPositions_FRA[curSection][0] + 45, sSectionPositions_FRA[curSection][1] + 16);
+            } else if ((curSection >= 0x1B) || (curSection == 0x5B)) {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_FRA[curSection][0] - 2, sSectionPositions_FRA[curSection][1], sSectionPositions_FRA[curSection][0] + 14, sSectionPositions_FRA[curSection][1] + 16);
+            } else {
+                gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_FRA[curSection][0] - 4, sSectionPositions_FRA[curSection][1], sSectionPositions_FRA[curSection][0] + 24, sSectionPositions_FRA[curSection][1] + 16);
+            } 
+        }
     } else {
-        gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions[curSection][0] - 4, sSectionPositions[curSection][1],
-                         sSectionPositions[curSection][0] + 24, sSectionPositions[curSection][1] + 16);
+        if (curSection == 0) {
+            gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_JPN[curSection][0], sSectionPositions_JPN[curSection][1], sSectionPositions_JPN[curSection][0] + 45, sSectionPositions_JPN[curSection][1] + 16);
+        } else if ((curSection >= 0x1B) || (curSection == 0x5B)) {
+            gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_JPN[curSection][0] - 2, sSectionPositions_JPN[curSection][1], sSectionPositions_JPN[curSection][0] + 14, sSectionPositions_JPN[curSection][1] + 16);
+        } else {
+            gDPFillRectangle(POLY_KAL_DISP++, sSectionPositions_JPN[curSection][0] - 4, sSectionPositions_JPN[curSection][1], sSectionPositions_JPN[curSection][0] + 24, sSectionPositions_JPN[curSection][1] + 16);
+        }
     }
 
     // Handles exiting the inventory editor with the L button
     // The editor is opened with `debugState` set to 1, and becomes closable after a frame once `debugState` is set to 2
     if (pauseCtx->debugState == 1) {
         pauseCtx->debugState = 2;
-    } else if ((pauseCtx->debugState == 2) && CHECK_BTN_ALL(input->press.button, BTN_L)) {
+    } else if ((pauseCtx->debugState == 2) && CHECK_BTN_ALL(input->press.button, BTN_Z)) {
         pauseCtx->debugState = 0;
     }
-
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_debug.c", 861);
 }

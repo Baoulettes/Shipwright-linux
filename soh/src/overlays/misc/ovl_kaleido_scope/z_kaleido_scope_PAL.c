@@ -923,7 +923,7 @@ void KaleidoScope_SwitchPage(PauseContext* pauseCtx, u8 pt) {
 }
 
 void KaleidoScope_HandlePageToggles(PauseContext* pauseCtx, Input* input) {
-    if (CVar_GetS32("gDebugEnabled", 0) && (pauseCtx->debugState == 0) && CHECK_BTN_ALL(input->press.button, BTN_L)) {
+    if (CVar_GetS32("gDebugEnabled", 0) && (pauseCtx->debugState == 0) && CHECK_BTN_ALL(input->press.button, BTN_Z)) {
         pauseCtx->debugState = 1;
         return;
     }
@@ -933,7 +933,7 @@ void KaleidoScope_HandlePageToggles(PauseContext* pauseCtx, Input* input) {
         return;
     }
 
-    if (CHECK_BTN_ALL(input->press.button, BTN_Z)) {
+    if (CHECK_BTN_ALL(input->press.button, BTN_L)) {
         KaleidoScope_SwitchPage(pauseCtx, 0);
         return;
     }
@@ -2015,7 +2015,7 @@ void func_808237B4(GlobalContext* globalCtx, Input* input) {
     s32 cond = false;
     s32 mode;
 
-    if (ZREG(13) && !CHECK_BTN_ALL(input->press.button, BTN_L)) {
+    if (ZREG(13) && !CHECK_BTN_ALL(input->press.button, BTN_Z)) {
         cond = true;
     }
 
