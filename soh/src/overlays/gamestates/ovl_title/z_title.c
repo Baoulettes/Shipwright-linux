@@ -11,7 +11,6 @@
 #include "textures/nintendo_rogo_static/nintendo_rogo_static.h"
 #include <soh/Enhancements/bootcommands.h>
 #include "GameVersions.h"
-#include "Cvar.h"
 
 const char* GetGameVersionString();
 
@@ -66,8 +65,7 @@ const char* quotes[11] = {
     "I wonder what's for dinner.",
     "You've saved me!",
     "After you've scrubbed all the floors in Hyrule, then we can talk about mercy! Take him away!",
-    "Waaaahahahohohahahahahahaha",
-    "Where is the 60 FPS mod? Enough! My ship sails in the morning."
+    "Waaaahahahohohahahahahahaha"
 };
 
 char* SetQuote() {
@@ -236,10 +234,7 @@ void Title_Main(GameState* thisx) {
         Gfx* gfx = POLY_OPA_DISP;
         s32 pad;
 
-        if (CVar_GetS32("gSOHSplashscreen",0)!=0) {
-            Title_PrintBuildInfo(&gfx);
-        }
-        
+        Title_PrintBuildInfo(&gfx);
         POLY_OPA_DISP = gfx;
     }
 

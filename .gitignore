@@ -401,3 +401,6 @@ ZAPD/BuildInfo.h
 
 DebugObj/*
 ReleaseObj/*
+*.md
+shipofharkinian.ini
+*.rej
