@@ -41,7 +41,7 @@ OTRGlobals* OTRGlobals::Instance;
 
 OTRGlobals::OTRGlobals() {
 
-    context = Ship::GlobalCtx2::CreateInstance("Ship of Harkinian");
+    context = Ship::GlobalCtx2::CreateInstance("The Legend of Zelda : Ocarina of Time");
     gSaveStateMgr = std::make_shared<SaveStateMgr>();
     context->GetWindow()->Init();
 }

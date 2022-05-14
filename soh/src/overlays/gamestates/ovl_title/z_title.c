@@ -11,6 +11,7 @@
 #include "textures/nintendo_rogo_static/nintendo_rogo_static.h"
 #include <soh/Enhancements/bootcommands.h>
 #include "GameVersions.h"
+#include "Cvar.h"
 
 const char* GetGameVersionString();
 
@@ -234,7 +235,9 @@ void Title_Main(GameState* thisx) {
         Gfx* gfx = POLY_OPA_DISP;
         s32 pad;
 
-        Title_PrintBuildInfo(&gfx);
+        if (CVar_GetS32("gSOHSplashscreen",0)!=0) {
+            Title_PrintBuildInfo(&gfx);
+        }
         POLY_OPA_DISP = gfx;
     }
 
