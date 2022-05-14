@@ -761,14 +761,14 @@ namespace SohImGui {
 
             if (ImGui::BeginMenu("Cosmetics"))  {
                 EnhancementCheckbox("Cosmetics editor", "gCosmticsEditor");
-                Tooltip("Edit Navi and Link's Tunics color.");
+                Tooltip("Edit Navi and Link's Tunics color");
                 EnhancementCheckbox("HUD Margins editor", "gUseMargins");
                 EnhancementRadioButton("N64 interface", "gHudColors", 0);
-                Tooltip("Change interface color to N64 style.");
+                Tooltip("Change interface color to N64 style");
                 EnhancementRadioButton("Gamecube interface", "gHudColors", 1);
-                Tooltip("Change interface color to Gamecube style.");
+                Tooltip("Change interface color to Gamecube style");
                 EnhancementRadioButton("Custom interface", "gHudColors", 2);
-                Tooltip("Change interface color to your own made style.");
+                Tooltip("Change interface color to your own made style");
                 if (CVar_GetS32("gHudColors", 1) == 2) {
                     EnhancementCheckbox("Interface editor", "gColorsEditor");
                     Tooltip("Edit the colors used for your own interface");
@@ -833,7 +833,7 @@ namespace SohImGui {
                 if (ImGui::BeginTabBar("Margins Editor", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton)) {
                     if (ImGui::BeginTabItem("Interface margins")) {
                         EnhancementCheckbox("Use margins", "gHUDMargins");
-                        Tooltip("Enable/Disable custom margins. \nIf disabled you will have original margins.");
+                        Tooltip("Enable/Disable custom margins. \nIf disabled you will have original margins");
                         EnhancementSliderInt("Top : %dx", "##UIMARGINT", "gHUDMargin_T", -20, 20, "");
                         EnhancementSliderInt("Left: %dx", "##UIMARGINL", "gHUDMargin_L", -25, 25, "");
                         EnhancementSliderInt("Right: %dx", "##UIMARGINR", "gHUDMargin_R", -25, 25, "");
@@ -854,7 +854,7 @@ namespace SohImGui {
                 if (ImGui::BeginTabBar("Cosmetics Editor", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton)) {
                     if (ImGui::BeginTabItem("Navi")) {
                         EnhancementCheckbox("Custom colors for Navi", "gUseNaviCol");
-                        Tooltip("Enable/Disable custom Navi's colors. \nIf disabled you will have original colors for Navi.\nColors are refreshed when Navi goes back in your pockets.");
+                        Tooltip("Enable/Disable custom Navi's colors. \nIf disabled you will have original colors for Navi.\nColors are refreshed when Navi goes back in your pockets");
                         EnhancementColor3("Navi Idle Inner", "gNavi_Idle_Inner_", navi_idle_i_col, false);
                         Tooltip("Inner color for Navi (idle flying around)");
                         EnhancementColor3("Navi Idle Outer", "gNavi_Idle_Outer_", navi_idle_o_col, false);
@@ -878,7 +878,7 @@ namespace SohImGui {
                     }
                     if (ImGui::BeginTabItem("Tunics")) {
                         EnhancementCheckbox("Custom colors on tunics", "gUseTunicsCol");
-                        Tooltip("Enable/Disable custom Link's tunics colors. \nIf disabled you will have original colors for Link's tunics.");
+                        Tooltip("Enable/Disable custom Link's tunics colors. \nIf disabled you will have original colors for Link's tunics");
                         EnhancementColor3("Kokiri Tunic", "gTunic_Kokiri_", kokiri_col, false);
                         ImGui::Separator();
                         EnhancementColor3("Goron Tunic", "gTunic_Goron_", goron_col, false);
@@ -902,12 +902,12 @@ namespace SohImGui {
                         EnhancementColor3("Hearts inner", "gCCHeartsPrim", hearts_colors, false);
                         Tooltip("Hearts inner color (red in original)\nAffect both Normal Hearts and the ones in Double Defense");
                         EnhancementColor3("Hearts double def", "gDDCCHeartsPrim", hearts_dd_colors, false);
-                        Tooltip("Hearts outline color (white in original)\nAffect Double Defense outline only.");
+                        Tooltip("Hearts outline color (white in original)\nAffect Double Defense outline only");
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Buttons")) {
                         EnhancementColor3("A Buttons", "gCCABtnPrim", a_btn_colors, false);
-                        Tooltip("A Buttons colors (Green in original Gamecube)\nAffect A buttons colors on interface, in shops, messages boxes, ocarina notes and inventory cursors.");
+                        Tooltip("A Buttons colors (Green in original Gamecube)\nAffect A buttons colors on interface, in shops, messages boxes, ocarina notes and inventory cursors");
                         EnhancementColor3("B Buttons", "gCCBBtnPrim", b_btn_colors, false);
                         Tooltip("B Button colors (Red in original Gamecube)\nAffect B button colors on interface");
                         EnhancementColor3("C Buttons", "gCCCBtnPrim", c_btn_colors, false);
@@ -918,20 +918,20 @@ namespace SohImGui {
                     }
                     if (ImGui::BeginTabItem("Magic Bar")) {
                         EnhancementColor3("Magic bar borders", "gCCMagicBorderPrim", magic_border_colors, false);
-                        Tooltip("Affect the border of the magic bar when being used\nWhite flash in original game.");
+                        Tooltip("Affect the border of the magic bar when being used\nWhite flash in original game");
                         EnhancementColor3("Magic bar main color", "gCCMagicPrim", magic_remaining_colors, false);
-                        Tooltip("Affect the magic bar color\nGreen in original game.");
+                        Tooltip("Affect the magic bar color\nGreen in original game");
                         EnhancementColor3("Magic bar being used", "gCCMagicUsePrim", magic_use_colors, false);
-                        Tooltip("Affect the magic bar when being used\nYellow in original game.");
+                        Tooltip("Affect the magic bar when being used\nYellow in original game");
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Misc")) {
                         EnhancementColor3("Minimap color", "gCCMinimapPrim", minimap_colors, false);
-                        Tooltip("Affect the Dungeon and Overworld minimaps.");
+                        Tooltip("Affect the Dungeon and Overworld minimaps");
                         EnhancementColor3("Rupee icon color", "gCCRupeePrim", rupee_colors, false);
-                        Tooltip("Affect the Rupee icon on interface\nGreen by default.");
+                        Tooltip("Affect the Rupee icon on interface\nGreen by default");
                         EnhancementColor3("Small Keys icon color", "gCCKeysPrim", smolekey_colors, false);
-                        Tooltip("Affect the Small keys icon on interface\nGray by default.");
+                        Tooltip("Affect the Small keys icon on interface\nGray by default");
                         ImGui::EndTabItem();
                     }
                     ImGui::EndTabBar();
