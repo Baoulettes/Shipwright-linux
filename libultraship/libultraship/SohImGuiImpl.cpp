@@ -89,6 +89,7 @@ namespace SohImGui {
     float navi_enemy_o_col[3] = { 0.0f, 0.0f, 0.0f };
     float navi_prop_i_col[3] = { 0.0f, 0.0f, 0.0f };
     float navi_prop_o_col[3] = { 0.0f, 0.0f, 0.0f };
+    float FPSCounter[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
     const char* filters[3] = {
         "Three-Point",
@@ -310,6 +311,10 @@ namespace SohImGui {
         navi_prop_o_col[0] = (float)CVar_GetS32("gNavi_Prop_Outer_R", 0)/255;
         navi_prop_o_col[1] = (float)CVar_GetS32("gNavi_Prop_Outer_G", 220)/255;
         navi_prop_o_col[2] = (float)CVar_GetS32("gNavi_Prop_Outer_B", 0)/255;
+        FPSCounter[0] = (float)CVar_GetS32("gFPSCounterR", 255)/255;
+        FPSCounter[1] = (float)CVar_GetS32("gFPSCounterG", 255)/255;
+        FPSCounter[2] = (float)CVar_GetS32("gFPSCounterB", 255)/255;
+        FPSCounter[3] = (float)CVar_GetS32("gFPSCounterA", 255)/255;
         if (CVar_GetS32("gHudColors", 1) ==0) {
             SelectedHUD = 0;
         } else if (CVar_GetS32("gHudColors", 1) == 1) {
@@ -371,6 +376,9 @@ namespace SohImGui {
         io = &ImGui::GetIO();
         io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io->Fonts->AddFontDefault();
+        if (CVar_GetS32("gOpenMenuBar", 0) != 1) {
+            SohImGui::overlay->TextDrawNotification(30.0f, true, "Press F1 to access enhancements menu");
+        }
 
         if (UseViewports()) {
             io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -380,7 +388,7 @@ namespace SohImGui {
         ImGuiWMInit();
         ImGuiBackendInit();
 
-        ModInternal::registerHookListener({ GFX_INIT, [](const HookEvent ev) {
+        ModInternal::RegisterHook<ModInternal::GfxInit>([] {
 
             if (GlobalCtx2::GetInstance()->GetWindow()->IsFullscreen())
                 ShowCursor(CVar_GetS32("gOpenMenuBar", 0), Dialogues::dLoadSettings);
@@ -396,7 +404,7 @@ namespace SohImGui {
             LoadTexture("C-Right", "assets/ship_of_harkinian/buttons/CRight.png");
             LoadTexture("C-Up", "assets/ship_of_harkinian/buttons/CUp.png");
             LoadTexture("C-Down", "assets/ship_of_harkinian/buttons/CDown.png");
-        } });
+        });
 
         for (const auto& [i, controllers] : Ship::Window::Controllers)
         {
@@ -405,9 +413,9 @@ namespace SohImGui {
             needs_save = true;
         }
 
-        ModInternal::registerHookListener({ CONTROLLER_READ, [](const HookEvent ev) {
-            pads = static_cast<OSContPad*>(ev->baseArgs["cont_pad"]);
-        }});
+        ModInternal::RegisterHook<ModInternal::ControllerRead>([](OSContPad* cont_pad) {
+            pads = cont_pad;
+        });
         Game::InitSettings();
     }
 
@@ -546,6 +554,22 @@ namespace SohImGui {
         }
     }
 
+    void EnhancementColor4(std::string text, std::string cvarName, float ColorRGBA[4], bool TitleSameLine) {
+        //Simplified.
+        ImGuiColorEditFlags flags = ImGuiColorEditFlags_None;
+        if (!TitleSameLine){
+            ImGui::Text("%s", text.c_str());
+            flags = ImGuiColorEditFlags_NoLabel;
+        }
+        if (ImGui::ColorEdit4(text.c_str(), ColorRGBA, flags)) {
+            CVar_SetS32((cvarName+"R").c_str(), ClampFloatToInt(ColorRGBA[0]*255,0,255));
+            CVar_SetS32((cvarName+"G").c_str(), ClampFloatToInt(ColorRGBA[1]*255,0,255));
+            CVar_SetS32((cvarName+"B").c_str(), ClampFloatToInt(ColorRGBA[2]*255,0,255));
+            CVar_SetS32((cvarName+"A").c_str(), ClampFloatToInt(ColorRGBA[3]*255,0,255));
+            needs_save = true;
+        }
+    }
+
     void Tooltip(std::string text){
         if (ImGui::IsItemHovered()) {
             ImGui::SetTooltip("%s", text.c_str());
@@ -563,7 +587,7 @@ namespace SohImGui {
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBackground |
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoResize;
-        if (CVar_GetS32("gOpenMenuBar", 0)) window_flags |= ImGuiWindowFlags_MenuBar;
+        if (CVar_GetS32("gOpenMenuBar", 1)) window_flags |= ImGuiWindowFlags_MenuBar;
 
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -702,56 +726,65 @@ namespace SohImGui {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Enhancements"))
-            {
-                ImGui::Text("Gameplay");
-                ImGui::Separator();
+            if (ImGui::BeginMenu("Enhancements")) {
+                if (ImGui::BeginMenu("Gameplay")) {
+                    EnhancementCheckbox("Force Max heart", "gForceMaxHeartCount");
+                    EnhancementSliderInt("Link maximum hearts %dx", "##HEARTSCOUNT", "gMaxHeartCount", 0, 20, "");
+                    EnhancementSliderInt("Text Speed: %dx", "##TEXTSPEED", "gTextSpeed", 1, 5, "");
+                    EnhancementSliderInt("King Zora Speed: %dx", "##WEEPSPEED", "gMweepSpeed", 1, 5, "");
+                    EnhancementCheckbox("SoH Splashcreen", "gSOHSplashscreen");
+                    Tooltip("Show build information on Nintendo 64 boot logo");
+                    EnhancementCheckbox("Skip Text", "gSkipText");
+                    Tooltip("Holding down B skips text");
+                    EnhancementCheckbox("Minimal UI", "gMinimalUI");
+                    Tooltip("Hides most of the UI when not needed");
+                    EnhancementCheckbox("MM Bunny Hood", "gMMBunnyHood");
+                    Tooltip("Wearing the Bunny Hood grants a speed increase like in Majora's Mask");
+                    EnhancementCheckbox("Visual Stone of Agony", "gVisualAgony");
+                    Tooltip("Displays an icon and plays a sound when Stone of Agony should be activated, for those without rumble");
+                    EnhancementCheckbox("Mute Low HP Alarm", "gLowHpAlarm");
+                    Tooltip("Mute low health bip sound effects");
+                    EnhancementCheckbox("Save Last Entrance", "gSaveEntrance");
+                    Tooltip("Link will no more teleport back to his home or Temple of Time\nWhen reloading a save");
+                    EnhancementCheckbox("DPad Shortcuts", "gDPadShortcuts");
+                    Tooltip("Allow to equips boots, speak to Navi and use ocarina with Dpad");
+                    EnhancementCheckbox("Disable Navi Call Audio", "gDisableNaviCallAudio");
+                    Tooltip("Disables the voice audio when Navi calls you");
 
-                EnhancementSliderInt("Text Speed: %dx", "##TEXTSPEED", "gTextSpeed", 1, 5, "");
-                EnhancementSliderInt("King Zora Speed: %dx", "##WEEPSPEED", "gMweepSpeed", 1, 5, "");
-                EnhancementCheckbox("SoH Splashcreen", "gSOHSplashscreen");
-                Tooltip("Show build information on Nintendo 64 boot logo");
-                EnhancementCheckbox("Skip Text", "gSkipText");
-                Tooltip("Holding down B skips text");
-                EnhancementCheckbox("Minimal UI", "gMinimalUI");
-                Tooltip("Hides most of the UI when not needed");
-                EnhancementCheckbox("MM Bunny Hood", "gMMBunnyHood");
-                Tooltip("Wearing the Bunny Hood grants a speed increase like in Majora's Mask");
-                EnhancementCheckbox("Visual Stone of Agony", "gVisualAgony");
-                Tooltip("Displays an icon and plays a sound when Stone of Agony should be activated, for those without rumble");
-                EnhancementCheckbox("Mute Low HP Alarm", "gLowHpAlarm");
-                Tooltip("Mute low health bip sound effects");
-                EnhancementCheckbox("Save Last Entrance", "gSaveEntrance");
-                Tooltip("Link will no more teleport back to his home or Temple of Time\nWhen reloading a save");
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Graphics")) {
+                    EnhancementCheckbox("N64 Mode", "gN64Mode");
+                    Tooltip("Sets aspect ratio to 4:3 and lowers resolution to 240p, the N64's native resolution");
+                    EnhancementCheckbox("Animated Link in Pause Menu", "gPauseLiveLink");
+                    Tooltip("Show animated Link in pause menu equipments");
+                    EnhancementCheckbox("Enable 3D Dropped items", "gNewDrops");
+                    Tooltip("Most of 2D dropped stuffs will show in 3D of their version");
+                    EnhancementCheckbox("Faster Block Push", "gFasterBlockPush");
+                    Tooltip("Link will push faster Block and other stuffs");
+                    EnhancementCheckbox("Dynamic Wallet Icon", "gDynamicWalletIcon");
+                    Tooltip("Changes the rupee in the wallet icon to match the wallet size you currently have");
+                    EnhancementCheckbox("Always show dungeon entrances", "gAlwaysShowDungeonMinimapIcon");
+                    Tooltip("Always shows dungeon entrance icons on the minimap");
+                    ImGui::EndMenu();
+                }
 
-                ImGui::Text("Graphics");
-                ImGui::Separator();
-
-                EnhancementCheckbox("N64 Mode", "gN64Mode");
-                Tooltip("Sets aspect ratio to 4:3 and lowers resolution to 240p, the N64's native resolution");
-                EnhancementCheckbox("Animated Link in Pause Menu", "gPauseLiveLink");
-                Tooltip("Show animated Link in pause menu equipments");
-                EnhancementCheckbox("Enable 3D Dropped items", "gNewDrops");
-                Tooltip("Most of 2D dropped stuffs will show in 3D of their version");
-                EnhancementCheckbox("Faster Block Push", "gFasterBlockPush");
-                Tooltip("Link will push faster Block and other stuffs");
-                EnhancementCheckbox("Dynamic Wallet Icon", "gDynamicWalletIcon");
-                Tooltip("Changes the rupee in the wallet icon to match the wallet size you currently have");
-                EnhancementCheckbox("Always show dungeon entrances", "gAlwaysShowDungeonMinimapIcon");
-                Tooltip("Always shows dungeon entrance icons on the minimap");
-
-                ImGui::Text("Fixes");
-                ImGui::Separator();
-                EnhancementCheckbox("Fix L&R Pause menu", "gUniformLR");
-                Tooltip("Makes the L and R buttons in the pause menu the same color");
-                EnhancementCheckbox("Fix Dungeon entrances", "gFixDungeonMinimapIcon");
-                Tooltip("Show dungeon entrances icon only when it should be");
-                EnhancementCheckbox("Fix Two Handed idle animations", "gTwoHandedIdle");
-                Tooltip("Add unused two handed swords/equipements/items animation back");
+                if (ImGui::BeginMenu("Fixes")) {
+                    
+                    EnhancementCheckbox("Fix L&R Pause menu", "gUniformLR");
+                    Tooltip("Makes the L and R buttons in the pause menu the same color");
+                    EnhancementCheckbox("Fix Dungeon entrances", "gFixDungeonMinimapIcon");
+                    Tooltip("Show dungeon entrances icon only when it should be");
+                    EnhancementCheckbox("Fix Two Handed idle animations", "gTwoHandedIdle");
+                    Tooltip("Makes two handed idle animation play, a seemingly finished animation that was disabled on accident in the original game");
+                    EnhancementCheckbox("Fix Deku Nut upgrade", "gDekuNutUpgradeFix");
+                    Tooltip("Prevents the Forest Stage Deku Nut upgrade from becoming unobtainable after receiving the Poacher's Saw");
+                    ImGui::EndMenu();
+                }
 
                 EXPERIMENTAL();
 
-                EnhancementCheckbox("60 fps interpolation", "g60FPS");
+                EnhancementCheckbox("60FPS Interpolation", "g60FPS");
                 Tooltip("60 FPS for us peasant, enjoy :D");
                 EnhancementCheckbox("Disable LOD", "gDisableLOD");
                 Tooltip("Turns off the level of detail setting, making models always use their higher poly variants");
@@ -799,7 +832,7 @@ namespace SohImGui {
                 EnhancementCheckbox("Easy ISG", "gEzISG");
                 Tooltip("Automatically activates the Infinite Sword glitch\nmaking you constantly have the glitch one\nalso can be used to prevent falling fromt platforms");
                 EnhancementCheckbox("Unrestricted Items", "gNoRestrictItems");
-                Tooltip("Allows you to use all items at any age");
+                Tooltip("Allows you to use any item at any location");
                 EnhancementCheckbox("Freeze Time", "gFreezeTime");
                 Tooltip("Freezes the time of day");
 
@@ -808,6 +841,17 @@ namespace SohImGui {
 
             if (ImGui::BeginMenu("Developer Tools"))
             {
+                if (ImGui::BeginMenu("FPS Counter")) {
+                    EnhancementCheckbox("Show FPS counter", "gDebugFPSCounterEnabled");
+                    Tooltip("FPS Counter for PC Master Race users.");
+                    EnhancementColor4("FPS Counter color", "gFPSCounter", FPSCounter, false);
+                    ImGui::Separator();
+                    ImGui::Text("Position");
+                    EnhancementSliderInt("Top | Bottom : %d", "##FPSCounterPosY", "gFPSCounterPosY", 0, gfx_current_game_window_viewport.height, "");
+                    EnhancementSliderInt("Left | Right : %d", "##FPSCounterPosX", "gFPSCounterPosX", -5, gfx_current_game_window_viewport.width, "");
+                    ImGui::EndMenu();
+                }
+                
                 EnhancementCheckbox("OoT Debug Mode", "gDebugEnabled");
                 Tooltip("Enables Debug Mode, allowing you to select maps with L + R + Z, noclip with L + D-pad Right,\nand open the debug menu with L on the pause screen");
                 ImGui::Separator();
@@ -816,14 +860,15 @@ namespace SohImGui {
                 EnhancementCheckbox("Console", "gConsoleEnabled");
                 Tooltip("Enables the console window, allowing you to input commands, type help for some examples");
                 console->opened = CVar_GetS32("gConsoleEnabled", 0);
-
+                EnhancementCheckbox("Translate dev menus", "gDbgMenuTranslation");
+                Tooltip("Dev menu will be translated to your selected language in Languages menu");
                 ImGui::EndMenu();
             }
 
             bool Margins_isOpen = CVar_GetS32("gUseMargins", 0);
             bool Cosmetics_isOpen = CVar_GetS32("gCosmticsEditor", 0);
             bool Interface_isOpen = CVar_GetS32("gColorsEditor", 0);
-
+            bool FPSCounter_isOpen = CVar_GetS32("gDebugFPSCounterEnabled", 0);
             if (Margins_isOpen) {
                 if (!Margins_isOpen) {
                     return;
@@ -939,7 +984,23 @@ namespace SohImGui {
                 ImGui::PopStyleColor();
                 ImGui::End();
             }
-
+            if (FPSCounter_isOpen) {
+                if (!FPSCounter_isOpen) {
+                    return;
+                }
+                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBackground |
+                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize |
+                ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar |
+                ImGuiWindowFlags_NoFocusOnAppearing;
+                ImGui::Begin("FPSCounter", nullptr, window_flags);
+                const float framerate = ImGui::GetIO().Framerate;
+                float PosX = CVar_GetS32("gFPSCounterPosX", 0);
+                float PosY = CVar_GetS32("gFPSCounterPosY", 0);
+                ImGui::SetWindowPos(ImVec2{PosX,PosY},0);
+                SohImGui::overlay->TextDraw(0,0,true,ImVec4{FPSCounter[0],FPSCounter[1],FPSCounter[2],FPSCounter[3]}," %.1f FPS", framerate);
+                ImGui::End();
+            }
+            
             for (const auto& category : windowCategories) {
                 if (ImGui::BeginMenu(category.first.c_str())) {
                     for (const std::string& name : category.second) {
@@ -952,7 +1013,6 @@ namespace SohImGui {
                     }
                     ImGui::EndMenu();
                 }
-
             }
 
             ImGui::EndMenuBar();

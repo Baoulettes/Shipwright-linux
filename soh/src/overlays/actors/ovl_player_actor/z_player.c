@@ -5018,6 +5018,13 @@ s32 func_8083B644(Player* this, GlobalContext* globalCtx) {
     s32 sp28 = 0;
     s32 sp24;
 
+    s32 BTNNavi = BTN_CUP;
+    if (CVar_GetS32("gDPadShortcuts", 1) != 0){
+        BTNNavi = BTN_DUP;
+    } else {
+        BTNNavi = BTN_CUP;
+    }
+
     sp24 = (sp30 != NULL) && (CHECK_FLAG_ALL(sp30->flags, ACTOR_FLAG_0 | ACTOR_FLAG_18) || (sp30->naviEnemyId != 0xFF));
 
     if (sp24 || (this->naviTextId != 0)) {
@@ -5057,7 +5064,7 @@ s32 func_8083B644(Player* this, GlobalContext* globalCtx) {
                             this->stateFlags2 |= PLAYER_STATE2_21;
                         }
 
-                        if (!CHECK_BTN_ALL(sControlInput->press.button, BTN_CUP) && !sp28) {
+                        if (!CHECK_BTN_ALL(sControlInput->press.button, BTNNavi) && !sp28) {
                             return 0;
                         }
 
@@ -5104,6 +5111,7 @@ s32 func_8083B8F4(Player* this, GlobalContext* globalCtx) {
 }
 
 s32 func_8083B998(Player* this, GlobalContext* globalCtx) {
+
     if (this->unk_6AD != 0) {
         func_8083B040(this, globalCtx);
         return 1;

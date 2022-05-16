@@ -9,8 +9,8 @@ LIBULTRASHIP := ../libultraship/libultraship.a
 ZAPDUTILS := ../ZAPDTR/ZAPDUtils/ZAPDUtils.a
 
 ASAN ?= 0
-DEBUG ?= 1
-OPTFLAGS ?= -O0
+DEBUG ?= 0
+OPTFLAGS ?= -O2
 LTO ?= 0
 
 WARN := \
@@ -71,7 +71,7 @@ LDLIBS := \
 	GL \
 	GLEW \
 	storm \
-	pulse\
+	pulse \
 	ultraship \
 ) \
 
