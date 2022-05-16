@@ -248,9 +248,9 @@ namespace SohImGui {
         hearts_dd_colors[0] = (float)CVar_GetS32("gDDCCHeartsPrimR", 255)/255;
         hearts_dd_colors[1] = (float)CVar_GetS32("gDDCCHeartsPrimG", 255)/255;
         hearts_dd_colors[2] = (float)CVar_GetS32("gDDCCHeartsPrimB", 255)/255;
-        a_btn_colors[0] = (float)CVar_GetS32("gCCABtnPrimR", 90)/255;
-        a_btn_colors[1] = (float)CVar_GetS32("gCCABtnPrimG", 90)/255;
-        a_btn_colors[2] = (float)CVar_GetS32("gCCABtnPrimB", 255)/255;
+        a_btn_colors[0] = (float)CVar_GetS32("gCCABtnPrimR", 255)/255;
+        a_btn_colors[1] = (float)CVar_GetS32("gCCABtnPrimG", 20)/255;
+        a_btn_colors[2] = (float)CVar_GetS32("gCCABtnPrimB", 20)/255;
         b_btn_colors[0] = (float)CVar_GetS32("gCCBBtnPrimR", 0)/255;
         b_btn_colors[1] = (float)CVar_GetS32("gCCBBtnPrimG", 150)/255;
         b_btn_colors[2] = (float)CVar_GetS32("gCCBBtnPrimB", 0)/255;
@@ -272,9 +272,9 @@ namespace SohImGui {
         minimap_colors[0] = (float)CVar_GetS32("gCCMinimapPrimR", 0)/255;
         minimap_colors[1] = (float)CVar_GetS32("gCCMinimapPrimG", 255)/255;
         minimap_colors[2] = (float)CVar_GetS32("gCCMinimapPrimB", 255)/255;
-        rupee_colors[0] = (float)CVar_GetS32("gCCRupeePrimR", 120)/255;
-        rupee_colors[1] = (float)CVar_GetS32("gCCRupeePrimG", 120)/255;
-        rupee_colors[2] = (float)CVar_GetS32("gCCRupeePrimB", 120)/255;
+        rupee_colors[0] = (float)CVar_GetS32("gCCRupeePrimR", 200)/255;
+        rupee_colors[1] = (float)CVar_GetS32("gCCRupeePrimG", 255)/255;
+        rupee_colors[2] = (float)CVar_GetS32("gCCRupeePrimB", 100)/255;
         smolekey_colors[0] = (float)CVar_GetS32("gCCKeysPrimR", 200)/255;
         smolekey_colors[1] = (float)CVar_GetS32("gCCKeysPrimG", 230)/255;
         smolekey_colors[2] = (float)CVar_GetS32("gCCKeysPrimB", 255)/255;

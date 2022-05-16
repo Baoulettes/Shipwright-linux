@@ -19,6 +19,7 @@ u32 cursorColorA_Navi;
 f32 cursorAnimTween;
 u8 cursorAnimState;
 f32 cursorAnimTween_Navi;
+u8 cursorAnimState_Navi;
 /**
  * Simple wrapper to load a texture to be drawn.
  */
@@ -62,21 +63,35 @@ void sprite_load(sprite_t* sprite, bool grayscale, int alpha) {
         }
         cursorColorA = ColChanMix(255, 0.0f, t);
         cursorAnimTween = t;
+        
+        if (!DISPLAY_DPAD || CVar_GetS32("gDPadShortcuts", 0) == 0)
+            cursorColorA = 0;
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, cursorColorR, cursorColorG, cursorColorB, cursorColorA);
     }
     if (sprite->tex == gNaviCUpENGTex) {
+        TweenNavi = cursorAnimTween_Navi;
         if (interfaceCtx->naviCalling > 0) {
+            cursorAnimState_Navi = 1;
+        } else {
+            cursorAnimState_Navi = 0;
+        }
+        if (cursorAnimState_Navi == 1) {
             TweenNavi += 0.05f;
             if (TweenNavi >= 1.0f) {
                 TweenNavi = 1.0f;
             }
+            cursorAnimState_Navi = 1;
         } else {
             TweenNavi -= 0.05f;
             if (TweenNavi <= 0.0f) {
                 TweenNavi = 0.0f;
             }
+            cursorAnimState_Navi = 0;
         }
-        cursorColorA_Navi = ColChanMix(0, 255.0f, TweenNavi);
+        cursorColorA_Navi = ColChanMix(255, 0.0f, TweenNavi);
+        cursorAnimTween_Navi = TweenNavi;
+        if (!DISPLAY_DPAD || CVar_GetS32("gDPadShortcuts", 0) == 0 || interfaceCtx->naviCalling == 0)
+            cursorColorA_Navi = 0;
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, cursorColorA_Navi);
     }
     if (sprite->im_siz == G_IM_SIZ_16b) {

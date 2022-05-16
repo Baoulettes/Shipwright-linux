@@ -260,7 +260,7 @@ void draw_dpad() {
             if (CUR_EQUIP_VALUE(EQUIP_BOOTS) == 10) {
                 sprite_load(&sprEquipedEffect, false, alpha);
                 sprite_draw(&sprEquipedEffect, ItemSlotsPos[2][0]-PosFixEfX, ItemSlotsPos[2][1]-PosFixEfY, ItemIconSize[3][0], ItemIconSize[3][1]);
-            } else if (CUR_EQUIP_VALUE(EQUIP_SHIELD) == 1) {
+            } else if (CUR_EQUIP_VALUE(EQUIP_SHIELD) == 2) {
                 sprite_load(&sprEquipedEffect, false, alpha);
                 sprite_draw(&sprEquipedEffect, ItemSlotsPos[3][0]-PosFixEfX, ItemSlotsPos[2][1]-PosFixEfY, ItemIconSize[3][0], ItemIconSize[3][1]);
             }

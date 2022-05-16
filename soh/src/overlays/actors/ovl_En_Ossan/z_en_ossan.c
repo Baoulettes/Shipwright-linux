@@ -1896,9 +1896,9 @@ void EnOssan_UpdateCursorAnim(EnOssan* this) {
         this->cursorColorG = ColChanMix(255, 80.0f, t);
         this->cursorColorB = ColChanMix(80, 0.0f, t);
     } else if (CVar_GetS32("gHudColors", 1) == 2) {
-        this->cursorColorR = ColChanMix(CVar_GetS32("gCCABtnPrimR", 90), ((CVar_GetS32("gCCABtnPrimR", 90)/255)*100), t);
-        this->cursorColorG = ColChanMix(CVar_GetS32("gCCABtnPrimG", 90), ((CVar_GetS32("gCCABtnPrimG", 90)/255)*100), t);
-        this->cursorColorB = ColChanMix(CVar_GetS32("gCCABtnPrimB", 90), ((CVar_GetS32("gCCABtnPrimB", 90)/255)*100), t);
+        this->cursorColorR = ColChanMix(CVar_GetS32("gCCABtnPrimR", 0), ((CVar_GetS32("gCCABtnPrimR", 0)/255)*100), t);
+        this->cursorColorG = ColChanMix(CVar_GetS32("gCCABtnPrimG", 255), ((CVar_GetS32("gCCABtnPrimG", 255)/255)*100), t);
+        this->cursorColorB = ColChanMix(CVar_GetS32("gCCABtnPrimB", 80), ((CVar_GetS32("gCCABtnPrimB", 80)/255)*100), t);
     }
     this->cursorColorA = ColChanMix(255, 0.0f, t);
     this->cursorAnimTween = t;
