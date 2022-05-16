@@ -35,6 +35,7 @@ void BootCommands_Init()
     CVar_RegisterS32("gUseTunicsCol", 0);
     CVar_RegisterS32("gTwoHandedIdle", 1);
     CVar_RegisterS32("gFixDungeonMinimapIcon", 1);
+    CVar_RegisterS32("gDekuNutUpgradeFix", 1);
 }
 
 //void BootCommands_ParseBootArgs(char* str)

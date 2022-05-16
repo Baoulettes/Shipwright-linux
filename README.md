@@ -38,8 +38,12 @@ cp external/StormLib/build/libstorm.a external
 cp /usr/local/lib/libGLEW.a external
 
 cd soh
+# Extract the assets/Compile the exporter/Run the exporter
 make setup -j$(nproc)
+# Compile the code
 make -j $(nproc)
 ```
+And that should be good to go, enjoy :)  
+
 # This build you build on Windows too following original readme on original repo :  
 # [Original readme on the original repo](https://github.com/HarbourMasters/Shipwright/blob/develop/README.md)

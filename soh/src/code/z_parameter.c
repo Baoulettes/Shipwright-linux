@@ -3,6 +3,7 @@
 #include "textures/parameter_static/parameter_static.h"
 #include "textures/do_action_static/do_action_static.h"
 #include "textures/icon_item_static/icon_item_static.h"
+#include <soh/Enhancements/dpad.h>
 
 #ifdef _MSC_VER
 #include <stdlib.h>
@@ -1800,7 +1801,7 @@ u8 Item_Give(GlobalContext* globalCtx, u8 item) {
             }
         }
     } else if ((item >= ITEM_WEIRD_EGG) && (item <= ITEM_CLAIM_CHECK)) {
-        if (item == ITEM_SAW) {
+        if ((item == ITEM_SAW) && CVar_GetS32("gDekuNutUpgradeFix", 0) == 0) {
             gSaveContext.itemGetInf[1] |= 0x8000;
         }
 
@@ -2156,15 +2157,16 @@ void Interface_SetNaviCall(GlobalContext* globalCtx, u16 naviCallState) {
 
     if (((naviCallState == 0x1D) || (naviCallState == 0x1E)) && !interfaceCtx->naviCalling &&
         (globalCtx->csCtx.state == CS_STATE_IDLE)) {
-        // clang-format off
-        if (naviCallState == 0x1E) { Audio_PlaySoundGeneral(NA_SE_VO_NAVY_CALL, &D_801333D4, 4,
-                                                            &D_801333E0, &D_801333E0, &D_801333E8); }
-        // clang-format on
+        if (!CVar_GetS32("gDisableNaviCallAudio", 0)) {          
+            // clang-format off
+            if (naviCallState == 0x1E) { Audio_PlaySoundGeneral(NA_SE_VO_NAVY_CALL, &D_801333D4, 4,
+                                                                &D_801333E0, &D_801333E0, &D_801333E8); } 
+            // clang-format on
 
-        if (naviCallState == 0x1D) {
-            func_800F4524(&D_801333D4, NA_SE_VO_NA_HELLO_2, 32);
+            if (naviCallState == 0x1D) {
+                func_800F4524(&D_801333D4, NA_SE_VO_NA_HELLO_2, 32);
+            }
         }
-
         interfaceCtx->naviCalling = 1;
         sCUpInvisible = 0;
         sCUpTimer = 10;
@@ -2910,7 +2912,7 @@ void Interface_DrawItemButtons(GlobalContext* globalCtx) {
     }
 
     if (interfaceCtx->naviCalling && (globalCtx->pauseCtx.state == 0) && (globalCtx->pauseCtx.debugState == 0) &&
-        (globalCtx->csCtx.state == CS_STATE_IDLE)) {
+        (globalCtx->csCtx.state == CS_STATE_IDLE) && CVar_GetS32("gDPadShortcuts", 1) != 1) {
         if (!sCUpInvisible) {
             // C-Up Button Texture, Color & Label (Navi Text)
             gDPPipeSync(OVERLAY_DISP++);
@@ -3417,6 +3419,7 @@ void Interface_Draw(GlobalContext* globalCtx) {
 
         if (fullUi) {
             Interface_DrawItemButtons(globalCtx);
+            draw_dpad();
         }
 
         gDPPipeSync(OVERLAY_DISP++);
@@ -4466,4 +4469,5 @@ void Interface_Update(GlobalContext* globalCtx) {
             gSaveContext.sunsSongState = SUNSSONG_SPECIAL;
         }
     }
+    handle_dpad();
 }

@@ -395,10 +395,12 @@ void HealthMeter_Draw(GlobalContext* globalCtx) {
     f32 temp4;
     InterfaceContext* interfaceCtx = &globalCtx->interfaceCtx;
     GraphicsContext* gfxCtx = globalCtx->state.gfxCtx;
+    s16 MaxHeartsCount = gSaveContext.healthCapacity;
+    s16 HealthNow = gSaveContext.health;
     Vtx* sp154 = interfaceCtx->beatingHeartVtx;
-    s32 curHeartFraction = gSaveContext.health % 0x10;
-    s16 totalHeartCount = gSaveContext.healthCapacity / 0x10;
-    s16 fullHeartCount = gSaveContext.health / 0x10;
+    s32 curHeartFraction = HealthNow % 0x10;
+    s16 totalHeartCount = MaxHeartsCount / 0x10;
+    s16 fullHeartCount = HealthNow / 0x10;
     s32 pad2;
     f32 sp144 = interfaceCtx->unk_22A * 0.1f;
     s32 curCombineModeSet = 0;
@@ -406,8 +408,34 @@ void HealthMeter_Draw(GlobalContext* globalCtx) {
     s32 ddHeartCountMinusOne = gSaveContext.inventory.defenseHearts - 1;
 
     OPEN_DISPS(gfxCtx, "../z_lifemeter.c", 353);
+    if (CVar_GetS32("gForceMaxHeartCount", 0)) {
+        MaxHeartsCount = CVar_GetS32("gMaxHeartCount", gSaveContext.healthCapacity)*16; //16 is what a full heart is
+        if (MaxHeartsCount < 4) { //1/4 of an heart.
+            MaxHeartsCount = 16; //prevent some glitch like infinite breath.
+            HealthNow = 4;
+        }
+        if (MaxHeartsCount > gSaveContext.healthCapacity) {
+            MaxHeartsCount = gSaveContext.healthCapacity;
+        }   
+        if (HealthNow > MaxHeartsCount) {
+            HealthNow = MaxHeartsCount;
+            gSaveContext.health = HealthNow;
+        }
+        curHeartFraction = HealthNow % 0x10;
+        totalHeartCount = MaxHeartsCount / 0x10;
+        fullHeartCount = HealthNow / 0x10;
+    } else {
+        MaxHeartsCount = gSaveContext.healthCapacity;
+        if (HealthNow > MaxHeartsCount) {
+            HealthNow = MaxHeartsCount;
+        }
+        curHeartFraction = HealthNow % 0x10;
+        totalHeartCount = MaxHeartsCount / 0x10;
+        fullHeartCount = HealthNow / 0x10;
+    }
 
-    if (!(gSaveContext.health % 0x10)) {
+
+    if (!(HealthNow % 0x10)) {
         fullHeartCount--;
     }
 
@@ -604,18 +632,57 @@ void HealthMeter_HandleCriticalAlarm(GlobalContext* globalCtx) {
 
 u32 HealthMeter_IsCritical(void) {
     s32 var;
+    s16 MaxHeartsCount = gSaveContext.healthCapacity;
+    s16 HealthNow = gSaveContext.health;
 
-    if (gSaveContext.healthCapacity <= 0x50) {
-        var = 0x10;
-    } else if (gSaveContext.healthCapacity <= 0xA0) {
-        var = 0x18;
-    } else if (gSaveContext.healthCapacity <= 0xF0) {
-        var = 0x20;
+    if (CVar_GetS32("gForceMaxHeartCount", 0)) {
+        MaxHeartsCount = CVar_GetS32("gMaxHeartCount", gSaveContext.healthCapacity)*16; //16 is what a full heart is
+        if (MaxHeartsCount < 4) { //1/4 of an heart.
+            MaxHeartsCount = 16; //prevent some glitch like infinite breath.
+            HealthNow = 4;
+        }
+        if (MaxHeartsCount > gSaveContext.healthCapacity) {
+            MaxHeartsCount = gSaveContext.healthCapacity;
+        }   
+        if (HealthNow > MaxHeartsCount) {
+            HealthNow = MaxHeartsCount;
+            gSaveContext.health = HealthNow;
+        }
     } else {
-        var = 0x2C;
+        MaxHeartsCount = gSaveContext.healthCapacity;
+        if (HealthNow > MaxHeartsCount) {
+            HealthNow = MaxHeartsCount;
+        }
     }
 
-    if ((var >= gSaveContext.health) && (gSaveContext.health > 0)) {
+
+    if (MaxHeartsCount <= 0x50) {
+        if (CVar_GetS32("gForceMaxHeartCount", 0)) {
+            var = 0;
+        } else {
+            var = 0x10;
+        }
+    } else if (MaxHeartsCount <= 0xA0) {
+        if (CVar_GetS32("gForceMaxHeartCount", 0)) {
+            var = 0;
+        } else {
+            var = 0x18;
+        }
+    } else if (MaxHeartsCount <= 0xF0) {
+        if (CVar_GetS32("gForceMaxHeartCount", 0)) {
+            var = 0;
+        } else {
+            var = 0x20;
+        }
+    } else {
+        if (CVar_GetS32("gForceMaxHeartCount", 0)) {
+            var = 0;
+        } else {
+            var = 0x2C;
+        }
+    }
+
+    if ((var >= HealthNow) && (HealthNow > 0)) {
         return true;
     } else {
         return false;
