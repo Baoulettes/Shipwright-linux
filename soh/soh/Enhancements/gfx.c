@@ -9,20 +9,13 @@ extern GlobalContext* gGlobalCtx;
 /**
  * Used for selected item animation
  */
-f32 t;
-f32 TweenNavi;
-u32 cursorColorR;
-u32 cursorColorG;
-u32 cursorColorB;
-u32 cursorColorA;
-u32 cursorColorA_Navi;
-f32 cursorAnimTween;
-u8 cursorAnimState;
-f32 cursorAnimTween_Navi;
-u8 cursorAnimState_Navi;
+f32 Cursor_Alpha[] = {0.2f,0.8f};
+f32 Cursor_CurA;
+f32 CursorFlashSpeed = 1.0f;
 /**
  * Simple wrapper to load a texture to be drawn.
  */
+
 void sprite_load(sprite_t* sprite, bool grayscale, int alpha) {
     InterfaceContext* interfaceCtx = &gGlobalCtx->interfaceCtx;
     OPEN_DISPS(gGlobalCtx->state.gfxCtx, "gfx.c", 12);
@@ -34,65 +27,38 @@ void sprite_load(sprite_t* sprite, bool grayscale, int alpha) {
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, alpha);
     }
     if (sprite->tex == gMagicArrowEquipEffectTex) {
-        t = cursorAnimTween;
-        if (cursorAnimState == 0) {
-            t += 0.05f;
-            if (t >= 1.0f) {
-                t = 1.0f;
-                cursorAnimState = 1;
+        u32 sIconPrimColors[1][3] = {
+            {CVar_GetS32("gCCABtnPrimR", 0),CVar_GetS32("gCCABtnPrimG", 150),CVar_GetS32("gCCABtnPrimB", 0)},
+        };
+
+        if (DISPLAY_GFX || CVar_GetS32("gDPadShortcuts", 0) != 0) {
+            if (Cursor_CurA <= Cursor_Alpha[0]) {
+                Math_SmoothStepToF(&Cursor_CurA, Cursor_Alpha[1], 1.0f, 0.01f, 0.0f);
+            } else if (Cursor_CurA >= Cursor_Alpha[1]) {
+                Math_SmoothStepToF(&Cursor_CurA, Cursor_Alpha[0], 1.0f, 0.01f, 0.0f);
             }
         } else {
-            t -= 0.05f;
-            if (t <= 0.0f) {
-                t = 0.0f;
-                cursorAnimState = 0;
-            }
+            Cursor_CurA = 0;
         }
-        if (CVar_GetS32("gHudColors", 1) == 0) {
-            cursorColorR = ColChanMix(0, 0.0f, t);
-            cursorColorG = ColChanMix(80, 80.0f, t);
-            cursorColorB = ColChanMix(255, 0.0f, t);
-        } else if (CVar_GetS32("gHudColors", 1) == 1) {
-            cursorColorR = ColChanMix(0, 0.0f, t);
-            cursorColorG = ColChanMix(255, 80.0f, t);
-            cursorColorB = ColChanMix(80, 0.0f, t);
-        } else if (CVar_GetS32("gHudColors", 1) == 2) {
-            cursorColorR = ColChanMix(CVar_GetS32("gCCABtnPrimR", 90), ((CVar_GetS32("gCCABtnPrimR", 90)/255)*100), t);
-            cursorColorG = ColChanMix(CVar_GetS32("gCCABtnPrimG", 90), ((CVar_GetS32("gCCABtnPrimG", 90)/255)*100), t);
-            cursorColorB = ColChanMix(CVar_GetS32("gCCABtnPrimB", 90), ((CVar_GetS32("gCCABtnPrimB", 90)/255)*100), t);
-        }
-        cursorColorA = ColChanMix(255, 0.0f, t);
-        cursorAnimTween = t;
-        
-        if (!DISPLAY_DPAD || CVar_GetS32("gDPadShortcuts", 0) == 0)
-            cursorColorA = 0;
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, cursorColorR, cursorColorG, cursorColorB, cursorColorA);
+
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, sIconPrimColors[0][0], sIconPrimColors[0][1], sIconPrimColors[0][2], Cursor_CurA);
     }
     if (sprite->tex == gNaviCUpENGTex) {
-        TweenNavi = cursorAnimTween_Navi;
-        if (interfaceCtx->naviCalling > 0) {
-            cursorAnimState_Navi = 1;
-        } else {
-            cursorAnimState_Navi = 0;
-        }
-        if (cursorAnimState_Navi == 1) {
-            TweenNavi += 0.05f;
-            if (TweenNavi >= 1.0f) {
-                TweenNavi = 1.0f;
-            }
-            cursorAnimState_Navi = 1;
-        } else {
-            TweenNavi -= 0.05f;
-            if (TweenNavi <= 0.0f) {
-                TweenNavi = 0.0f;
-            }
-            cursorAnimState_Navi = 0;
-        }
-        cursorColorA_Navi = ColChanMix(255, 0.0f, TweenNavi);
-        cursorAnimTween_Navi = TweenNavi;
-        if (!DISPLAY_DPAD || CVar_GetS32("gDPadShortcuts", 0) == 0 || interfaceCtx->naviCalling == 0)
-            cursorColorA_Navi = 0;
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, cursorColorA_Navi);
+        s16 sNaviIconFlashInitTimer = 10;
+        s16 sNaviIconFlashTimer = 10;
+        u32 sNaviIconPrimColors[2] = {
+            255,
+            50,
+        };
+        s16 sNaviIconFlashColorIdx = 0;
+        s16 sNaviIconPrimA = 0;
+        s16 primA;
+        if (interfaceCtx->naviCalling >= 0) {
+            primA = VREG(61);
+        } else if (interfaceCtx->naviCalling <= 0) {
+            primA = 50;
+        } 
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, primA);
     }
     if (sprite->im_siz == G_IM_SIZ_16b) {
         gDPLoadTextureBlock(

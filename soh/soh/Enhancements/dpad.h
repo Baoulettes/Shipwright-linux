@@ -24,7 +24,7 @@ extern GlobalContext* gGlobalCtx;
                              0x00200000 | \
                              0x08000000)
 
-#define CAN_USE_DPAD        (((GET_PLAYER(gGlobalCtx)->stateFlags1 & BLOCK_DPAD) == 0) && \
+#define CAN_USE_DPAD        (((GET_PLAYER(gGlobalCtx)->stateFlags1 & BLOCK_DPAD) == 0) && gGlobalCtx->pauseCtx.state == 0 && \
                             ((uint32_t)gGlobalCtx->state.destroy == gGameStateOverlayTable[3].destroy) && \
                             (gSaveContext.gameMode == 0))
                             //((z64_event_state_1 & 0x20) == 0)) // @NOTE Figure out what this relates to? Pretty sure it's a flag for scene transition.
@@ -32,7 +32,7 @@ extern GlobalContext* gGlobalCtx;
                                                                  // scene transitions from my testing. BLOCK_DPAD should take care of this and this check
                                                                  // may just be redundant in the randomizer repo.
 
-#define DISPLAY_DPAD        CAN_USE_DPAD == true && gGlobalCtx->pauseCtx.state == 0
+#define DISPLAY_DPAD        CAN_USE_DPAD == true
                             
 
 #define CAN_USE_OCARINA     (gGlobalCtx->pauseCtx.state == 0 && \

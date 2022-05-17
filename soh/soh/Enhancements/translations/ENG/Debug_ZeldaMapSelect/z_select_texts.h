@@ -1,6 +1,5 @@
 /*
- * File: z_select_tr_ENG.h
- * Overlay: ovl_select
+ * File: z_select_texts.h
  * Description: English translation
  */
 

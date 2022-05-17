@@ -1,9 +1,9 @@
 /*
- * File: z_select_tr_JPN.h
- * Overlay: ovl_select
+ * File: z_select_texts.h
  * Description: Japanese translation
  */
-#include "global.h"
+#define GFXP_HIRAGANA "\x8D"
+#define GFXP_KATAKANA "\x8C"
 char* dbg_select_texts_JPN[] = {
     "ZELDA MAP SELECT",
     "Age:",

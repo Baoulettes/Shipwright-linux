@@ -1,6 +1,5 @@
 /*
- * File: z_select_tr_GER.h
- * Overlay: ovl_select
+ * File: z_select_texts.h
  * Description: German translation
  */
 char* dbg_select_texts_GER[] = {

@@ -1080,6 +1080,10 @@ void func_80A98DB4(EnKo* this, GlobalContext* globalCtx) {
         dist = this->actor.xzDistToPlayer;
     }
 
+    if (CVar_GetS32("gDisableLOD", 0) != 0) {
+        dist = 0;
+    }
+
     Math_SmoothStepToF(&this->modelAlpha, (this->appearDist < dist) ? 0.0f : 255.0f, 0.3f, 40.0f, 1.0f);
     if (this->modelAlpha < 10.0f) {
         this->actor.flags &= ~ACTOR_FLAG_0;

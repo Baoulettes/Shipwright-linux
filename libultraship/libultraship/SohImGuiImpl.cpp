@@ -555,7 +555,7 @@ namespace SohImGui {
     }
 
     void EnhancementColor4(std::string text, std::string cvarName, float ColorRGBA[4], bool TitleSameLine) {
-        //Simplified.
+        //If you do not need Alpha channel use 3 Variant !
         ImGuiColorEditFlags flags = ImGuiColorEditFlags_None;
         if (!TitleSameLine){
             ImGui::Text("%s", text.c_str());
@@ -643,50 +643,39 @@ namespace SohImGui {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Controller"))
-            {
-                for (const auto& [i, controllers] : Ship::Window::Controllers)
-                {
+            if (ImGui::BeginMenu("Controller")) {
+                EnhancementCheckbox("Show Inputs", "gInputEnabled");
+                Tooltip("Shows currently pressed inputs on the bottom right of the screen");
+                if (CVar_GetS32("gInputEnabled", 0)) {
+                    EnhancementSliderFloat("Input Scale: %.1f", "##Input", "gInputScale", 1.0f, 3.0f, "", 1.0f, false);
+                    Tooltip("Sets the on screen size of the displayed inputs from Show Inputs");
+                }
+                
+                for (const auto& [i, controllers] : Ship::Window::Controllers) {
                     bool hasPad = std::find_if(controllers.begin(), controllers.end(), [](const auto& c) {
                         return c->HasPadConf() && c->Connected();
                         }) != controllers.end();
-
                         if (!hasPad) continue;
-
                         auto menuLabel = "Controller " + std::to_string(i + 1);
-                        if (ImGui::BeginMenu(menuLabel.c_str()))
-                        {
-                            EnhancementSliderFloat("Gyro Sensitivity: %d %%", "##GYROSCOPE", StringHelper::Sprintf("gCont%i_GyroSensitivity", i), 0.0f, 1.0f, "", 1.0f, true);
-
-                            if (ImGui::Button("Recalibrate Gyro"))
-                            {
-                                CVar_SetFloat(StringHelper::Sprintf("gCont%i_GyroDriftX", i).c_str(), 0);
-                                CVar_SetFloat(StringHelper::Sprintf("gCont%i_GyroDriftY", i).c_str(), 0);
-                                needs_save = true;
+                            EnhancementCheckbox("Enable Gyroscope", "gGyroEnabled");
+                            if (CVar_GetS32("gGyroEnabled", 0)) { //Need to check controller capabilities there.
+                                EnhancementSliderFloat("Gyro Sensitivity: %d %%", "##GYROSCOPE", StringHelper::Sprintf("gCont%i_GyroSensitivity", i), 0.0f, 1.0f, "", 1.0f, true);
+                                if (ImGui::Button("Recalibrate Gyro")) {
+                                    CVar_SetFloat(StringHelper::Sprintf("gCont%i_GyroDriftX", i).c_str(), 0);
+                                    CVar_SetFloat(StringHelper::Sprintf("gCont%i_GyroDriftY", i).c_str(), 0);
+                                    needs_save = true;
+                                }
                             }
-
                             ImGui::Separator();
-
-                            EnhancementSliderFloat("Rumble Strength: %d %%", "##RUMBLE", StringHelper::Sprintf("gCont%i_RumbleStrength", i), 0.0f, 1.0f, "", 1.0f, true);
-
-                            ImGui::EndMenu();
-                        }
-                        ImGui::Separator();
+                            EnhancementCheckbox("Rumble Enabled", "gRumbleEnabled");
+                            if (CVar_GetS32("gRumbleEnabled", 0)) {
+                                EnhancementSliderFloat("Rumble Strength: %d %%", "##RUMBLE", StringHelper::Sprintf("gCont%i_RumbleStrength", i), 0.0f, 1.0f, "", 1.0f, true);
+                            }
                 }
-
-                EnhancementCheckbox("Show Inputs", "gInputEnabled");
-                Tooltip("Shows currently pressed inputs on the bottom right of the screen");
-                EnhancementCheckbox("Rumble Enabled", "gRumbleEnabled");
-
-                EnhancementSliderFloat("Input Scale: %.1f", "##Input", "gInputScale", 1.0f, 3.0f, "", 1.0f, false);
-                Tooltip("Sets the on screen size of the displayed inputs from Show Inputs");
-
                 ImGui::Separator();
-
                 EnhancementCheckbox("Dpad Support on Pause and File Select", "gDpadPauseName");
                 EnhancementCheckbox("DPad Support in Ocarina and Text Choice", "gDpadOcarinaText");
                 EnhancementCheckbox("DPad Support for Browsing Shop Items", "gDpadShop");
-
                 ImGui::EndMenu();
             }
 
@@ -750,7 +739,14 @@ namespace SohImGui {
                     Tooltip("Allow to equips boots, speak to Navi and use ocarina with Dpad");
                     EnhancementCheckbox("Disable Navi Call Audio", "gDisableNaviCallAudio");
                     Tooltip("Disables the voice audio when Navi calls you");
-
+                    EnhancementCheckbox("Better Owl", "gBetterOwl");
+                    Tooltip("The default response to Kaepora Gaebora is always that you understood what he said");
+                    EnhancementCheckbox("No Skulltula Freeze", "gSkulltulaFreeze");
+                    Tooltip("Stops the game from freezing the player when picking up Gold Skulltulas");
+                    EnhancementCheckbox("Assignable Tunics and Boots", "gAssignableTunicsAndBoots");
+                    Tooltip("Allows equiping the tunic and boots to c-buttons");
+                    EnhancementCheckbox("2 Day Biggoron Quest", "gBiggoronShortQuest");
+                    Tooltip("Makes you wait 2 days instead of 3 to forge the Biggoron Sword");
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Graphics")) {
@@ -851,7 +847,11 @@ namespace SohImGui {
                     EnhancementSliderInt("Left | Right : %d", "##FPSCounterPosX", "gFPSCounterPosX", -5, gfx_current_game_window_viewport.width, "");
                     ImGui::EndMenu();
                 }
-                
+                EnhancementCheckbox("Fast File Select", "gSkipLogoTitle");
+                Tooltip("Directly load the game to selected slot bellow\nUse slot number 4 to load directly in Zelda Map Select\n(Do not require debug menu but you will be unable to save there)\n(you can also load Zelda map select with Debug mod + slot 0).");
+                if (CVar_GetS32("gSkipLogoTitle",0)) {
+                    EnhancementSliderInt("Save file to load: %d", "##SaveFileID", "gSaveFileID", 1, 4, "");
+                }
                 EnhancementCheckbox("OoT Debug Mode", "gDebugEnabled");
                 Tooltip("Enables Debug Mode, allowing you to select maps with L + R + Z, noclip with L + D-pad Right,\nand open the debug menu with L on the pause screen");
                 ImGui::Separator();

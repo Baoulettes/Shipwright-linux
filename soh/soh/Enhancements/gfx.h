@@ -2,16 +2,18 @@
 #define GFX_EHHANCEMENT_H
 
 #define ColChanMix(c1, c2, m) (c1 - (s32)(c2 * m)) & 0xFF
-#define BLOCK_DPAD          (0x00000001 | \
+#define BLOCK_GFX_DRAW      (0x00000001 | \
 	                         0x00000002 | \
                              0x00000080 | \
                              0x00000400 | \
                              0x10000000 | \
                              0x20000000)
-#define CAN_USE_DPAD        (((GET_PLAYER(gGlobalCtx)->stateFlags1 & BLOCK_DPAD) == 0) && \
+
+#define CAN_DRAW_GFX        (((GET_PLAYER(gGlobalCtx)->stateFlags1 & BLOCK_GFX_DRAW) == 0) && gGlobalCtx->pauseCtx.state == 0 && \
                             ((uint32_t)gGlobalCtx->state.destroy == gGameStateOverlayTable[3].destroy) && \
                             (gSaveContext.gameMode == 0))
-#define DISPLAY_DPAD        CAN_USE_DPAD == true && gGlobalCtx->pauseCtx.state == 0
+
+#define DISPLAY_GFX         CAN_DRAW_GFX == true
 
 #include "z64.h"
 

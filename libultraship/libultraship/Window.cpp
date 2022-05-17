@@ -59,7 +59,7 @@ extern "C" {
                 auto guid = std::string(buf);
                 auto name = std::string(SDL_GameControllerNameForIndex(i));
 
-                SPDLOG_INFO("Found Controller \"{}\" with ID \"{}\"", name, guid);
+                SPDLOG_INFO("Found Controller \"{}\" with on usb{} & GUID \"{}\"", name, i+1, guid);
             }
         }
 
@@ -74,6 +74,14 @@ extern "C" {
                 Ship::Window::Controllers[i].push_back(std::make_shared<Ship::KeyboardController>(i));
             } else if (ControllerType == "usb") {
                 Ship::Window::Controllers[i].push_back(std::make_shared<Ship::SDLController>(i));
+            } else if (ControllerType == "usb1") {
+                Ship::Window::Controllers[i].push_back(std::make_shared<Ship::SDLController>(0));
+            } else if (ControllerType == "usb2") {
+                Ship::Window::Controllers[i].push_back(std::make_shared<Ship::SDLController>(1));
+            } else if (ControllerType == "usb3") {
+                Ship::Window::Controllers[i].push_back(std::make_shared<Ship::SDLController>(2));
+            } else if (ControllerType == "usb3") {
+                Ship::Window::Controllers[i].push_back(std::make_shared<Ship::SDLController>(3));
             } else if (ControllerType == "unplugged") {
                 // Do nothing for unplugged controllers
             } else {

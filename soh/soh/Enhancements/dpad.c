@@ -24,6 +24,8 @@ sprite_t sprZoraTunic = { gZoraTunicIconTex, 32, 32, G_IM_FMT_RGBA, G_IM_SIZ_32b
 sprite_t sprHoverBoots = { gHoverBootsIconTex, 32, 32, G_IM_FMT_RGBA, G_IM_SIZ_32b };
 sprite_t sprIronBoots = { gIronBootsIconTex, 32, 32, G_IM_FMT_RGBA, G_IM_SIZ_32b };
 
+sprite_t sprBunnyHood = { gBunnyHoodIconTex, 32, 32, G_IM_FMT_RGBA, G_IM_SIZ_32b };
+
 s32 PageSwitcherBTN = BTN_L;
 
 u16 CurrentPage = 1; //1=Swords/shield,2=tunics,3=boots
@@ -32,6 +34,7 @@ s32 Equi_swords = NA_SE_PL_METALEFFECT_ADULT;
 s32 Equi_shields = NA_SE_PL_CHANGE_ARMS;
 s32 Equi_tunics = NA_SE_PL_CHANGE_ARMS;
 s32 Equi_boots = NA_SE_PL_CHANGE_ARMS;
+s32 Equi_mask = NA_SE_PL_CHANGE_ARMS;
 u16 PosFixEfX = 5;
 u16 PosFixEfY = 4;
 u16 ItemSlotsPos[5][2] = {
@@ -131,7 +134,19 @@ void handle_dpad() {
                 }
             } else {
                 //Equip mask there on left
-
+                //printf("ID:%d\n",player->exchangeItemId);
+                
+                if (INV_CONTENT(PLAYER_MASK_BUNNY)) {
+                    if (CHECK_BTN_ALL(p1Input->press.button, BTN_DLEFT)) {
+                        if (player->currentMask == PLAYER_MASK_BUNNY) {
+                            player->currentMask = PLAYER_MASK_NONE;
+                            Audio_PlaySoundGeneral(Equi_mask, &D_801333D4, 4, &D_801333E0, &D_801333E0, &D_801333E8);
+                        } else {
+                            player->currentMask = PLAYER_MASK_BUNNY;
+                            Audio_PlaySoundGeneral(Equi_mask, &D_801333D4, 4, &D_801333E0, &D_801333E0, &D_801333E8);
+                        }
+                    }
+                }
 
                 if (CHECK_BTN_ALL(p1Input->press.button, BTN_DRIGHT)) {
                     // Toggle Hylian shield
@@ -257,13 +272,29 @@ void draw_dpad() {
 
         } else {
             //Link is child what to add in first page? Mask ?
-            if (CUR_EQUIP_VALUE(EQUIP_BOOTS) == 10) {
+            if (LINK_AGE_IN_YEARS != YEARS_CHILD) {
                 sprite_load(&sprEquipedEffect, false, alpha);
                 sprite_draw(&sprEquipedEffect, ItemSlotsPos[2][0]-PosFixEfX, ItemSlotsPos[2][1]-PosFixEfY, ItemIconSize[3][0], ItemIconSize[3][1]);
             } else if (CUR_EQUIP_VALUE(EQUIP_SHIELD) == 2) {
                 sprite_load(&sprEquipedEffect, false, alpha);
                 sprite_draw(&sprEquipedEffect, ItemSlotsPos[3][0]-PosFixEfX, ItemSlotsPos[2][1]-PosFixEfY, ItemIconSize[3][0], ItemIconSize[3][1]);
             }
+            if (INV_CONTENT(PLAYER_MASK_BUNNY)) {
+                sprite_load(&sprBunnyHood, false, alpha);
+                sprite_draw(&sprBunnyHood, ItemSlotsPos[2][0], ItemSlotsPos[2][1], ItemIconSize[2][0], ItemIconSize[2][1]);
+            } else {
+                sprite_load(&sprBunnyHood, true, alpha);
+                sprite_draw(&sprBunnyHood, ItemSlotsPos[2][0], ItemSlotsPos[2][1], ItemIconSize[2][0], ItemIconSize[2][1]);
+            }
+            /* Disabled cause crash in case someone build while I fix it.
+            if (player->exchangeItemId==PLAYER_MASK_BUNNY) {
+                //player has exchanged the mask should allow equiping at any time ?
+                sprite_load(&sprBunnyHood, false, alpha);
+                sprite_draw(&sprBunnyHood, ItemSlotsPos[2][0], ItemSlotsPos[2][1], ItemIconSize[2][0], ItemIconSize[2][1]);
+            } else {
+                sprite_load(&sprBunnyHood, true, alpha);
+                sprite_draw(&sprBunnyHood, ItemSlotsPos[2][0], ItemSlotsPos[2][1], ItemIconSize[2][0], ItemIconSize[2][1]);
+            }*/
             if (CHECK_OWNED_EQUIP(EQUIP_SHIELD, 1)) {
                 sprite_load(&sprHylianShield, false, alpha);
                 sprite_draw(&sprHylianShield, ItemSlotsPos[3][0], ItemSlotsPos[3][1], ItemIconSize[2][0], ItemIconSize[2][1]);
