@@ -37,6 +37,7 @@ static int vsync_enabled = 0;
 static unsigned int window_width = DESIRED_SCREEN_WIDTH;
 static unsigned int window_height = DESIRED_SCREEN_HEIGHT;
 static bool fullscreen_state;
+static bool is_running = true;
 static void (*on_fullscreen_changed_callback)(bool is_now_fullscreen);
 static bool (*on_key_down_callback)(int scancode);
 static bool (*on_key_up_callback)(int scancode);
@@ -129,13 +130,13 @@ static int frameDivisor = 1;
 #define FRAME_INTERVAL_US_DENOMINATOR 3
 #define FRAME_INTERVAL_US_NUMERATOR (FRAME_INTERVAL_US_NUMERATOR_ * frameDivisor)
 
-static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
+static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen, uint32_t width, uint32_t height) {
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-#ifndef __linux
+#ifndef __linux__
     timer = CreateWaitableTimer(nullptr, false, nullptr);
 #endif
 
@@ -145,6 +146,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
     char title[512];
     int len = sprintf(title, "%s (%s)", game_name, GFX_API_NAME);
 
+    window_width = width;
+    window_height = height;
     wnd = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
@@ -194,8 +197,7 @@ static void gfx_sdl_set_keyboard_callbacks(bool (*on_key_down)(int scancode), bo
 }
 
 static void gfx_sdl_main_loop(void (*run_one_game_iter)(void)) {
-    while (1)
-    {
+    while(is_running) {
         run_one_game_iter();
     }
 }
@@ -250,7 +252,7 @@ static void gfx_sdl_handle_events(void) {
                 }
                 break;
             case SDL_QUIT:
-                exit(0);
+                _Exit(0);
         }
     }
 }

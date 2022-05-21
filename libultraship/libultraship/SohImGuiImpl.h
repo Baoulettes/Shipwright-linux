@@ -63,13 +63,15 @@ namespace SohImGui {
     extern bool needs_save;
     void Init(WindowImpl window_impl);
     void Update(EventImpl event);
-
-    void EnhancementRadioButton(std::string text, std::string cvarName, int value);
-    void EnhancementCheckbox(std::string text, std::string cvarName);
-    void EnhancementSliderInt(std::string text, std::string id, std::string cvarName, int min, int max, std::string format);
-    void EnhancementSliderFloat(std::string text, std::string id, std::string cvarName, float min, float max, std::string format, float defaultValue);
-    void EnhancementColor3(std::string text, std::string cvarName, float ColorRGB[3], bool TitleSameLine);
-    void EnhancementColor4(std::string text, std::string cvarName, float ColorRGBA[4], bool TitleSameLine);
+    void Tooltip(const char* text);
+    
+    void EnhancementRadioButton(const char* text, const char* cvarName, int id);
+    void EnhancementCheckbox(const char* text, const char* cvarName);
+    void EnhancementSliderInt(const char* text, const char* id, const char* cvarName, int min, int max, const char* format);
+    void EnhancementSliderFloat(const char* text, const char* id, const char* cvarName, float min, float max, const char* format, float defaultValue, bool isPercentage);
+    void EnhancementColor3(const char* text, const char* cvarName, float ColorRGB[3], bool TitleSameLine);
+    void EnhancementColor4(const char* text, const char* cvarName, float ColorRGBA[4], bool TitleSameLine);
+    void EnhancementCombobox(const char* name, const char* ComboArray[], uint8_t FirstTimeValue);
     void DrawMainMenuAndCalculateGameSize(void);
     
     void DrawFramebufferAndGameInput(void);

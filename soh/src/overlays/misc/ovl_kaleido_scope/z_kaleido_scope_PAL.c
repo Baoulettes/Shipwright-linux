@@ -930,7 +930,14 @@ void KaleidoScope_SwitchPage(PauseContext* pauseCtx, u8 pt) {
 }
 
 void KaleidoScope_HandlePageToggles(PauseContext* pauseCtx, Input* input) {
-    if (CVar_GetS32("gDebugEnabled", 0) && (pauseCtx->debugState == 0) && CHECK_BTN_ALL(input->press.button, BTN_Z)) {
+    s16 Debug_BTN = BTN_L;
+    s16 PageLeft_BTN = BTN_Z;
+    if (CVar_GetS32("gNGCKaleidoSwitcher", 0) != 0) {
+        Debug_BTN = BTN_Z;
+        PageLeft_BTN = BTN_L;
+    }
+
+    if (CVar_GetS32("gDebugEnabled", 0) && (pauseCtx->debugState == 0) && CHECK_BTN_ALL(input->press.button, Debug_BTN)) {
         pauseCtx->debugState = 1;
         return;
     }
@@ -940,7 +947,7 @@ void KaleidoScope_HandlePageToggles(PauseContext* pauseCtx, Input* input) {
         return;
     }
 
-    if (CHECK_BTN_ALL(input->press.button, BTN_L)) {
+    if (CHECK_BTN_ALL(input->press.button, PageLeft_BTN)) {
         KaleidoScope_SwitchPage(pauseCtx, 0);
         return;
     }
@@ -2888,50 +2895,54 @@ void KaleidoScope_Draw(GlobalContext* globalCtx) {
     Input* input = &globalCtx->state.input[0];
     PauseContext* pauseCtx = &globalCtx->pauseCtx;
     InterfaceContext* interfaceCtx = &globalCtx->interfaceCtx;
+    if (CVar_GetS32("gNewKaleido", 0) != 0) {
+        KaleidoScope_DrawNewMenu(globalCtx);
+        func_800AAA50(&globalCtx->view, 15);
+    } else {
+        OPEN_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_scope_PAL.c", 3188);
 
-    OPEN_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_scope_PAL.c", 3188);
+        pauseCtx->stickRelX = input->rel.stick_x;
+        pauseCtx->stickRelY = input->rel.stick_y;
 
-    pauseCtx->stickRelX = input->rel.stick_x;
-    pauseCtx->stickRelY = input->rel.stick_y;
+        //gSPSegment(POLY_KAL_DISP++, 0x02, interfaceCtx->parameterSegment);
+        gSPSegment(POLY_KAL_DISP++, 0x07, pauseCtx->playerSegment);
+        //gSPSegment(POLY_KAL_DISP++, 0x08, pauseCtx->iconItemSegment);
+        //gSPSegment(POLY_KAL_DISP++, 0x09, pauseCtx->iconItem24Segment);
+        gSPSegment(POLY_KAL_DISP++, 0x0A, pauseCtx->nameSegment);
+        //gSPSegment(POLY_KAL_DISP++, 0x0C, pauseCtx->iconItemAltSegment);
+        //gSPSegment(POLY_KAL_DISP++, 0x0D, pauseCtx->iconItemLangSegment);
 
-    //gSPSegment(POLY_KAL_DISP++, 0x02, interfaceCtx->parameterSegment);
-    gSPSegment(POLY_KAL_DISP++, 0x07, pauseCtx->playerSegment);
-    //gSPSegment(POLY_KAL_DISP++, 0x08, pauseCtx->iconItemSegment);
-    //gSPSegment(POLY_KAL_DISP++, 0x09, pauseCtx->iconItem24Segment);
-    gSPSegment(POLY_KAL_DISP++, 0x0A, pauseCtx->nameSegment);
-    //gSPSegment(POLY_KAL_DISP++, 0x0C, pauseCtx->iconItemAltSegment);
-    //gSPSegment(POLY_KAL_DISP++, 0x0D, pauseCtx->iconItemLangSegment);
+        if (pauseCtx->debugState == 0)
+        {
+            KaleidoScope_SetView(pauseCtx, pauseCtx->eye.x, pauseCtx->eye.y, pauseCtx->eye.z);
 
-    if (pauseCtx->debugState == 0)
-    {
-        KaleidoScope_SetView(pauseCtx, pauseCtx->eye.x, pauseCtx->eye.y, pauseCtx->eye.z);
+            func_800949A8_KAL(globalCtx->state.gfxCtx);
+            KaleidoScope_InitVertices(globalCtx, globalCtx->state.gfxCtx);
+            KaleidoScope_DrawPages(globalCtx, globalCtx->state.gfxCtx);
 
-        func_800949A8_KAL(globalCtx->state.gfxCtx);
-        KaleidoScope_InitVertices(globalCtx, globalCtx->state.gfxCtx);
-        KaleidoScope_DrawPages(globalCtx, globalCtx->state.gfxCtx);
+            func_800949A8_KAL(globalCtx->state.gfxCtx);
+            gDPSetCombineLERP(POLY_KAL_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
+                            PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
 
-        func_800949A8_KAL(globalCtx->state.gfxCtx);
-        gDPSetCombineLERP(POLY_KAL_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0,
-                          PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
+            KaleidoScope_SetView(pauseCtx, 0.0f, 0.0f, 64.0f);
 
-        KaleidoScope_SetView(pauseCtx, 0.0f, 0.0f, 64.0f);
-
-        if (!((pauseCtx->state >= 8) && (pauseCtx->state <= 0x11))) {
-            KaleidoScope_DrawInfoPanel(globalCtx);
+            if (!((pauseCtx->state >= 8) && (pauseCtx->state <= 0x11))) {
+                KaleidoScope_DrawInfoPanel(globalCtx);
+            }
         }
+
+        if ((pauseCtx->state >= 0xB) && (pauseCtx->state <= 0x11)) {
+            KaleidoScope_DrawGameOver(globalCtx);
+        }
+
+        if ((pauseCtx->debugState == 1) || (pauseCtx->debugState == 2)) {
+            KaleidoScope_DrawDebugEditor(globalCtx);
+        }
+
+        func_800AAA50(&globalCtx->view, 15);
+
+        CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_scope_PAL.c", 3254);
     }
-
-    if ((pauseCtx->state >= 0xB) && (pauseCtx->state <= 0x11)) {
-        KaleidoScope_DrawGameOver(globalCtx);
-    }
-
-    if ((pauseCtx->debugState == 1) || (pauseCtx->debugState == 2)) {
-        KaleidoScope_DrawDebugEditor(globalCtx);
-    }
-
-    func_800AAA50(&globalCtx->view, 15);
-
-    CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_scope_PAL.c", 3254);
 }
 
 uint32_t _bswap32(uint32_t a)

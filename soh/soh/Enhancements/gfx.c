@@ -9,123 +9,136 @@ extern GlobalContext* gGlobalCtx;
 /**
  * Used for selected item animation
  */
-f32 Cursor_Alpha[] = {0.2f,0.8f};
-f32 Cursor_CurA;
-f32 CursorFlashSpeed = 1.0f;
+const u16 ItemSlotsPos[5][2] = {
+    //X,Y
+    //Top
+    {263, 56},
+    //Left
+    {261, 67},
+    //Right
+    {287, 67},
+    //Down
+    {274, 79},
+    //Dpad background
+    {270, 64}
+};
+u16 PosFixEfX = 5;
+u16 PosFixEfY = 5;
+
+s32 EquipedEffect(){
+
+    printf("New value should be []\n");
+    return 0;
+}
 /**
  * Simple wrapper to load a texture to be drawn.
  */
-
-void sprite_load(sprite_t* sprite, bool grayscale, int alpha) {
+void sprite_load(sprite_t* sprite, int type) {
     InterfaceContext* interfaceCtx = &gGlobalCtx->interfaceCtx;
     OPEN_DISPS(gGlobalCtx->state.gfxCtx, "gfx.c", 12);
-    if(grayscale) {
-        gsDPSetGrayscaleColor(OVERLAY_DISP++, 109, 109, 109, alpha);
-        gsSPGrayscale(OVERLAY_DISP++, true);
-    } else {
-        gsSPGrayscale(OVERLAY_DISP++, false);
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, alpha);
-    }
-    if (sprite->tex == gMagicArrowEquipEffectTex) {
-        u32 sIconPrimColors[1][3] = {
-            {CVar_GetS32("gCCABtnPrimR", 0),CVar_GetS32("gCCABtnPrimG", 150),CVar_GetS32("gCCABtnPrimB", 0)},
-        };
 
-        if (DISPLAY_GFX || CVar_GetS32("gDPadShortcuts", 0) != 0) {
-            if (Cursor_CurA <= Cursor_Alpha[0]) {
-                Math_SmoothStepToF(&Cursor_CurA, Cursor_Alpha[1], 1.0f, 0.01f, 0.0f);
-            } else if (Cursor_CurA >= Cursor_Alpha[1]) {
-                Math_SmoothStepToF(&Cursor_CurA, Cursor_Alpha[0], 1.0f, 0.01f, 0.0f);
+    if (type == 1) {        //Navi texture load
+        
+        if (interfaceCtx->naviCalling >= 1) {
+            printf("Nave is calling [%d]\n",interfaceCtx->naviCalling);
+            static s16 pointPulseAlpha[2] = {
+                { 255 },
+                { 0 },
+            };
+            static s16 pointPulseStage = 1;
+            static s16 pointPulseTimer = 5;
+            s16 stepA;
+            stepA = ABS(sprite->alpha - pointPulseAlpha[pointPulseStage]) / pointPulseTimer;
+            if (sprite->alpha >= pointPulseAlpha[pointPulseStage]) {
+                sprite->alpha -= stepA;
+            } else {
+                sprite->alpha += stepA;
+            }
+            pointPulseTimer--;
+            if (pointPulseTimer == 0) {
+                sprite->alpha = pointPulseAlpha[pointPulseStage];
+                pointPulseStage ^= 1;
+                pointPulseTimer = 5;
+            }
+        } else if (interfaceCtx->naviCalling == 0) {
+            sprite->alpha = 70;
+        } 
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, sprite->alpha);
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, sprite->tex, G_IM_FMT_IA, 32, 8, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    } else if (type == 2) { //Selected item effect.
+        if (DISPLAY_GFX) {
+            static s16 pointPulseAlpha[2] = {
+                { 180 },
+                { 120 },
+            };
+            static s16 pointPulseStage = 1;
+            static s16 pointPulseTimer = 20;
+            s16 stepA;
+            stepA = ABS(sprite->alpha - pointPulseAlpha[pointPulseStage]) / pointPulseTimer;
+            if (sprite->alpha >= pointPulseAlpha[pointPulseStage]) {
+                sprite->alpha -= stepA;
+            } else {
+                sprite->alpha += stepA;
+            }
+            pointPulseTimer--;
+            if (pointPulseTimer == 0) {
+                sprite->alpha = pointPulseAlpha[pointPulseStage];
+                pointPulseStage ^= 1;
+                pointPulseTimer = 20;
             }
         } else {
-            Cursor_CurA = 0;
+            sprite->alpha = 70;
         }
-
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, sIconPrimColors[0][0], sIconPrimColors[0][1], sIconPrimColors[0][2], Cursor_CurA);
+        if (CVar_GetS32("gHudColors", 1) == 0) {
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 50, 255, sprite->alpha);
+        } else if (CVar_GetS32("gHudColors", 1) == 1) {
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 255, 50, sprite->alpha);
+        } else if (CVar_GetS32("gHudColors", 1) == 2) {
+            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, CVar_GetS32("gCCABtnPrimR", 0), CVar_GetS32("gCCABtnPrimG", 255), CVar_GetS32("gCCABtnPrimB", 50), sprite->alpha);
+        }
+        gDPLoadTextureBlock(OVERLAY_DISP++, sprite->tex, sprite->im_fmt, G_IM_SIZ_8b, sprite->width, sprite->height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    } else if (type == 3) { //DPad Background
+        gDPLoadTextureBlock(OVERLAY_DISP++, sprite->tex, sprite->im_fmt, G_IM_SIZ_8b, sprite->width, sprite->height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    } else if (type == 0) { //Anything else.
+        gDPLoadTextureBlock(OVERLAY_DISP++, sprite->tex, sprite->im_fmt, G_IM_SIZ_32b, sprite->width, sprite->height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
     }
-    if (sprite->tex == gNaviCUpENGTex) {
-        s16 sNaviIconFlashInitTimer = 10;
-        s16 sNaviIconFlashTimer = 10;
-        u32 sNaviIconPrimColors[2] = {
-            255,
-            50,
-        };
-        s16 sNaviIconFlashColorIdx = 0;
-        s16 sNaviIconPrimA = 0;
-        s16 primA;
-        if (interfaceCtx->naviCalling >= 0) {
-            primA = VREG(61);
-        } else if (interfaceCtx->naviCalling <= 0) {
-            primA = 50;
-        } 
-        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, primA);
-    }
-    if (sprite->im_siz == G_IM_SIZ_16b) {
-        gDPLoadTextureBlock(
-            OVERLAY_DISP++,
-            sprite->tex,
-            sprite->im_fmt,
-            G_IM_SIZ_16b, // @TEMP until I figure out how to use sprite->im_siz
-            sprite->width, sprite->height,
-            0,
-            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
-            G_TX_NOMASK, G_TX_NOMASK,
-            G_TX_NOLOD, G_TX_NOLOD
-        );
-    } else if (sprite->im_siz == G_IM_SIZ_8b) {
-        gDPLoadTextureBlock(
-            OVERLAY_DISP++,
-            sprite->tex,
-            sprite->im_fmt,
-            G_IM_SIZ_8b,
-            sprite->width, sprite->height,
-            0,
-            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 
-            G_TX_NOMASK, G_TX_NOMASK,
-            G_TX_NOLOD, G_TX_NOLOD
-        );
-        gDPSetCombineLERP(OVERLAY_DISP++, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE,  0, PRIMITIVE, ENVIRONMENT, TEXEL0, ENVIRONMENT, TEXEL0, 0, PRIMITIVE, 0);
-    } else if (sprite->im_siz == G_IM_SIZ_4b) {
-        gDPLoadTextureBlock_4b(
-            OVERLAY_DISP++, 
-            sprite->tex, 
-            G_IM_FMT_IA, 
-            32, 
-            8, 
-            0,
-            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | 
-            G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK,
-            G_TX_NOLOD, G_TX_NOLOD
-        );
-    } else {
-        gDPLoadTextureBlock(
-            OVERLAY_DISP++,
-            sprite->tex,
-            sprite->im_fmt,
-            G_IM_SIZ_32b, // @TEMP until I figure out how to use sprite->im_siz
-            sprite->width, sprite->height,
-            0,
-            G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP,
-            G_TX_NOMASK, G_TX_NOMASK,
-            G_TX_NOLOD, G_TX_NOLOD
-        );
-    }
-
     CLOSE_DISPS(gGlobalCtx->state.gfxCtx, "gfx.c", 40);
 }
 
 /**
  * Simple wrapper to draw a sprite/texture on the screen.
- * sprite_load needs to be ran right before this.
+ * type of sprite shader: 
+ * 0 items icon 32x32 / 1 : Navi icon / 2 : Selected item effect. / 3DPad texture
+ * slot : 0:Top / 1:Left / 2:Right / 3:Down / 4: DPad Background. 
+ * grayscale : if true draw in black and white.
  */
-void sprite_draw(sprite_t* sprite, int left, int top, int width, int height) {
+void sprite_draw(sprite_t* sprite, int type, int slot, bool grayscale, s16 alpha) {
+    InterfaceContext* interfaceCtx = &gGlobalCtx->interfaceCtx;
+
+    sprite_load(sprite, type);
+
+    int height = sprite->height * sprite->scale_h;
+    int width = sprite->width * sprite->scale_w;
+
     int width_factor = (1 << 10) * sprite->width / width;
     int height_factor = (1 << 10) * sprite->height / height;
 
     OPEN_DISPS(gGlobalCtx->state.gfxCtx, "gfx.c", 51);
-    left = left + CVar_GetS32("gHUDMargin_R", 0);
-    s16 PosX = OTRGetRectDimensionFromRightEdge(left);
-    s16 PosY = top;
+    if(grayscale) {
+        gsDPSetGrayscaleColor(OVERLAY_DISP++, 109, 109, 109, alpha);
+        gsSPGrayscale(OVERLAY_DISP++, true);
+    } else {
+        gsSPGrayscale(OVERLAY_DISP++, false);
+    }
+    if (type != 1 && type != 2 ) {
+        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, alpha);
+    }
+    s16 PosX = OTRGetRectDimensionFromRightEdge(ItemSlotsPos[slot][0] + CVar_GetS32("gHUDMargin_R", 0));
+    s16 PosY = ItemSlotsPos[slot][1];
+    if (type == 2) {
+        PosX = PosX - PosFixEfX;
+        PosY = PosY - PosFixEfY;
+    }
     if (sprite->im_siz == G_IM_SIZ_4b) {
         gSPWideTextureRectangle(
             OVERLAY_DISP++, 

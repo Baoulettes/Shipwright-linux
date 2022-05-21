@@ -398,6 +398,17 @@ void GameState_Update(GameState* gameState) {
         }
     }
 
+    //Turbo On L
+    if (CVar_GetS32("gTurboOnL", 0) != 0) {
+        if (gGlobalCtx) {
+            Player* player = GET_PLAYER(gGlobalCtx);
+
+            if (CHECK_BTN_ANY(gGlobalCtx->state.input[0].cur.button, BTN_L)) {
+                player->linearVelocity = 27.0f;
+            }
+        }
+    }
+
     // Permanent infinite sword glitch (ISG)
     if (CVar_GetS32("gEzISG", 0) != 0) {
         if (gGlobalCtx) {
@@ -425,6 +436,23 @@ void GameState_Update(GameState* gameState) {
         CVar_SetS32("gPrevTime", -1);
     }
    
+    //za warudo
+    if (CVar_GetS32("gFreezeEnemies", 0) != 0) {
+        if (gGlobalCtx) {
+            ActorContext* actx = &gGlobalCtx->actorCtx;
+            Actor* actor;
+            u8 enemy_cats[2] = { ACTORCAT_ENEMY, ACTORCAT_BOSS };
+
+            for (s32 i = 0; i < ARRAY_COUNT(enemy_cats); i++) {
+                actor = actx->actorLists[enemy_cats[i]].head;
+                while (actor != NULL) {
+                    actor->freezeTimer = 5;
+                    actor = actor->next;
+                }
+            }
+        }
+    }
+
     //since our CVar is same value and properly default to 0 there is not problems doing this in single line.
     gSaveContext.language = CVar_GetS32("gLanguages", 0);
 

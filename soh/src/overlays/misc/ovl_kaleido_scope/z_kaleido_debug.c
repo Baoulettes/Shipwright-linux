@@ -934,9 +934,13 @@ void KaleidoScope_DrawDebugEditor(GlobalContext* globalCtx) {
 
     // Handles exiting the inventory editor with the L button
     // The editor is opened with `debugState` set to 1, and becomes closable after a frame once `debugState` is set to 2
+    s16 Debug_BTN = BTN_L;
+    if (CVar_GetS32("gNGCKaleidoSwitcher", 0) != 0) {
+        Debug_BTN = BTN_Z;
+    }
     if (pauseCtx->debugState == 1) {
         pauseCtx->debugState = 2;
-    } else if ((pauseCtx->debugState == 2) && CHECK_BTN_ALL(input->press.button, BTN_Z)) {
+    } else if ((pauseCtx->debugState == 2) && CHECK_BTN_ALL(input->press.button, Debug_BTN)) {
         pauseCtx->debugState = 0;
     }
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_debug.c", 861);

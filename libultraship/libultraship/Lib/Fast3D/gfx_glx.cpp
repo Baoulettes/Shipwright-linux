@@ -157,6 +157,7 @@ static struct {
 
     bool is_fullscreen;
     void (*on_fullscreen_changed)(bool is_now_fullscreen);
+    bool is_running = true;
 
     int keymap[256];
     bool (*on_key_down)(int scancode);
@@ -298,10 +299,11 @@ static bool gfx_glx_check_extension(const char *extensions, const char *extensio
     return false;
 }
 
-static void gfx_glx_init(const char *game_name, bool start_in_fullscreen) {
+static void gfx_glx_init(const char *game_name, bool start_in_fullscreen, u_int32_t width, uint32_t height) {
     // On NVIDIA proprietary driver, make the driver queue up to two frames on glXSwapBuffers,
     // which means that glXSwapBuffers should be non-blocking,
     // if we are sure to wait at least one vsync interval between calls.
+    printf("gfx_glx_init - init");
     setenv("__GL_MaxFramesAllowed", "2", true);
 
     glx.dpy = XOpenDisplay(NULL);
@@ -399,7 +401,7 @@ static void gfx_glx_set_keyboard_callbacks(bool (*on_key_down)(int scancode), bo
 }
 
 static void gfx_glx_main_loop(void (*run_one_game_iter)(void)) {
-    while (1) {
+    while (glx.is_running) {
         run_one_game_iter();
     }
 }
@@ -440,7 +442,7 @@ static void gfx_glx_handle_events(void) {
             }
         }
         if (xev.type == ClientMessage && (Atom)xev.xclient.data.l[0] == glx.atom_wm_delete_window) {
-            exit(0);
+            _Exit(0);
         }
     }
 }

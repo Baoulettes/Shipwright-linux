@@ -470,6 +470,7 @@ void BossFd_Fly(BossFd* this, GlobalContext* globalCtx) {
                 osSyncPrintf("WAY_SPD X = %f\n", this->camData.atVel.x);
                 osSyncPrintf("WAY_SPD Y = %f\n", this->camData.atVel.y);
                 osSyncPrintf("WAY_SPD Z = %f\n", this->camData.atVel.z);
+                osSyncPrintf("this->timers[3] %d \n",this->timers[3]);
                 if ((this->timers[3] > 190) && !(gSaveContext.eventChkInf[7] & 8)) {
                     Audio_PlaySoundGeneral(NA_SE_EN_DODO_K_ROLL - SFX_FLAG, &this->actor.projectedPos, 4, &D_801333E0,
                                            &D_801333E0, &D_801333E8);
@@ -536,9 +537,10 @@ void BossFd_Fly(BossFd* this, GlobalContext* globalCtx) {
                             break;
                     }
                 }
-                osSyncPrintf("this->timer[2] = %d\n", this->timers[2]);
+                osSyncPrintf("this->timer[2] = %d\n", this->timers[2]); //Main cutscene timer if zero it should be done.
                 osSyncPrintf("this->timer[5] = %d\n", this->timers[5]);
                 if (this->timers[2] == 0) {
+                    osSyncPrintf("timer 2 is 0\n");
                     mainCam->eye = this->camData.eye;
                     mainCam->eyeNext = this->camData.eye;
                     mainCam->at = this->camData.at;
@@ -1477,10 +1479,11 @@ void BossFd_UpdateEffects(BossFd* this, GlobalContext* globalCtx) {
                 }
             } else if (effect->type == BFD_FX_FIRE_BREATH) {
                 diff.x = player->actor.world.pos.x - effect->pos.x;
-                diff.y = player->actor.world.pos.y + 30.0f - effect->pos.y;
+                diff.y = player->actor.world.pos.y + (f32)30.0f - effect->pos.y;
                 diff.z = player->actor.world.pos.z - effect->pos.z;
-                if ((this->timers[3] == 0) && (sqrtf(SQ(diff.x) + SQ(diff.y) + SQ(diff.z)) < 20.0f)) {
+                if ((this->timers[3] == 0) && (sqrtf(SQ(diff.x) + SQ(diff.y) + SQ(diff.z)) < (f32)20.0f)) {
                     this->timers[3] = 50;
+                    osSyncPrintf("Am I going there?\n");
                     func_8002F6D4(globalCtx, NULL, 5.0f, effect->kbAngle, 0.0f, 0x30);
                     if (player->isBurning == false) {
                         for (i2 = 0; i2 < ARRAY_COUNT(player->flameTimers); i2++) {

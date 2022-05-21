@@ -26,7 +26,8 @@ void KaleidoScope_DrawAmmoCount(PauseContext* pauseCtx, GraphicsContext* gfxCtx,
 
     gDPPipeSync(POLY_KAL_DISP++);
 
-    if (!((gSlotAgeReqs[SLOT(item)] == 9) || gSlotAgeReqs[SLOT(item)] == ((void)0, gSaveContext.linkAge))) {
+    if (!((gSlotAgeReqs[SLOT(item)] == 9) ||gSlotAgeReqs[SLOT(item)] == ((void)0, gSaveContext.linkAge) ||
+        (CVar_GetS32("gNoRestrictAge", 0)))) {
         gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 100, 100, 100, pauseCtx->alpha);
     } else {
         gDPSetPrimColor(POLY_KAL_DISP++, 0, 0, 255, 255, 255, pauseCtx->alpha);
@@ -338,7 +339,8 @@ void KaleidoScope_DrawItemSelect(GlobalContext* globalCtx) {
             pauseCtx->cursorItem[PAUSE_ITEM] = cursorItem;
             pauseCtx->cursorSlot[PAUSE_ITEM] = cursorSlot;
 
-            if (!((gSlotAgeReqs[cursorSlot] == 9) || (gSlotAgeReqs[cursorSlot] == ((void)0, gSaveContext.linkAge)))) {
+            if (!((gSlotAgeReqs[cursorSlot] == 9) ||
+                (gSlotAgeReqs[cursorSlot] == ((void)0, gSaveContext.linkAge)) || CVar_GetS32("gNoRestrictAge", 0))) {
                 pauseCtx->nameColorSet = 1;
             }
 
@@ -349,7 +351,8 @@ void KaleidoScope_DrawItemSelect(GlobalContext* globalCtx) {
                 if ((pauseCtx->debugState == 0) && (pauseCtx->state == 6) && (pauseCtx->unk_1E4 == 0)) {
                     if (CHECK_BTN_ANY(input->press.button, BTN_CLEFT | BTN_CDOWN | BTN_CRIGHT)) {
                         if (((gSlotAgeReqs[cursorSlot] == 9) ||
-                             (gSlotAgeReqs[cursorSlot] == ((void)0, gSaveContext.linkAge))) &&
+                             (gSlotAgeReqs[cursorSlot] == ((void)0, gSaveContext.linkAge)) ||
+                            (CVar_GetS32("gNoRestrictAge", 0))) &&
                             (cursorItem != ITEM_SOLD_OUT)) {
                             KaleidoScope_SetupItemEquip(globalCtx, cursorItem, cursorSlot,
                                                         pauseCtx->itemVtx[index].v.ob[0] * 10,
@@ -436,7 +439,8 @@ void KaleidoScope_DrawItemSelect(GlobalContext* globalCtx) {
 
             gSPVertex(POLY_KAL_DISP++, &pauseCtx->itemVtx[j + 0], 4, 0);
             int itemId = gSaveContext.inventory.items[i];
-            bool not_acquired = (gItemAgeReqs[itemId] != 9) && (gItemAgeReqs[itemId] != gSaveContext.linkAge);
+            bool not_acquired =
+                (gItemAgeReqs[itemId] != 9) && (gItemAgeReqs[itemId] != gSaveContext.linkAge) && !(CVar_GetS32("gNoRestrictAge", 0));
             if (not_acquired) {
                 gsDPSetGrayscaleColor(POLY_KAL_DISP++, 109, 109, 109, 255);
                 gsSPGrayscale(POLY_KAL_DISP++, true);

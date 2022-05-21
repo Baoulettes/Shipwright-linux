@@ -11,6 +11,9 @@ ZAPDUTILS := ../ZAPDTR/ZAPDUtils/ZAPDUtils.a
 ASAN ?= 0
 DEBUG ?= 0
 OPTFLAGS ?= -O2
+OPTFLAGS += -msse2
+OPTFLAGS += -mfpmath=sse
+
 LTO ?= 0
 
 WARN := \

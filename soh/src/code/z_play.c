@@ -154,6 +154,30 @@ void Gameplay_Destroy(GameState* thisx) {
     GlobalContext* globalCtx = (GlobalContext*)thisx;
     Player* player = GET_PLAYER(globalCtx);
 
+    if (CVar_GetS32("gKeepMask", 0) != 0) {
+        if (CVar_GetS32("gNoRestrictAge", 0) != 0) {
+            if (gSaveContext.fileNum == 1) {
+                CVar_SetS32("gMaskNum", player->currentMask);
+            } else if (gSaveContext.fileNum == 2) {
+                CVar_SetS32("gMaskNum_2", player->currentMask);
+            } else if (gSaveContext.fileNum == 3) {
+                CVar_SetS32("gMaskNum_3", player->currentMask);
+            } else {
+                CVar_SetS32("gMaskNum_debug", player->currentMask);
+            }
+        } else {
+            if (gSaveContext.fileNum == 1 && LINK_AGE_IN_YEARS == LINK_IS_CHILD) {
+                CVar_SetS32("gMaskNum", player->currentMask);
+            } else if (gSaveContext.fileNum == 2 && LINK_AGE_IN_YEARS == LINK_IS_CHILD) {
+                CVar_SetS32("gMaskNum_2", player->currentMask);
+            } else if (gSaveContext.fileNum == 3 && LINK_AGE_IN_YEARS == LINK_IS_CHILD) {
+                CVar_SetS32("gMaskNum_3", player->currentMask);
+            } else if (LINK_AGE_IN_YEARS == LINK_IS_CHILD) {
+                CVar_SetS32("gMaskNum_debug", player->currentMask);
+            }
+        }
+    }
+
     globalCtx->state.gfxCtx->callback = NULL;
     globalCtx->state.gfxCtx->callbackParam = 0;
     SREG(91) = 0;

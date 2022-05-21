@@ -89,12 +89,14 @@ void KaleidoScope_DrawEquipmentImage(GlobalContext* globalCtx, void* source, u32
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_kaleido_equipment.c", 122);
 }
 
+Vec3s link_kaleido_rot = {0,32300,0};
+
 void KaleidoScope_DrawPlayerWork(GlobalContext* globalCtx) {
     PauseContext* pauseCtx = &globalCtx->pauseCtx;
     Vec3f pos;
-    Vec3s rot;
     f32 scale;
-
+    Input* input = &globalCtx->state.input[0];
+    s16 RotationSpeed = 150 * CVar_GetS32("gPauseLiveLinkRotationSpeed", 0);
     if (LINK_AGE_IN_YEARS == YEARS_CHILD) {
         pos.x = 2.0f;
         pos.y = -130.0f;
@@ -112,11 +114,25 @@ void KaleidoScope_DrawPlayerWork(GlobalContext* globalCtx) {
         scale = 0.047f;
     }
 
-    rot.y = 32300;
-    rot.x = rot.z = 0;
+    link_kaleido_rot.x = link_kaleido_rot.z = 0;
+
+    if (CHECK_BTN_ALL(input->cur.button, BTN_DLEFT) && CVar_GetS32("gPauseLiveLink", 1) >= 1) {
+        //printf("Rotation (L)Desired:[%d]\n", link_kaleido_rot.x);
+        link_kaleido_rot.y = link_kaleido_rot.y - RotationSpeed;
+        link_kaleido_rot.x = 0;
+    } else if (CHECK_BTN_ALL(input->cur.button, BTN_DRIGHT) && CVar_GetS32("gPauseLiveLink", 1) >= 1) {
+        //printf("Rotation (R)Desired:[%d]\n", link_kaleido_rot.x);
+        link_kaleido_rot.y = link_kaleido_rot.y + RotationSpeed;
+        link_kaleido_rot.x = 0;
+    }
+
+    if (CHECK_BTN_ALL(input->press.button, BTN_DUP) || CHECK_BTN_ALL(input->press.button, BTN_DDOWN) && CVar_GetS32("gPauseLiveLink", 1) >= 1) {
+        link_kaleido_rot.y = 32300;
+    }
+
     extern int fbTest;
     gsSPSetFB(globalCtx->state.gfxCtx->polyOpa.p++, fbTest);
-    func_8009214C(globalCtx, pauseCtx->playerSegment, &pauseCtx->playerSkelAnime, &pos, &rot, scale,
+    func_8009214C(globalCtx, pauseCtx->playerSegment, &pauseCtx->playerSkelAnime, &pos, &link_kaleido_rot, scale,
                   CUR_EQUIP_VALUE(EQUIP_SWORD), CUR_EQUIP_VALUE(EQUIP_TUNIC) - 1, CUR_EQUIP_VALUE(EQUIP_SHIELD),
                   CUR_EQUIP_VALUE(EQUIP_BOOTS) - 1);
     gsSPResetFB(globalCtx->state.gfxCtx->polyOpa.p++);
@@ -476,8 +492,8 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
             (pauseCtx->cursorX[PAUSE_EQUIP] != 0)) {
 
             if ((gEquipAgeReqs[pauseCtx->cursorY[PAUSE_EQUIP]][pauseCtx->cursorX[PAUSE_EQUIP]] == 9) ||
-                (gEquipAgeReqs[pauseCtx->cursorY[PAUSE_EQUIP]][pauseCtx->cursorX[PAUSE_EQUIP]] ==
-                 ((void)0, gSaveContext.linkAge))) {
+                (gEquipAgeReqs[pauseCtx->cursorY[PAUSE_EQUIP]][pauseCtx->cursorX[PAUSE_EQUIP]] == ((void)0, gSaveContext.linkAge)) || 
+                (CVar_GetS32("gNoRestrictAge", 0))) {
                 if (CHECK_BTN_ALL(input->press.button, BTN_A)) {
                     Inventory_ChangeEquipment(pauseCtx->cursorY[PAUSE_EQUIP], pauseCtx->cursorX[PAUSE_EQUIP]);
 
@@ -562,7 +578,7 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
         for (k = 0, temp = rowStart + 1, bit = rowStart, j = point; k < 3; k++, bit++, j += 4, temp++) {
 
             if ((gBitFlags[bit] & gSaveContext.inventory.equipment) && (pauseCtx->cursorSpecialPos == 0)) {
-                if ((gEquipAgeReqs[i][k + 1] == 9) || (gEquipAgeReqs[i][k + 1] == ((void)0, gSaveContext.linkAge))) {
+                if ((gEquipAgeReqs[i][k + 1] == 9) || (gEquipAgeReqs[i][k + 1] == ((void)0, gSaveContext.linkAge)) || CVar_GetS32("gNoRestrictAge", 0)) {
                     if (temp == cursorSlot) {
                         pauseCtx->equipVtx[j].v.ob[0] = pauseCtx->equipVtx[j + 2].v.ob[0] =
                             pauseCtx->equipVtx[j].v.ob[0] - 2;
@@ -613,7 +629,8 @@ void KaleidoScope_DrawEquipment(GlobalContext* globalCtx) {
                 KaleidoScope_DrawQuadTextureRGBA32(globalCtx->state.gfxCtx, gBrokenGiantsKnifeIconTex, 32, 32, point);
             } else if (gBitFlags[bit] & gSaveContext.inventory.equipment) {
                 int itemId = ITEM_SWORD_KOKIRI + temp;
-                bool not_acquired = (gItemAgeReqs[itemId] != 9) && (gItemAgeReqs[itemId] != gSaveContext.linkAge);
+                bool not_acquired =
+                    (gItemAgeReqs[itemId] != 9) && (gItemAgeReqs[itemId] != gSaveContext.linkAge) && !(CVar_GetS32("gNoRestrictAge", 0));
                 if (not_acquired) {
                     gsDPSetGrayscaleColor(POLY_KAL_DISP++, 109, 109, 109, 255);
                     gsSPGrayscale(POLY_KAL_DISP++, true);

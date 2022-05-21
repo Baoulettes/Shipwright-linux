@@ -36,6 +36,10 @@ void BootCommands_Init()
     CVar_RegisterS32("gTwoHandedIdle", 1);
     CVar_RegisterS32("gFixDungeonMinimapIcon", 1);
     CVar_RegisterS32("gDekuNutUpgradeFix", 1);
+    CVar_RegisterS32("gMaskNum", 0);
+    CVar_RegisterS32("gGravediggingTourFix", 1);
+    CVar_RegisterS32("gNGCKaleidoSwitcher", 1);
+    CVar_RegisterS32("gForgeTime", 3);
 }
 
 //void BootCommands_ParseBootArgs(char* str)
