@@ -66,31 +66,52 @@ namespace SohImGui {
     std::vector<const char*> CustomTexts;
     int SelectedLanguage = CVar_GetS32("gLanguages", 0); //Default Language to 0=English 1=German 2=French
     int SelectedHUD = CVar_GetS32("gHudColors", 1);      //Default colors to Gamecube.
-    float hearts_colors[3] = {0,0,0};
-    float hearts_dd_colors[3] = {0,0,0};
-    float a_btn_colors[3] = {0,0,0};
-    float b_btn_colors[3] = {0,0,0};
-    float c_btn_colors[3] = {0,0,0};
-    float start_btn_colors[3] = {0,0,0};
-    float magic_border_colors[3] = {0,0,0};
-    float magic_remaining_colors[3] = {0,0,0};
-    float magic_use_colors[3] = {0,0,0};
-    float minimap_colors[3] = {0,0,0};
-    float rupee_colors[3] = {0,0,0};
-    float smolekey_colors[3] = {0,0,0};
-    float kokiri_col[3] = { 0.118f, 0.41f, 0.106f };
-    float goron_col[3] = { 0.392f, 0.078f, 0.0f };
-    float zora_col[3] = { 0.0f, 0.235f, 0.392f };
-    float navi_idle_i_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_idle_o_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_npc_i_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_npc_o_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_enemy_i_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_enemy_o_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_prop_i_col[3] = { 0.0f, 0.0f, 0.0f };
-    float navi_prop_o_col[3] = { 0.0f, 0.0f, 0.0f };
-    float FPSCounter[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    ImVec4 hearts_colors;
+    ImVec4 hearts_dd_colors;
+    ImVec4 a_btn_colors;
+    ImVec4 b_btn_colors;
+    ImVec4 c_btn_colors;
+    ImVec4 start_btn_colors;
+    ImVec4 magic_border_colors;
+    ImVec4 magic_remaining_colors;
+    ImVec4 magic_use_colors;
+    ImVec4 minimap_colors;
+    ImVec4 rupee_colors;
+    ImVec4 smolekey_colors;
+    ImVec4 kokiri_col;
+    ImVec4 goron_col;
+    ImVec4 zora_col;
+    ImVec4 navi_idle_i_col;
+    ImVec4 navi_idle_o_col;
+    ImVec4 navi_npc_i_col;
+    ImVec4 navi_npc_o_col;
+    ImVec4 navi_enemy_i_col;
+    ImVec4 navi_enemy_o_col;
+    ImVec4 navi_prop_i_col;
+    ImVec4 navi_prop_o_col;
+    ImVec4 FPSCounter;
 
+    ImVec4 trailscol;
+    ImVec4 c_btn_u_colors;
+    ImVec4 c_btn_l_colors;
+    ImVec4 c_btn_d_colors;
+    ImVec4 c_btn_r_colors;
+    ImVec4 magic_bordern_colors;
+
+    const char* RainbowColorCvarList[] = {
+        "gTunic_Kokiri_","gTunic_Goron_","gTunic_Zora_", "gTrailCol",
+        "gNavi_Idle_Inner_","gNavi_Idle_Outer_",
+        "gNavi_NPC_Inner_","gNavi_NPC_Outer_",
+        "gNavi_Enemy_Inner_","gNavi_Enemy_Outer_",
+        "gNavi_Prop_Inner_","gNavi_Prop_Outer_",
+        "gCCHeartsPrim","gDDCCHeartsPrim",
+        "gCCABtnPrim","gCCBBtnPrim","gCCCBtnPrim","gCCStartBtnPrim",
+        "gCCCUBtnPrim", "gCCCLBtnPrim", "gCCCRBtnPrim", "gCCCDBtnPrim",
+        "gCCMagicBorderNormPrim","gCCMagicBorderPrim","gCCMagicPrim","gCCMagicUsePrim",
+        "gCCMinimapPrim","gCCRupeePrim","gCCKeysPrim"        
+    };
+
+    //float MenuColor_FileSelect[4] = { 100, 150, 255, 150 };
     const char* filters[] = {
         "Three-Point",
         "Linear",
@@ -99,6 +120,9 @@ namespace SohImGui {
 
     std::map<std::string, std::vector<std::string>> windowCategories;
     std::map<std::string, CustomWindow> customWindows;
+    int ClampFloatToInt(float value, int min, int max){
+        return fmin(fmax(value,min),max);
+    }
 
     void ImGuiWMInit() {
         switch (impl.backend) {
@@ -241,89 +265,6 @@ namespace SohImGui {
         stbi_image_free(img_data);
     }
 
-    void LoadInterfaceEditor(){//This function is necessary as without it IMGui wont load the updated float array.
-        hearts_colors[0] = (float)CVar_GetS32("gCCHeartsPrimR", 255)/255;
-        hearts_colors[1] = (float)CVar_GetS32("gCCHeartsPrimG", 70)/255;
-        hearts_colors[2] = (float)CVar_GetS32("gCCHeartsPrimB", 50)/255;
-        hearts_dd_colors[0] = (float)CVar_GetS32("gDDCCHeartsPrimR", 255)/255;
-        hearts_dd_colors[1] = (float)CVar_GetS32("gDDCCHeartsPrimG", 255)/255;
-        hearts_dd_colors[2] = (float)CVar_GetS32("gDDCCHeartsPrimB", 255)/255;
-        a_btn_colors[0] = (float)CVar_GetS32("gCCABtnPrimR", 255)/255;
-        a_btn_colors[1] = (float)CVar_GetS32("gCCABtnPrimG", 20)/255;
-        a_btn_colors[2] = (float)CVar_GetS32("gCCABtnPrimB", 20)/255;
-        b_btn_colors[0] = (float)CVar_GetS32("gCCBBtnPrimR", 0)/255;
-        b_btn_colors[1] = (float)CVar_GetS32("gCCBBtnPrimG", 150)/255;
-        b_btn_colors[2] = (float)CVar_GetS32("gCCBBtnPrimB", 0)/255;
-        c_btn_colors[0] = (float)CVar_GetS32("gCCCBtnPrimR", 255)/255;
-        c_btn_colors[1] = (float)CVar_GetS32("gCCCBtnPrimG", 160)/255;
-        c_btn_colors[2] = (float)CVar_GetS32("gCCCBtnPrimB", 0)/255;
-        start_btn_colors[0] = (float)CVar_GetS32("gCCStartBtnPrimR", 120)/255;
-        start_btn_colors[1] = (float)CVar_GetS32("gCCStartBtnPrimG", 120)/255;
-        start_btn_colors[2] = (float)CVar_GetS32("gCCStartBtnPrimB", 120)/255;
-        magic_border_colors[0] = (float)CVar_GetS32("gCCMagicBorderPrimR", 255)/255;
-        magic_border_colors[1] = (float)CVar_GetS32("gCCMagicBorderPrimG", 255)/255;
-        magic_border_colors[2] = (float)CVar_GetS32("gCCMagicBorderPrimB", 255)/255;
-        magic_use_colors[0] = (float)CVar_GetS32("gCCMagicPrimR", 250)/255;
-        magic_use_colors[1] = (float)CVar_GetS32("gCCMagicPrimG", 250)/255;
-        magic_use_colors[2] = (float)CVar_GetS32("gCCMagicPrimB", 0)/255;
-        magic_remaining_colors[0] = (float)CVar_GetS32("gCCMagicUsePrimR", 0)/255;
-        magic_remaining_colors[1] = (float)CVar_GetS32("gCCMagicUsePrimG", 200)/255;
-        magic_remaining_colors[2] = (float)CVar_GetS32("gCCMagicUsePrimB", 0)/255;
-        minimap_colors[0] = (float)CVar_GetS32("gCCMinimapPrimR", 0)/255;
-        minimap_colors[1] = (float)CVar_GetS32("gCCMinimapPrimG", 255)/255;
-        minimap_colors[2] = (float)CVar_GetS32("gCCMinimapPrimB", 255)/255;
-        rupee_colors[0] = (float)CVar_GetS32("gCCRupeePrimR", 200)/255;
-        rupee_colors[1] = (float)CVar_GetS32("gCCRupeePrimG", 255)/255;
-        rupee_colors[2] = (float)CVar_GetS32("gCCRupeePrimB", 100)/255;
-        smolekey_colors[0] = (float)CVar_GetS32("gCCKeysPrimR", 200)/255;
-        smolekey_colors[1] = (float)CVar_GetS32("gCCKeysPrimG", 230)/255;
-        smolekey_colors[2] = (float)CVar_GetS32("gCCKeysPrimB", 255)/255;
-        kokiri_col[0] = (float)CVar_GetS32("gTunic_Kokiri_R", 30)/255;
-        kokiri_col[1] = (float)CVar_GetS32("gTunic_Kokiri_G", 105)/255;
-        kokiri_col[2] = (float)CVar_GetS32("gTunic_Kokiri_B", 27)/255;
-        goron_col[0] = (float)CVar_GetS32("gTunic_Goron_R", 100)/255;
-        goron_col[1] = (float)CVar_GetS32("gTunic_Goron_G", 20)/255;
-        goron_col[2] = (float)CVar_GetS32("gTunic_Goron_B", 0)/255;
-        zora_col[0] = (float)CVar_GetS32("gTunic_Zora_R", 0)/255;
-        zora_col[1] = (float)CVar_GetS32("gTunic_Zora_G", 60)/255;
-        zora_col[2] = (float)CVar_GetS32("gTunic_Zora_B", 100)/255;
-        navi_idle_i_col[0] = (float)CVar_GetS32("gNavi_Idle_Inner_R", 255)/255;
-        navi_idle_i_col[1] = (float)CVar_GetS32("gNavi_Idle_Inner_G", 255)/255;
-        navi_idle_i_col[2] = (float)CVar_GetS32("gNavi_Idle_Inner_B", 255)/255;
-        navi_idle_o_col[0] = (float)CVar_GetS32("gNavi_Idle_Outer_R", 115)/255;
-        navi_idle_o_col[1] = (float)CVar_GetS32("gNavi_Idle_Outer_G", 230)/255;
-        navi_idle_o_col[2] = (float)CVar_GetS32("gNavi_Idle_Outer_B", 255)/255;
-        navi_npc_i_col[0] = (float)CVar_GetS32("gNavi_NPC_Inner_R", 100)/255;
-        navi_npc_i_col[1] = (float)CVar_GetS32("gNavi_NPC_Inner_G", 100)/255;
-        navi_npc_i_col[2] = (float)CVar_GetS32("gNavi_NPC_Inner_B", 255)/255;
-        navi_npc_o_col[0] = (float)CVar_GetS32("gNavi_NPC_Outer_R", 90)/255;
-        navi_npc_o_col[1] = (float)CVar_GetS32("gNavi_NPC_Outer_G", 90)/255;
-        navi_npc_o_col[2] = (float)CVar_GetS32("gNavi_NPC_Outer_B", 255)/255;
-        navi_enemy_i_col[0] = (float)CVar_GetS32("gNavi_Enemy_Inner_R", 255)/255;
-        navi_enemy_i_col[1] = (float)CVar_GetS32("gNavi_Enemy_Inner_G", 255)/255;
-        navi_enemy_i_col[2] = (float)CVar_GetS32("gNavi_Enemy_Inner_B", 0)/255;
-        navi_enemy_o_col[0] = (float)CVar_GetS32("gNavi_Enemy_Outer_R", 220)/255;
-        navi_enemy_o_col[1] = (float)CVar_GetS32("gNavi_Enemy_Outer_G", 220)/255;
-        navi_enemy_o_col[2] = (float)CVar_GetS32("gNavi_Enemy_Outer_B", 0)/255;
-        navi_prop_i_col[0] = (float)CVar_GetS32("gNavi_Prop_Inner_R", 0)/255;
-        navi_prop_i_col[1] = (float)CVar_GetS32("gNavi_Prop_Inner_G", 255)/255;
-        navi_prop_i_col[2] = (float)CVar_GetS32("gNavi_Prop_Inner_B", 0)/255;
-        navi_prop_o_col[0] = (float)CVar_GetS32("gNavi_Prop_Outer_R", 0)/255;
-        navi_prop_o_col[1] = (float)CVar_GetS32("gNavi_Prop_Outer_G", 220)/255;
-        navi_prop_o_col[2] = (float)CVar_GetS32("gNavi_Prop_Outer_B", 0)/255;
-        FPSCounter[0] = (float)CVar_GetS32("gFPSCounterR", 255)/255;
-        FPSCounter[1] = (float)CVar_GetS32("gFPSCounterG", 255)/255;
-        FPSCounter[2] = (float)CVar_GetS32("gFPSCounterB", 255)/255;
-        FPSCounter[3] = (float)CVar_GetS32("gFPSCounterA", 255)/255;
-        if (CVar_GetS32("gHudColors", 1) ==0) {
-            SelectedHUD = 0;
-        } else if (CVar_GetS32("gHudColors", 1) == 1) {
-            SelectedHUD = 1;
-        } else if (CVar_GetS32("gHudColors", 1) == 2) {
-            SelectedHUD = 2;
-        }
-    }
-
     void LoadResource(const std::string& name, const std::string& path, const ImVec4& tint) {
         GfxRenderingAPI* api = gfx_get_current_rendering_api();
         const auto res = static_cast<Ship::Texture*>(GlobalCtx2::GetInstance()->GetResourceManager()->LoadResource(path).get());
@@ -366,6 +307,68 @@ namespace SohImGui {
         api->upload_texture(texBuffer.data(), res->width, res->height);
 
         DefaultAssets[name] = asset;
+    }
+
+    void LoadRainbowColor() {
+        for (uint16_t s=0; s <= sizeof(RainbowColorCvarList); s++) {
+            std::string cvarName = RainbowColorCvarList[s];
+            std::string Cvar_Red = cvarName;
+            Cvar_Red += "R";
+            std::string Cvar_Green = cvarName;
+            Cvar_Green += "G";
+            std::string Cvar_Blue = cvarName;
+            Cvar_Blue += "B";
+            std::string Cvar_RBM = cvarName;
+            Cvar_RBM += "RBM";
+            std::string RBM_HUE = cvarName;
+            RBM_HUE+="Hue";
+            f32 Canon = 10.f*s;
+            ImVec4 NewColor;
+            const f32 deltaTime = 1.0f / ImGui::GetIO().Framerate;
+            f32 hue = CVar_GetFloat(RBM_HUE.c_str(), 0.0f);
+            f32 newHue = hue + CVar_GetS32("gColorRainbowSpeed", 1) * 36.0f * deltaTime;
+            if (newHue >= 360)
+                newHue = 0;
+            CVar_SetFloat(RBM_HUE.c_str(), newHue);
+            f32 current_hue = CVar_GetFloat(RBM_HUE.c_str(), 0);
+            u8 i = current_hue / 60 + 1;
+            u8 a = (-current_hue / 60.0f + i) * 255;
+            u8 b = (current_hue / 60.0f + (1 - i)) * 255;
+            
+            switch (i) {
+                case 1: NewColor.x = 255; NewColor.y = b; NewColor.z = 0; break;
+                case 2: NewColor.x = a; NewColor.y = 255; NewColor.z = 0; break;
+                case 3: NewColor.x = 0; NewColor.y = 255; NewColor.z = b; break;
+                case 4: NewColor.x = 0; NewColor.y = a; NewColor.z = 255; break;
+                case 5: NewColor.x = b; NewColor.y = 0; NewColor.z = 255; break;
+                case 6: NewColor.x = 255; NewColor.y = 0; NewColor.z = a; break;
+            }
+
+            if(CVar_GetS32(Cvar_RBM.c_str(), 0) != 0) {
+                CVar_SetS32(Cvar_Red.c_str(), ClampFloatToInt(NewColor.x,0,255));
+                CVar_SetS32(Cvar_Green.c_str(), ClampFloatToInt(NewColor.y,0,255));
+                CVar_SetS32(Cvar_Blue.c_str(), ClampFloatToInt(NewColor.z,0,255));
+            }
+        }
+    }
+
+    void LoadPickersColors(ImVec4& ColorArray, const char* cvarname, const ImVec4& default_colors, bool has_alpha) {
+        std::string Cvar_Red = cvarname;
+        Cvar_Red += "R";
+        std::string Cvar_Green = cvarname;
+        Cvar_Green += "G";
+        std::string Cvar_Blue = cvarname;
+        Cvar_Blue += "B";
+        std::string Cvar_Alpha = cvarname;
+        Cvar_Alpha += "A";
+
+        ColorArray.x = (float)CVar_GetS32(Cvar_Red.c_str(), default_colors.x)/255;
+        ColorArray.y = (float)CVar_GetS32(Cvar_Green.c_str(), default_colors.y)/255;
+        ColorArray.z = (float)CVar_GetS32(Cvar_Blue.c_str(), default_colors.z)/255;
+        
+        if (has_alpha) {
+            ColorArray.w = (float)CVar_GetS32(Cvar_Alpha.c_str(), default_colors.w)/255;
+        }
     }
 
     void Init(WindowImpl window_impl) {
@@ -420,6 +423,7 @@ namespace SohImGui {
     }
 
     void Update(EventImpl event) {
+
         if (needs_save) {
             Game::SaveSettings();
             needs_save = false;
@@ -474,15 +478,22 @@ namespace SohImGui {
             EnhancementRadioButton("German", "gLanguages", 1);
             EnhancementRadioButton("French", "gLanguages", 2);
         */
+        std::string make_invisible = "##";
+        make_invisible += text;
+        make_invisible += cvarName;
+        
         int val = CVar_GetS32(cvarName, 0);
-        if (ImGui::RadioButton(text, id == val)) {
+        if (ImGui::RadioButton(make_invisible.c_str(), id == val)) {
             CVar_SetS32(cvarName, id);
             needs_save = true;
         }
+        ImGui::SameLine();
+        ImGui::Text("%s", text);
     }
 
     void EnhancementCheckbox(const char* text, const char* cvarName) {
         bool val = (bool)CVar_GetS32(cvarName, 0);
+
         if (ImGui::Checkbox(text, &val)) {
             CVar_SetS32(cvarName, val);
             needs_save = true;
@@ -546,41 +557,120 @@ namespace SohImGui {
         }
     }
 
-    int ClampFloatToInt(float value, int min, int max){
-        return fmin(fmax(value,min),max);
+    void RandomizeColor(const char* cvarName, ImVec4* colors) {
+        std::string Cvar_Red = cvarName;
+        Cvar_Red += "R";
+        std::string Cvar_Green = cvarName;
+        Cvar_Green += "G";
+        std::string Cvar_Blue = cvarName;
+        Cvar_Blue += "B";
+        std::string Cvar_RBM = cvarName;
+        Cvar_RBM += "RBM";
+        std::string MakeInvisible = "##";
+        MakeInvisible += cvarName;
+        MakeInvisible += "Random";
+        std::string FullName = "Random";
+        FullName+=MakeInvisible;
+        if (ImGui::Button(FullName.c_str())) {
+            s16 RND_R = rand() % (255 - 0);
+            s16 RND_G = rand() % (255 - 0);
+            s16 RND_B = rand() % (255 - 0);
+            colors->x = (float)RND_R/255;
+            colors->y = (float)RND_G/255;
+            colors->z = (float)RND_B/255;
+            CVar_SetS32(Cvar_Red.c_str(), ClampFloatToInt(colors->x*255,0,255));
+            CVar_SetS32(Cvar_Green.c_str(), ClampFloatToInt(colors->y*255,0,255));
+            CVar_SetS32(Cvar_Blue.c_str(), ClampFloatToInt(colors->z*255,0,255));
+            CVar_SetS32(Cvar_RBM.c_str(), 0); //On click disable rainbow mode.
+            needs_save = true;
+        }
+        Tooltip("Clicking this button will make a random color for the colors at it's right.\nPrevious color will be overwrite and will not be recoverable");
+    }
+    
+    void RainbowColor(const char* cvarName, ImVec4* colors) {
+        std::string Cvar_RBM = cvarName;
+        Cvar_RBM += "RBM";
+        std::string MakeInvisible = "Rainbow";
+        MakeInvisible += "##";
+        MakeInvisible += cvarName;
+        MakeInvisible += "Rainbow";
+
+        EnhancementCheckbox(MakeInvisible.c_str(), Cvar_RBM.c_str());
+        Tooltip("Clicking this button will make color cycling\nPrevious color will be overwrite and will not be recoverable");
     }
 
-    void EnhancementColor3(const char* text, const char* cvarName, float ColorRGB[3], bool TitleSameLine) {
-        //Simplified.
+    void ResetColor(const char* cvarName, ImVec4* colors, ImVec4 defaultcolors, bool has_alpha) {
+        std::string Cvar_Red = cvarName;
+        Cvar_Red += "R";
+        std::string Cvar_Green = cvarName;
+        Cvar_Green += "G";
+        std::string Cvar_Blue = cvarName;
+        Cvar_Blue += "B";
+        std::string Cvar_Alpha = cvarName;
+        Cvar_Alpha += "A";
+        std::string Cvar_RBM = cvarName;
+        Cvar_RBM += "RBM";
+        std::string MakeInvisible = "Reset";
+        MakeInvisible += "##";
+        MakeInvisible += cvarName;
+        MakeInvisible += "Reset";
+        if (ImGui::Button(MakeInvisible.c_str())) {
+            colors->x = defaultcolors.x/255;
+            colors->y = defaultcolors.y/255;
+            colors->z = defaultcolors.z/255;
+            if (has_alpha) { colors->w = defaultcolors.w/255;};
+            CVar_SetS32(Cvar_Red.c_str(), ClampFloatToInt(colors->x*255,0,255));
+            CVar_SetS32(Cvar_Green.c_str(), ClampFloatToInt(colors->y*255,0,255));
+            CVar_SetS32(Cvar_Blue.c_str(), ClampFloatToInt(colors->z*255,0,255));
+            if (has_alpha) { CVar_SetS32(Cvar_Alpha.c_str(), ClampFloatToInt(colors->w*255,0,255)); };
+            CVar_SetS32(Cvar_RBM.c_str(), 0); //On click disable rainbow mode.
+            needs_save = true;
+        }
+        Tooltip("Clicking this button will to the game original color (GameCube version)\nPrevious color will be overwrite and will not be recoverable");
+    }
+
+    void EnhancementColor(const char* text, const char* cvarName, ImVec4 ColorRGBA, ImVec4 default_colors, bool has_alpha, bool TitleSameLine) {
+        std::string Cvar_Red = cvarName;
+        Cvar_Red += "R";
+        std::string Cvar_Green = cvarName;
+        Cvar_Green += "G";
+        std::string Cvar_Blue = cvarName;
+        Cvar_Blue += "B";
+        std::string Cvar_Alpha = cvarName;
+        Cvar_Alpha += "A";
+        std::string Cvar_RBM = cvarName;
+        Cvar_RBM += "RBM";
+
+        LoadPickersColors(ColorRGBA, cvarName, default_colors, has_alpha);
         ImGuiColorEditFlags flags = ImGuiColorEditFlags_None;
+
         if (!TitleSameLine){
             ImGui::Text("%s", text);
             flags = ImGuiColorEditFlags_NoLabel;
         }
-        std::string cvarNameStr(cvarName);
-        if (ImGui::ColorEdit3(text, ColorRGB, flags)) {
-            CVar_SetS32((cvarNameStr+"R").c_str(), ClampFloatToInt(ColorRGB[0]*255,0,255));
-            CVar_SetS32((cvarNameStr+"G").c_str(), ClampFloatToInt(ColorRGB[1]*255,0,255));
-            CVar_SetS32((cvarNameStr+"B").c_str(), ClampFloatToInt(ColorRGB[2]*255,0,255));
-            needs_save = true;
+        if (!has_alpha) {
+            if (ImGui::ColorEdit3(text, (float *)&ColorRGBA, flags)) {
+                CVar_SetS32(Cvar_Red.c_str(), ClampFloatToInt(ColorRGBA.x*255,0,255));
+                CVar_SetS32(Cvar_Green.c_str(), ClampFloatToInt(ColorRGBA.y*255,0,255));
+                CVar_SetS32(Cvar_Blue.c_str(), ClampFloatToInt(ColorRGBA.z*255,0,255));
+                needs_save = true;
+            }
+        } else {
+            if (ImGui::ColorEdit4(text, (float *)&ColorRGBA, flags)) {
+                CVar_SetS32(Cvar_Red.c_str(), ClampFloatToInt(ColorRGBA.x*255,0,255));
+                CVar_SetS32(Cvar_Green.c_str(), ClampFloatToInt(ColorRGBA.y*255,0,255));
+                CVar_SetS32(Cvar_Blue.c_str(), ClampFloatToInt(ColorRGBA.z*255,0,255));
+                CVar_SetS32(Cvar_Alpha.c_str(), ClampFloatToInt(ColorRGBA.w*255,0,255));
+                needs_save = true;
+            }
         }
-    }
 
-    void EnhancementColor4(const char* text, const char* cvarName, float ColorRGBA[4], bool TitleSameLine) {
-        //If you do not need Alpha channel use 3 Variant !
-        ImGuiColorEditFlags flags = ImGuiColorEditFlags_None;
-        if (!TitleSameLine){
-            ImGui::Text("%s", text);
-            flags = ImGuiColorEditFlags_NoLabel;
-        }
-        std::string cvarNameStr(cvarName);
-        if (ImGui::ColorEdit4(text, ColorRGBA, flags)) {
-            CVar_SetS32((cvarNameStr+"R").c_str(), ClampFloatToInt(ColorRGBA[0]*255,0,255));
-            CVar_SetS32((cvarNameStr+"G").c_str(), ClampFloatToInt(ColorRGBA[1]*255,0,255));
-            CVar_SetS32((cvarNameStr+"B").c_str(), ClampFloatToInt(ColorRGBA[2]*255,0,255));
-            CVar_SetS32((cvarNameStr+"A").c_str(), ClampFloatToInt(ColorRGBA[3]*255,0,255));
-            needs_save = true;
-        }
+        ImGui::SameLine();
+        ResetColor(cvarName, &ColorRGBA, default_colors, has_alpha);
+        ImGui::SameLine();
+        RandomizeColor(cvarName, &ColorRGBA);
+        ImGui::SameLine();
+        RainbowColor(cvarName, &ColorRGBA);
     }
 
     void Tooltip(const char* text) {
@@ -594,7 +684,6 @@ namespace SohImGui {
         ImGuiBackendNewFrame();
         ImGuiWMNewFrame();
         ImGui::NewFrame();
-        LoadInterfaceEditor();
 
         const std::shared_ptr<Window> wnd = GlobalCtx2::GetInstance()->GetWindow();
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBackground |
@@ -701,6 +790,34 @@ namespace SohImGui {
                 Tooltip("Activates anti-aliasing when above 1, up to 8x for 8 samples for every pixel");
                 gfx_msaa_level = CVar_GetS32("gMSAAValue", 1);
 
+                if (impl.backend == Backend::DX11)
+                {
+                    const char* cvar = "gExtraLatencyThreshold";
+                    int val = CVar_GetS32(cvar, 80);
+                    val = MAX(MIN(val, 250), 0);
+                    int fps = val;
+
+                    if (fps == 0)
+                    {
+                        ImGui::Text("Jitter fix: Off");
+                    }
+                    else
+                    {
+                        ImGui::Text("Jitter fix: >= %d FPS", fps);
+                    }
+
+                    if (ImGui::SliderInt("##ExtraLatencyThreshold", &val, 0, 250, "", ImGuiSliderFlags_AlwaysClamp))
+                    {
+                        CVar_SetS32(cvar, val);
+                        needs_save = true;
+                    }
+
+                    Tooltip("When Interpolation FPS setting is at least this threshold,\n"
+                            "add one frame of input lag (e.g. 16.6 ms for 60 FPS) in order to avoid jitter.\n"
+                            "This setting allows the CPU to work on one frame while GPU works on the previous frame.\n"
+                            "This setting should be used when your computer is too slow to do CPU + GPU work in time.");
+                }
+
                 EXPERIMENTAL();
                 ImGui::Text("Texture Filter (Needs reload)");
                 EnhancementCombobox("gTextureFilter", filters);
@@ -756,6 +873,12 @@ namespace SohImGui {
                     Tooltip("Allows you to change the number of days it takes for Biggoron to forge the Biggoron Sword");
                     EnhancementCheckbox("Keep mask equiped between zones", "gKeepMask");
                     Tooltip("With this Masks will stay equiped what ever you change maps\nenter an house etc.");
+                    EnhancementCheckbox("Pause menu progress page", "gKaleidoProgress");
+                    Tooltip("Press C-Up in pause menu to open a progress page menu.");
+                    if (CVar_GetS32("gKaleidoProgress", 0) != 0) {
+                        EnhancementCheckbox("Colored labels progress page", "gKaleidoProgressColored");
+                        Tooltip("Color the labels of Progress page to match their theme.");
+                    }
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Graphics")) {
@@ -764,9 +887,12 @@ namespace SohImGui {
                     EnhancementCheckbox("Disable Black Bar Letterboxes", "gDisableBlackBars");
                     Tooltip("Disables Black Bar Letterboxes during cutscenes and Z-targeting");
                     if (ImGui::BeginMenu("Animated Link in Pause Menu")) {
-                        EnhancementCheckbox("Rotate Link with D-pad", "gPauseLiveLinkRotation");
+                        EnhancementRadioButton("Disabled", "gPauseLiveLinkRotation", 0);
+                        EnhancementRadioButton("Rotate Link with D-pad", "gPauseLiveLinkRotation", 1);
                         Tooltip("Allow you to rotate Link on the Equipment menu with the DPAD\nUse DPAD-Up or DPAD-Down to reset Link's rotation");
-                        if (CVar_GetS32("gPauseLiveLinkRotation", 0) == 1) {
+                        EnhancementRadioButton("Rotate Link with C-buttons", "gPauseLiveLinkRotation", 2);
+                        Tooltip("Allow you to rotate Link on the Equipment menu with the C-buttons\nUse C-Up or C-Down to reset Link's rotation");
+                        if (CVar_GetS32("gPauseLiveRotation", 0) != 0) {
                             EnhancementSliderInt("Rotation Speed: %d", "##MinRotationSpeed", "gPauseLiveLinkRotationSpeed", 1, 20, "");
                         }
                         ImGui::Separator();
@@ -800,15 +926,24 @@ namespace SohImGui {
                     }
                     EnhancementCheckbox("Enable 3D Dropped items", "gNewDrops");
                     Tooltip("Most of 2D dropped stuffs will show in 3D of their version");
+                    EnhancementCheckbox("Enable 3D projectiles", "gNewProjectiles");
+                    Tooltip("Change most of monster projectiles to their 3D variants");
+                    EnhancementCheckbox("Enable 3D Link's items", "gNewItems");
+                    Tooltip("Change the items that are in 2D to their 3D variants");
                     EnhancementCheckbox("Faster Block Push", "gFasterBlockPush");
                     Tooltip("Link will push faster Block and other stuffs");
                     EnhancementCheckbox("Dynamic Wallet Icon", "gDynamicWalletIcon");
                     Tooltip("Changes the rupee in the wallet icon to match the wallet size you currently have");
                     EnhancementCheckbox("Always show dungeon entrances", "gAlwaysShowDungeonMinimapIcon");
                     Tooltip("Always shows dungeon entrance icons on the minimap");
+                    EnhancementCheckbox("Disable Draw Distance", "gDisableDrawDistance");
+                    Tooltip("Turns off the draw distance limitation, making objects visible from further away");
+                    if (CVar_GetS32("gDisableDrawDistance", 0) == 1) {
+                        EnhancementCheckbox("Kokiri Draw Distance", "gDisableKokiriDrawDistance");
+                        Tooltip("Kokiri are mystical beings that only appear from a certain distance away\nEnabling this will remove their draw distance limitation\nRequires reloading the map to take effect");
+                    }
                     ImGui::EndMenu();
                 }
-
                 if (ImGui::BeginMenu("Fixes")) {
                     EnhancementCheckbox("Fix L&R Pause menu", "gUniformLR");
                     Tooltip("Makes the L and R buttons in the pause menu the same color");
@@ -822,13 +957,54 @@ namespace SohImGui {
                     Tooltip("Prevents the Forest Stage Deku Nut upgrade from becoming unobtainable after receiving the Poacher's Saw");
                     EnhancementCheckbox("Fix the Gravedigging Tour Glitch", "gGravediggingTourFix");
                     Tooltip("Fixes a bug where you can permanently miss the Gravedigging Tour Heart Piece");
+                    EnhancementCheckbox("Fix Navi text HUD position", "gNaviTextFix");
+                    Tooltip("Correctly centers the Navi text prompt on the HUD's C-Up button");
                     ImGui::EndMenu();
                 }
 
                 EXPERIMENTAL();
 
-                EnhancementCheckbox("60FPS Interpolation", "g60FPS");
-                Tooltip("60 FPS for us peasant, enjoy :D");
+                const char* fps_cvar = "gInterpolationFPS";
+                {
+                    int val = CVar_GetS32(fps_cvar, 20);
+                    val = MAX(MIN(val, 250), 20);
+                    int fps = val;
+
+                    if (fps == 20)
+                    {
+                        ImGui::Text("Frame interpolation: Off");
+                        Tooltip("20 fps really ? rease them really !");
+                    }
+                    else
+                    {
+                        ImGui::Text("Frame interpolation: %d FPS", fps);
+                    }
+
+                    if (ImGui::SliderInt("##FPSInterpolation", &val, 20, 250, "", ImGuiSliderFlags_AlwaysClamp))
+                    {
+                        CVar_SetS32(fps_cvar, val);
+                        needs_save = true;
+                    }
+
+                    Tooltip("Interpolate extra frames to get smoother graphics.\n"
+                        "Set to match your monitor's refresh rate, or a divisor of it.\n"
+                        "A higher target FPS than your monitor's refresh rate will just waste resources,\n"
+                        "and might give a worse result.\n"
+                        "For consistent input lag, set this value and your monitor's refresh rate to a multiple of 20.\n"
+                        "Ctrl+Click for keyboard input.");
+                }
+                if (impl.backend == Backend::DX11)
+                {
+                    if (ImGui::Button("Match Refresh Rate"))
+                    {
+                        int hz = roundf(gfx_get_detected_hz());
+                        if (hz >= 20 && hz <= 250)
+                        {
+                            CVar_SetS32(fps_cvar, hz);
+                            needs_save = true;
+                        }
+                    }
+                }
                 EnhancementCheckbox("Disable LOD", "gDisableLOD");
                 Tooltip("Turns off the level of detail setting, making models always use their higher poly variants");
                 ImGui::EndMenu();
@@ -894,10 +1070,13 @@ namespace SohImGui {
 
             if (ImGui::BeginMenu("Developer Tools"))
             {
+                //EnhancementSliderInt("Top | Bottom : %d", "##DEBUGSLIDERY", "gDBGPOSY", 25, 400, ""); //Do not enable them these are random slider I use to test various stuff when I am doing some things :)
+                //EnhancementSliderInt("Left | Right : %d", "##DEBUGSLIDERX", "gDBGPOSX", 100, 400, "");
+                //EnhancementSliderFloat("SCALE : %d", "##DEBUGSCALE", "gDBGScale", 0.01f, 10.0f, "", 1.0f, true);
                 if (ImGui::BeginMenu("FPS Counter")) {
                     EnhancementCheckbox("Show FPS counter", "gDebugFPSCounterEnabled");
                     Tooltip("FPS Counter for PC Master Race users.");
-                    EnhancementColor4("FPS Counter color", "gFPSCounter", FPSCounter, false);
+                    EnhancementColor("FPS Counter color", "gFPSCounter", FPSCounter, ImVec4(255,255,255,255), true);
                     ImGui::Separator();
                     ImGui::Text("Position");
                     EnhancementSliderInt("Top | Bottom : %d", "##FPSCounterPosY", "gFPSCounterPosY", 0, gfx_current_game_window_viewport.height, "");
@@ -957,37 +1136,43 @@ namespace SohImGui {
                     if (ImGui::BeginTabItem("Navi")) {
                         EnhancementCheckbox("Custom colors for Navi", "gUseNaviCol");
                         Tooltip("Enable/Disable custom Navi's colors. \nIf disabled you will have original colors for Navi.\nColors are refreshed when Navi goes back in your pockets");
-                        EnhancementColor3("Navi Idle Inner", "gNavi_Idle_Inner_", navi_idle_i_col, false);
+                        EnhancementColor("Navi Idle Inner", "gNavi_Idle_Inner_", navi_idle_i_col, ImVec4(255,255,255,255));
                         Tooltip("Inner color for Navi (idle flying around)");
-                        EnhancementColor3("Navi Idle Outer", "gNavi_Idle_Outer_", navi_idle_o_col, false);
+                        EnhancementColor("Navi Idle Outer", "gNavi_Idle_Outer_", navi_idle_o_col, ImVec4(115,230,255,255));
                         Tooltip("Outer color for Navi (idle flying around)");
                         ImGui::Separator();
-                        EnhancementColor3("Navi NPC Inner", "gNavi_NPC_Inner_", navi_npc_i_col, false);
+                        EnhancementColor("Navi NPC Inner", "gNavi_NPC_Inner_", navi_npc_i_col, ImVec4(100,100,255,255));
                         Tooltip("Inner color for Navi (when Navi fly around NPCs)");
-                        EnhancementColor3("Navi NPC Outer", "gNavi_NPC_Outer_", navi_npc_o_col, false);
+                        EnhancementColor("Navi NPC Outer", "gNavi_NPC_Outer_", navi_npc_o_col, ImVec4(90,90,255,255));
                         Tooltip("Outer color for Navi (when Navi fly around NPCs)");
                         ImGui::Separator();
-                        EnhancementColor3("Navi Enemy Inner", "gNavi_Enemy_Inner_", navi_enemy_i_col, false);
+                        EnhancementColor("Navi Enemy Inner", "gNavi_Enemy_Inner_", navi_enemy_i_col, ImVec4(255,255,0,255));
                         Tooltip("Inner color for Navi (when Navi fly around Enemies or Bosses)");
-                        EnhancementColor3("Navi Enemy Outer", "gNavi_Enemy_Outer_", navi_enemy_o_col, false);
+                        EnhancementColor("Navi Enemy Outer", "gNavi_Enemy_Outer_", navi_enemy_o_col, ImVec4(220,220,0,255));
                         Tooltip("Outer color for Navi (when Navi fly around Enemies or Bosses)");
                         ImGui::Separator();
-                        EnhancementColor3("Navi Prop Inner", "gNavi_Prop_Inner_", navi_prop_i_col, false);
+                        EnhancementColor("Navi Prop Inner", "gNavi_Prop_Inner_", navi_prop_i_col, ImVec4(0,255,0,255));
                         Tooltip("Inner color for Navi (when Navi fly around props (signs etc))");
-                        EnhancementColor3("Navi Prop Outer", "gNavi_Prop_Outer_", navi_prop_o_col, false);
+                        EnhancementColor("Navi Prop Outer", "gNavi_Prop_Outer_", navi_prop_o_col, ImVec4(0,220,0,255));
                         Tooltip("Outer color for Navi (when Navi fly around props (signs etc))");
                         ImGui::EndTabItem();
                     }
-                    if (ImGui::BeginTabItem("Tunics")) {
+                    if (ImGui::BeginTabItem("Link's Equipments")) {
                         EnhancementCheckbox("Custom colors on tunics", "gUseTunicsCol");
                         Tooltip("Enable/Disable custom Link's tunics colors. \nIf disabled you will have original colors for Link's tunics");
-                        EnhancementColor3("Kokiri Tunic", "gTunic_Kokiri_", kokiri_col, false);
+                        EnhancementColor("Kokiri Tunic", "gTunic_Kokiri_", kokiri_col, ImVec4(30,105,27,255));
                         ImGui::Separator();
-                        EnhancementColor3("Goron Tunic", "gTunic_Goron_", goron_col, false);
+                        EnhancementColor("Goron Tunic", "gTunic_Goron_", goron_col, ImVec4(100,20,0,255));
                         ImGui::Separator();
-                        EnhancementColor3("Zora Tunic", "gTunic_Zora_", zora_col, false);
+                        EnhancementColor("Zora Tunic", "gTunic_Zora_", zora_col, ImVec4(0,60,100,255));
+                        ImGui::Separator();
+                        EnhancementCheckbox("Custom Swords trails", "gUseTrailsCol");
+                        Tooltip("Enable/Disable custom Link's swords trails colors.");
+                        EnhancementColor("Trail colors", "gTrailCol", trailscol, ImVec4(255,255,255,255));
+                        EnhancementSliderInt("Trails duration: %dx", "##TrailsMul", "gTrailDurantion", 1, 5, "");
                         ImGui::EndTabItem();
                     }
+
                     ImGui::EndTabBar();
                 }
                 ImGui::PopStyleColor();
@@ -1001,38 +1186,58 @@ namespace SohImGui {
                 ImGui::Begin("Interface Editor", nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
                 if (ImGui::BeginTabBar("Interface Editor", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton)) {
                     if (ImGui::BeginTabItem("Hearts")) {
-                        EnhancementColor3("Hearts inner", "gCCHeartsPrim", hearts_colors, false);
+                        EnhancementColor("Hearts inner", "gCCHeartsPrim", hearts_colors, ImVec4(255,70,50,255));
                         Tooltip("Hearts inner color (red in original)\nAffect both Normal Hearts and the ones in Double Defense");
-                        EnhancementColor3("Hearts double def", "gDDCCHeartsPrim", hearts_dd_colors, false);
+                        EnhancementColor("Hearts double def", "gDDCCHeartsPrim", hearts_dd_colors, ImVec4(255,255,255,255));
                         Tooltip("Hearts outline color (white in original)\nAffect Double Defense outline only");
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Buttons")) {
-                        EnhancementColor3("A Buttons", "gCCABtnPrim", a_btn_colors, false);
+                        EnhancementColor("A Buttons", "gCCABtnPrim", a_btn_colors, ImVec4(90,90,255,255));
                         Tooltip("A Buttons colors (Green in original Gamecube)\nAffect A buttons colors on interface, in shops, messages boxes, ocarina notes and inventory cursors");
-                        EnhancementColor3("B Buttons", "gCCBBtnPrim", b_btn_colors, false);
+                        EnhancementColor("B Buttons", "gCCBBtnPrim", b_btn_colors, ImVec4(0,150,0,255));
                         Tooltip("B Button colors (Red in original Gamecube)\nAffect B button colors on interface");
-                        EnhancementColor3("C Buttons", "gCCCBtnPrim", c_btn_colors, false);
-                        Tooltip("C Buttons colors (Yellowish / Oranges in originals)\nAffect C buttons colors on interface, in inventory and ocarina notes");
-                        EnhancementColor3("Start Buttons", "gCCStartBtnPrim", start_btn_colors, false);
+                        EnhancementColor("C Buttons & C Cursor", "gCCCBtnPrim", c_btn_colors, ImVec4(255,160,0,255));
+                        Tooltip("C Buttons colors (Yellowish / Oranges in originals)\nAffect C buttons colors on interface, in inventory cursor and ocarina notes");
+                        EnhancementCheckbox("C Button use separated colors", "gCCparated");
+                        if (CVar_GetS32("gCCparated",0)) {
+                            EnhancementColor("C Buttons Up", "gCCCUBtnPrim", c_btn_u_colors, ImVec4(255,160,0,255));
+                            Tooltip("C Up Buttons colors (Yellowish / Oranges in originals)\nAffect C Up buttons colors on interface, in inventory and ocarina notes");
+                            EnhancementColor("C Buttons Down", "gCCCDBtnPrim", c_btn_d_colors, ImVec4(255,160,0,255));
+                            Tooltip("C Down Buttons colors (Yellowish / Oranges in originals)\nAffect C Down buttons colors on interface, in inventory and ocarina notes");
+                            EnhancementColor("C Buttons Left", "gCCCLBtnPrim", c_btn_l_colors, ImVec4(255,160,0,255));
+                            Tooltip("C Left Buttons colors (Yellowish / Oranges in originals)\nAffect C Left buttons colors on interface, in inventory and ocarina notes");
+                            EnhancementColor("C Buttons Right", "gCCCRBtnPrim", c_btn_r_colors, ImVec4(255,160,0,255));
+                            Tooltip("C Right Buttons colors (Yellowish / Oranges in originals)\nAffect C Right buttons colors on interface, in inventory and ocarina notes");
+                            ImGui::Separator();
+                        }
+                        EnhancementColor("Start Buttons", "gCCStartBtnPrim", start_btn_colors, ImVec4(120,120,120,255));
                         Tooltip("Start Button colors (gray in Gamecube)\nAffect Start button colors in inventory");
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Magic Bar")) {
-                        EnhancementColor3("Magic bar borders", "gCCMagicBorderPrim", magic_border_colors, false);
+                        EnhancementColor("Magic bar borders", "gCCMagicBorderNormPrim", magic_bordern_colors, ImVec4(255,255,255,255), false);
+                        Tooltip("Affect the border of the magic bar\nWhite in original game, color change only when used one time\nAdvice: Leave it white it is not working properly");
+                        EnhancementColor("Magic bar borders being used", "gCCMagicBorderPrim", magic_border_colors, ImVec4(255,255,255,255), false);
                         Tooltip("Affect the border of the magic bar when being used\nWhite flash in original game");
-                        EnhancementColor3("Magic bar main color", "gCCMagicPrim", magic_remaining_colors, false);
+                        EnhancementColor("Magic bar main color", "gCCMagicPrim", magic_remaining_colors, ImVec4(0,200,0,255));
                         Tooltip("Affect the magic bar color\nGreen in original game");
-                        EnhancementColor3("Magic bar being used", "gCCMagicUsePrim", magic_use_colors, false);
+                        EnhancementColor("Magic bar being used", "gCCMagicUsePrim", magic_use_colors, ImVec4(250,250,0,255));
                         Tooltip("Affect the magic bar when being used\nYellow in original game");
                         ImGui::EndTabItem();
                     }
+                    //if (ImGui::BeginTabItem("Menu")) {
+                        
+                        //EnhancementColor3("Files Select color", "gCCFileSelectPrim", MenuColor_FileSelect, false);
+                        //Tooltip("Affect the background of the menu File Select");
+                        //ImGui::EndTabItem();
+                    //}
                     if (ImGui::BeginTabItem("Misc")) {
-                        EnhancementColor3("Minimap color", "gCCMinimapPrim", minimap_colors, false);
+                        EnhancementColor("Minimap color", "gCCMinimapPrim", minimap_colors, ImVec4(0,255,255,255));
                         Tooltip("Affect the Dungeon and Overworld minimaps");
-                        EnhancementColor3("Rupee icon color", "gCCRupeePrim", rupee_colors, false);
-                        Tooltip("Affect the Rupee icon on interface\nGreen by default");
-                        EnhancementColor3("Small Keys icon color", "gCCKeysPrim", smolekey_colors, false);
+                        EnhancementColor("Rupee icon color", "gCCRupeePrim", rupee_colors, ImVec4(120,120,120,255));
+                        Tooltip("Affect the Rupee icon on interface\nGreen by default, if you use Dynamic Wallet mods it will overwrite this one\nTo use custom rupee icon disable Dynamic Wallet");
+                        EnhancementColor("Small Keys icon color", "gCCKeysPrim", smolekey_colors, ImVec4(200,230,255,255));
                         Tooltip("Affect the Small keys icon on interface\nGray by default");
                         ImGui::EndTabItem();
                     }
@@ -1054,7 +1259,7 @@ namespace SohImGui {
                 float PosX = CVar_GetS32("gFPSCounterPosX", 0);
                 float PosY = CVar_GetS32("gFPSCounterPosY", 0);
                 ImGui::SetWindowPos(ImVec2{PosX,PosY},0);
-                SohImGui::overlay->TextDraw(0,0,true,ImVec4{FPSCounter[0],FPSCounter[1],FPSCounter[2],FPSCounter[3]}," %.1f FPS", framerate);
+                SohImGui::overlay->TextDraw(0,0,true,ImVec4 {CVar_GetS32("gFPSCounterR",255),CVar_GetS32("gFPSCounterG",255),CVar_GetS32("gFPSCounterB",255),CVar_GetS32("gFPSCounterA",255)}," %.1f FPS", framerate);
                 ImGui::End();
             }
             
@@ -1213,6 +1418,7 @@ namespace SohImGui {
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
+        LoadRainbowColor();
     }
 
     void CancelFrame() {

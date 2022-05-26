@@ -36,4 +36,6 @@ void PauseMapMark_Draw(GlobalContext* globalCtx);
 
 void KaleidoScope_UpdateCursorSize(PauseContext* pauseCtx);
 
+void KaleidoScope_ProgressPage(GlobalContext* globalCtx);
+
 #endif

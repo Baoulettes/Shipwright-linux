@@ -7,6 +7,8 @@
 #include "z_en_bom.h"
 #include "overlays/effects/ovl_Effect_Ss_Dead_Sound/z_eff_ss_dead_sound.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "objects/object_gi_bomb_1/object_gi_bomb_1.h"
+#include "objects/object_goroiwa/object_goroiwa.h"
 
 #define FLAGS (ACTOR_FLAG_4 | ACTOR_FLAG_5)
 
@@ -17,6 +19,8 @@ void EnBom_Draw(Actor* thisx, GlobalContext* globalCtx);
 
 void EnBom_Move(EnBom* this, GlobalContext* globalCtx);
 void EnBom_WaitForRelease(EnBom* this, GlobalContext* globalCtx);
+
+s16 ScaleAdd;
 
 const ActorInit En_Bom_InitVars = {
     ACTOR_EN_BOM,
@@ -363,24 +367,38 @@ void EnBom_Draw(Actor* thisx, GlobalContext* globalCtx) {
     if (1) {}
 
     OPEN_DISPS(globalCtx->state.gfxCtx, "../z_en_bom.c", 913);
+    if (CVar_GetS32("gNewItems", 0) != 0) {
+        if (thisx->params == BOMB_BODY) {
+            gDPPipeSync(POLY_OPA_DISP++);
+            func_80093D18(globalCtx->state.gfxCtx);
+            func_8002EBCC(&this->actor, globalCtx, 0);
+            gDPSetEnvColor(POLY_OPA_DISP++, (s16)this->flashIntensity, 0, 40, 255);
+            gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, (s16)this->flashIntensity, 0, 40, 255);
+            Matrix_Scale(25.0f,25.0f,25.0f,MTXMODE_APPLY);
+            Matrix_RotateZYX(0, 0x4000, 0, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, __FILE__, __LINE__), G_MTX_MODELVIEW | G_MTX_LOAD);
+            //gSPDisplayList(POLY_OPA_DISP++, gGiBombDL);
+            Gfx_DrawDListOpa(globalCtx, gGiBombDL);
+            Collider_UpdateSpheres(0, &this->explosionCollider);
+        }
+    } else {
+        if (thisx->params == BOMB_BODY) {
+            func_80093D18(globalCtx->state.gfxCtx);
+            Matrix_ReplaceRotation(&globalCtx->billboardMtxF);
+            func_8002EBCC(thisx, globalCtx, 0);
 
-    if (thisx->params == BOMB_BODY) {
-        func_80093D18(globalCtx->state.gfxCtx);
-        Matrix_ReplaceRotation(&globalCtx->billboardMtxF);
-        func_8002EBCC(thisx, globalCtx, 0);
-
-        gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 928),
-                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        gSPDisplayList(POLY_OPA_DISP++, gBombCapDL);
-        Matrix_RotateZYX(0x4000, 0, 0, MTXMODE_APPLY);
-        gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 934),
-                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        gDPPipeSync(POLY_OPA_DISP++);
-        gDPSetEnvColor(POLY_OPA_DISP++, (s16)this->flashIntensity, 0, 40, 255);
-        gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, (s16)this->flashIntensity, 0, 40, 255);
-        gSPDisplayList(POLY_OPA_DISP++, gBombBodyDL);
-        Collider_UpdateSpheres(0, &this->explosionCollider);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 928),
+                    G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, gBombCapDL);
+            Matrix_RotateZYX(0x4000, 0, 0, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_bom.c", 934),
+                    G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gDPPipeSync(POLY_OPA_DISP++);
+            gDPSetEnvColor(POLY_OPA_DISP++, (s16)this->flashIntensity, 0, 40, 255);
+            gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, (s16)this->flashIntensity, 0, 40, 255);
+            gSPDisplayList(POLY_OPA_DISP++, gBombBodyDL);
+            Collider_UpdateSpheres(0, &this->explosionCollider);
+        }
     }
-
     CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_en_bom.c", 951);
 }

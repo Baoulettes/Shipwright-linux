@@ -6,6 +6,8 @@
 
 #include "z_en_arrow.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
+#include "objects/gameplay_field_keep/gameplay_field_keep.h"
+#include "objects/object_gi_nuts/object_gi_nuts.h"
 
 #define FLAGS (ACTOR_FLAG_4 | ACTOR_FLAG_5)
 
@@ -454,43 +456,75 @@ void EnArrow_Draw(Actor* thisx, GlobalContext* globalCtx) {
     EnArrow* this = (EnArrow*)thisx;
     u8 alpha;
     f32 scale;
-
-    if (this->actor.params <= ARROW_0E) {
-        func_80093D18(globalCtx->state.gfxCtx);
-        SkelAnime_DrawLod(globalCtx, this->skelAnime.skeleton, this->skelAnime.jointTable, NULL, NULL, this,
-                          (this->actor.projectedPos.z < MREG(95)) ? 0 : 1);
-    } else if (this->actor.speedXZ != 0.0f) {
-        alpha = (Math_CosS(this->timer * 5000) * 127.5f) + 127.5f;
-
-        OPEN_DISPS(globalCtx->state.gfxCtx, "../z_en_arrow.c", 1346);
-
-        func_80093C14(globalCtx->state.gfxCtx);
-
-        if (this->actor.params == ARROW_SEED) {
-            gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 255);
-            gDPSetEnvColor(POLY_XLU_DISP++, 0, 255, 255, alpha);
-            scale = 50.0f;
-        } else {
-            gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 12, 0, 0, 255);
-            gDPSetEnvColor(POLY_XLU_DISP++, 250, 250, 0, alpha);
-            scale = 150.0f;
+    if (CVar_GetS32("gNewItems", 0) != 0) {
+        
+        if (this->actor.params <= ARROW_0E) {
+            func_80093D18(globalCtx->state.gfxCtx);
+            SkelAnime_DrawLod(globalCtx, this->skelAnime.skeleton, this->skelAnime.jointTable, NULL, NULL, this,
+                            (this->actor.projectedPos.z < MREG(95)) ? 0 : 1);
+        } else if (this->actor.speedXZ != 0.0f) {
+            OPEN_DISPS(globalCtx->state.gfxCtx, __FILE__, __LINE__);
+            func_80093C14(globalCtx->state.gfxCtx);
+            if (this->actor.params == ARROW_SEED) {
+                func_80093D18(globalCtx->state.gfxCtx);
+                gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, 255, 255, 0, 255);
+                gDPSetEnvColor(POLY_OPA_DISP++, 250, 250, 0, 255);
+                Matrix_Scale(1.5f,1.5f,1.5f,MTXMODE_APPLY);
+                Matrix_RotateZ((this->actor.speedXZ == 0.0f) ? 0.0f : ((globalCtx->gameplayFrames & 0xFF) * 4000) * (M_PI / 0x8000), MTXMODE_APPLY);
+                gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, __FILE__, __LINE__),
+                        G_MTX_MODELVIEW | G_MTX_LOAD);
+                gSPDisplayList(POLY_OPA_DISP++, gSilverRockDL);
+            } else {
+                func_80093D18(globalCtx->state.gfxCtx);
+                gSPSegment(POLY_OPA_DISP++, 0x08,
+                Gfx_TwoTexScroll(globalCtx->state.gfxCtx, 0, 1 * (globalCtx->state.frames * 6),
+                                    1 * (globalCtx->state.frames * 6), 32, 32, 1, 1 * (globalCtx->state.frames * 6),
+                                    1 * (globalCtx->state.frames * 6), 32, 32));
+                Matrix_Scale(13.0f,13.0f,13.0f,MTXMODE_APPLY);
+                Matrix_RotateZ((this->actor.speedXZ == 0.0f) ? 0.0f : ((globalCtx->gameplayFrames & 0xFF) * 4000) * (M_PI / 0x8000), MTXMODE_APPLY);
+                gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, __FILE__, __LINE__),
+                        G_MTX_MODELVIEW | G_MTX_LOAD);
+                gSPDisplayList(POLY_OPA_DISP++, gGiNutDL);
+            }
+            CLOSE_DISPS(globalCtx->state.gfxCtx, __FILE__, __LINE__);
         }
+    } else {
+        if (this->actor.params <= ARROW_0E) {
+            func_80093D18(globalCtx->state.gfxCtx);
+            SkelAnime_DrawLod(globalCtx, this->skelAnime.skeleton, this->skelAnime.jointTable, NULL, NULL, this,
+                            (this->actor.projectedPos.z < MREG(95)) ? 0 : 1);
+        } else if (this->actor.speedXZ != 0.0f) {
+            alpha = (Math_CosS(this->timer * 5000) * 127.5f) + 127.5f;
 
-        Matrix_Push();
-        Matrix_Mult(&globalCtx->billboardMtxF, MTXMODE_APPLY);
-        // redundant check because this is contained in an if block for non-zero speed
-        Matrix_RotateZ((this->actor.speedXZ == 0.0f) ? 0.0f
-                                                     : ((globalCtx->gameplayFrames & 0xFF) * 4000) * (M_PI / 0x8000),
-                       MTXMODE_APPLY);
-        Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
-        gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_arrow.c", 1374),
-                  G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        gSPDisplayList(POLY_XLU_DISP++, gEffSparklesDL);
-        Matrix_Pop();
-        Matrix_RotateY(this->actor.world.rot.y * (M_PI / 0x8000), MTXMODE_APPLY);
+            OPEN_DISPS(globalCtx->state.gfxCtx, "../z_en_arrow.c", 1346);
 
-        CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_en_arrow.c", 1381);
+            func_80093C14(globalCtx->state.gfxCtx);
+
+            if (this->actor.params == ARROW_SEED) {
+                gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, 255);
+                gDPSetEnvColor(POLY_XLU_DISP++, 0, 255, 255, alpha);
+                scale = 50.0f;
+            } else {
+                gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 12, 0, 0, 255);
+                gDPSetEnvColor(POLY_XLU_DISP++, 250, 250, 0, alpha);
+                scale = 150.0f;
+            }
+
+            Matrix_Push();
+            Matrix_Mult(&globalCtx->billboardMtxF, MTXMODE_APPLY);
+            // redundant check because this is contained in an if block for non-zero speed
+            Matrix_RotateZ((this->actor.speedXZ == 0.0f) ? 0.0f
+                                                        : ((globalCtx->gameplayFrames & 0xFF) * 4000) * (M_PI / 0x8000),
+                        MTXMODE_APPLY);
+            Matrix_Scale(scale, scale, scale, MTXMODE_APPLY);
+            gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(globalCtx->state.gfxCtx, "../z_en_arrow.c", 1374),
+                    G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_XLU_DISP++, gEffSparklesDL);
+            Matrix_Pop();
+            Matrix_RotateY(this->actor.world.rot.y * (M_PI / 0x8000), MTXMODE_APPLY);
+
+            CLOSE_DISPS(globalCtx->state.gfxCtx, "../z_en_arrow.c", 1381);
+        }
     }
-
     func_809B4800(this, globalCtx);
 }

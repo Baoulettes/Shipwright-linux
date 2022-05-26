@@ -203,6 +203,25 @@ s32 EffectBlure_Update(void* thisx) {
         return 0;
     }
 
+    if (CVar_GetS32("gUseTrailsCol",0) !=0) {
+        s16 RedColor = CVar_GetS32("gTrailColR",255);
+        s16 GreenColor = CVar_GetS32("gTrailColG",255);
+        s16 BlueColor = CVar_GetS32("gTrailColB",255);
+        this->p1StartColor.r = RedColor;
+        this->p2StartColor.r = RedColor;
+        this->p1EndColor.r = RedColor;
+        this->p2EndColor.r = RedColor;
+        this->p1StartColor.g = GreenColor;
+        this->p2StartColor.g = GreenColor;
+        this->p1EndColor.g = GreenColor;
+        this->p2EndColor.g = GreenColor;
+        this->p1StartColor.b = BlueColor;
+        this->p2StartColor.b = BlueColor;
+        this->p1EndColor.b = BlueColor;
+        this->p2EndColor.b = BlueColor;
+        this->elemDuration = 4.0f*CVar_GetS32("gTrailDurantion",1);
+    }
+
     while (true) {
         if (this->elements[0].state == 0) {
             for (i = 0; i < 15; i++) {

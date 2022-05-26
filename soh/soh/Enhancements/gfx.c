@@ -40,7 +40,7 @@ void sprite_load(sprite_t* sprite, int type) {
     if (type == 1) {        //Navi texture load
         
         if (interfaceCtx->naviCalling >= 1) {
-            printf("Nave is calling [%d]\n",interfaceCtx->naviCalling);
+            //printf("Nave is calling [%d]\n",interfaceCtx->naviCalling);
             static s16 pointPulseAlpha[2] = {
                 { 255 },
                 { 0 },
@@ -64,7 +64,7 @@ void sprite_load(sprite_t* sprite, int type) {
             sprite->alpha = 70;
         } 
         gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, sprite->alpha);
-        gDPLoadTextureBlock_4b(OVERLAY_DISP++, sprite->tex, G_IM_FMT_IA, 32, 8, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        gDPLoadTextureBlock_4b(OVERLAY_DISP++, sprite->tex, G_IM_FMT_IA, sprite->width, sprite->height, 0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
     } else if (type == 2) { //Selected item effect.
         if (DISPLAY_GFX) {
             static s16 pointPulseAlpha[2] = {
