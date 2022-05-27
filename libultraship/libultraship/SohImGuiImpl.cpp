@@ -97,9 +97,21 @@ namespace SohImGui {
     ImVec4 c_btn_d_colors;
     ImVec4 c_btn_r_colors;
     ImVec4 magic_bordern_colors;
+    ImVec4 firearrow_col;
+    ImVec4 icearrow_col;
+    ImVec4 lightarrow_col;
+    ImVec4 firearrow_colenv;
+    ImVec4 icearrow_colenv;
+    ImVec4 lightarrow_colenv;
+    ImVec4 charged1_col;
+    ImVec4 charged2_col;
+    ImVec4 charged1_colenv;
+    ImVec4 charged2_colenv;
 
     const char* RainbowColorCvarList[] = {
-        "gTunic_Kokiri_","gTunic_Goron_","gTunic_Zora_", "gTrailCol",
+        "gTunic_Kokiri_","gTunic_Goron_","gTunic_Zora_",
+        "gTrailCol", "gCharged1Col", "gCharged2Col", "gCharged1ColEnv", "gCharged2ColEnv",
+        "gFireArrowCol","gIceArrowCol","gLightArrowCol", "gFireArrowColEnv","gIceArrowColEnv","gLightArrowColEnv",
         "gNavi_Idle_Inner_","gNavi_Idle_Outer_",
         "gNavi_NPC_Inner_","gNavi_NPC_Outer_",
         "gNavi_Enemy_Inner_","gNavi_Enemy_Outer_",
@@ -1157,7 +1169,7 @@ namespace SohImGui {
                         Tooltip("Outer color for Navi (when Navi fly around props (signs etc))");
                         ImGui::EndTabItem();
                     }
-                    if (ImGui::BeginTabItem("Link's Equipments")) {
+                    if (ImGui::BeginTabItem("Link's Items & Skills")) {
                         EnhancementCheckbox("Custom colors on tunics", "gUseTunicsCol");
                         Tooltip("Enable/Disable custom Link's tunics colors. \nIf disabled you will have original colors for Link's tunics");
                         EnhancementColor("Kokiri Tunic", "gTunic_Kokiri_", kokiri_col, ImVec4(30,105,27,255));
@@ -1165,6 +1177,22 @@ namespace SohImGui {
                         EnhancementColor("Goron Tunic", "gTunic_Goron_", goron_col, ImVec4(100,20,0,255));
                         ImGui::Separator();
                         EnhancementColor("Zora Tunic", "gTunic_Zora_", zora_col, ImVec4(0,60,100,255));
+                        ImGui::Separator();
+                        EnhancementCheckbox("Custom colors on Arrows", "gUseArrowsCol");
+                        EnhancementColor("Fire Arrows Inner", "gFireArrowCol", firearrow_col, ImVec4(255,200,0,255));
+                        EnhancementColor("Fire Arrows Outer", "gFireArrowColEnv", firearrow_colenv, ImVec4(255,0,0,255));
+                        ImGui::Separator();
+                        EnhancementColor("Ice Arrows Inner", "gIceArrowCol", icearrow_col, ImVec4(170,255,255,255));
+                        EnhancementColor("Ice Arrows Outer", "gIceArrowColEnv", icearrow_colenv, ImVec4(0,0,255,255));
+                        ImGui::Separator();
+                        EnhancementColor("Light Arrows Inner", "gLightArrowCol", lightarrow_col, ImVec4(255,255,170,255));
+                        EnhancementColor("Light Arrows Outer", "gLightArrowColEnv", lightarrow_colenv, ImVec4(255,255,0,255));
+                        ImGui::Separator();
+                        EnhancementCheckbox("Custom charged swords", "gUseChargedCol");
+                        EnhancementColor("Level 1 Inner", "gCharged1Col", charged1_col, ImVec4(170,255,255,255));
+                        EnhancementColor("Level 1 Outer", "gCharged1ColEnv", charged1_colenv, ImVec4(0,100,255,255));
+                        EnhancementColor("Level 2 Inner", "gCharged2Col", charged2_col, ImVec4(255,255,170,255));
+                        EnhancementColor("Level 2 Outer", "gCharged2ColEnv", charged2_colenv, ImVec4(255,100,0,255));
                         ImGui::Separator();
                         EnhancementCheckbox("Custom Swords trails", "gUseTrailsCol");
                         Tooltip("Enable/Disable custom Link's swords trails colors.");
